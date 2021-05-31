@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 /**
  * 产生式：
+ * {@code
  * e0 -> insert e1 | delete e2 | update e4 | find e3 | count e2 | page e3
  * e1 -> All | ε
  * e2 -> All | e4
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
  * e5 -> OrderBy e7
  * e6 -> Variable ByOp | Variable | Variable ByOp And e5 | Variable And e5 | Variable ByOp Or e5 | Variable Or e5
  * e7 -> Variable OrderByOp | Variable | Variable OrderByOp And e5 | Variable And e5 | Variable OrderByOp Or e5 | Variable Or e5
+ * }
  *
  * @author fengwk
  */

@@ -13,7 +13,7 @@ Mybatis在中国的互联网企业被广泛使用，但使用过程中开发者�
     <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
 </dependency>
 ```
 
