@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    username: fengwk
+    password: a123
+    url: jdbc:mysql://mysql.centos7:3306/test
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  mapper-locations: classpath:fun/fengwk/automapper/example/mapper/*.xml
