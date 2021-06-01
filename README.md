@@ -13,7 +13,7 @@ Mybatis在中国的互联网企业被广泛使用，但使用过程中开发者�
     <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
 </dependency>
 ```
 
@@ -273,4 +273,4 @@ AutoMapper基于JSR 269 Annotation Processing API实现，Annotation Processing 
 
 # 结束语
 
-如果在使用过程中发现任何问题您可以立即报告issue或者提交PR，我会尽快处理这些问题，如需加急处理可以联系邮箱759543714@qq.com。
+如果在使用过程中发现任何问题您可以报告issues或者提交PR，我会尽快处理这些问题。

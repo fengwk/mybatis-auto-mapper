@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>fun.fengwk</groupId>
+    <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>auto-mapper</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -27,7 +27,7 @@
 
     <developers>
         <developer>
-            <name>Manfred Moser</name>
+            <name>fengwk</name>
             <email>759543714@qq.com</email>
             <url>https://github.com/fengwk</url>
         </developer>
