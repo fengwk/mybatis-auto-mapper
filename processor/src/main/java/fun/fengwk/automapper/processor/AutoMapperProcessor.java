@@ -194,6 +194,7 @@ public class AutoMapperProcessor extends AbstractProcessor {
     private void writeResource(String resourceFile, String context) {
         try {
             FileObject fileObject = filer.createResource(StandardLocation.CLASS_OUTPUT, "", resourceFile);
+            log("write resource %s", resourceFile);
             try (Writer writer = new OutputStreamWriter(fileObject.openOutputStream(), StandardCharsets.UTF_8)) {
                 writer.write(context);
             }

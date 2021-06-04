@@ -39,75 +39,8 @@ public class MapperMethodParser {
     }
 
     private static boolean isObjectMethod(ExecutableElement methodElement) {
-        String methodName = methodElement.getSimpleName().toString();
-        List<? extends VariableElement> parameters = methodElement.getParameters();
-        parameters = parameters == null ? Collections.emptyList() : parameters;
-
-        if ("registerNatives".equals(methodName)
-                && parameters.isEmpty()) {
-            return true;
-        }
-
-        if ("getClass".equals(methodName)
-                && parameters.isEmpty()) {
-            return true;
-        }
-
-        if ("hashCode".equals(methodName)
-                && parameters.isEmpty()) {
-            return true;
-        }
-
-        if ("equals".equals(methodName)
-                && parameters.size() == 1
-                && "java.lang.Object".equals(getTypeName(parameters.get(0)))) {
-            return true;
-        }
-
-        if ("clone".equals(methodName)
-                && parameters.isEmpty()) {
-            return true;
-        }
-
-        if ("toString".equals(methodName)
-                && parameters.isEmpty()) {
-            return true;
-        }
-
-        if ("notify".equals(methodName)
-                && parameters.isEmpty()) {
-            return true;
-        }
-
-        if ("notifyAll".equals(methodName)
-                && parameters.isEmpty()) {
-            return true;
-        }
-
-        if ("wait".equals(methodName)
-                && parameters.size() == 1
-                && "long".equals(getTypeName(parameters.get(0)))) {
-            return true;
-        }
-
-        if ("wait".equals(methodName)
-                && parameters.size() == 2
-                && "long".equals(getTypeName(parameters.get(0)))
-                && "int".equals(getTypeName(parameters.get(1)))) {
-            return true;
-        }
-
-        if ("wait".equals(methodName)
-                && parameters.isEmpty()) {
-            return true;
-        }
-
-        if ("finalize".equals(methodName)
-                && parameters.isEmpty()) {
-            return true;
-        }
-
-        return false;
+        TypeElement enclosingElement = (TypeElement) methodElement.getEnclosingElement();
+        return Object.class.getName().equals(enclosingElement.getQualifiedName().toString());
     }
 
     private final Types types;
