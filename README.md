@@ -1,6 +1,6 @@
 # AutoMapper
 
-AutoMapper是一款Mybatis SQL生成工具，它提供了类似JPA的接口方法转SQL能力，仅需依赖一个编译期Jar包就能避免大量简单且类似SQL的重复编写工作。
+AutoMapper是一款Mybatis SQL生成框架提供了类似JPA的接口方法转SQL能力，仅需依赖一个编译期Jar包就能避免大量简单且类似SQL的重复编写工作。
 
 Mybatis在中国的互联网企业被广泛使用，但使用过程中开发者却不得不机械地编写一些简单的模板SQL，例如`insert into table (field1, field2, field3...) values (#{var1}, #{var2}, #{var3}...)`或者`select field1 as var1, field2 as var2, field3 as var3 from table where ...`，这些SQL简单却使用频繁，因此不得不在每一个实体（表）的xml文件中进行类似的工作，如果实体中具有众多字段那这样的重复劳动就显得格外枯燥乏味。AutoMapper就是专门为解决这种重复工作而设计的，它能应对80%的SQL编写工作（tips：出于性能考虑互联网企业的大部分SQL都只会对单表进行简单操作）。
 
@@ -269,7 +269,7 @@ AutoMapper解析父类泛型E得到ExampleDO，继而读取ExampleDO字段生成
 
 # 原理
 
-AutoMapper基于JSR 269 Annotation Processing API实现，Annotation Processing API是Javac程序的一个SPI扩展点，通过编译期读取原文件信息自动生成相应代码片段，类似原理实现的工具有Lombok、Google auto......
+AutoMapper基于JSR 269 Annotation Processing API实现，Annotation Processing API是Javac程序的一个SPI扩展点，通过编译期读取原文件信息自动生成相应代码片段，类似原理实现的框架有Lombok、Google auto......
 
 # 结束语
 
