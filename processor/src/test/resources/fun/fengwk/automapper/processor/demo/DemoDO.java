@@ -3,18 +3,9 @@ package fun.fengwk.automapper.processor.demo;
 /**
  * @author fengwk
  */
-public class DemoDO {
+public class DemoDO extends BaseDO {
 
-    private Long id;
     private String name;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

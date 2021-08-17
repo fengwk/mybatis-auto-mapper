@@ -17,8 +17,11 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import java.beans.Introspector;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -26,17 +29,15 @@ import java.util.stream.Collectors;
  */
 public class MapperMethodParser {
 
+    private static final Pattern PATTERN_GETTER = Pattern.compile("^get(.+)$");
+    private static final Pattern PATTERN_SETTER = Pattern.compile("^set(.+)$");
+
     private static final List<Predicate<ExecutableElement>> METHOD_FILTERS = Arrays.asList(
             methodElement -> !methodElement.getModifiers().contains(Modifier.NATIVE),
             methodElement -> !methodElement.getModifiers().contains(Modifier.STATIC),
             methodElement -> !methodElement.isDefault(),
             methodElement -> !isObjectMethod(methodElement)
     );
-
-    private static String getTypeName(VariableElement parameter) {
-        String typeName = parameter.asType().toString();
-        return typeName;
-    }
 
     private static boolean isObjectMethod(ExecutableElement methodElement) {
         TypeElement enclosingElement = (TypeElement) methodElement.getEnclosingElement();
@@ -170,6 +171,10 @@ public class MapperMethodParser {
                             return init(mapperElement, typeArguments.get(0), fieldNamingConverter, depth + 1);
                         }
                         return false;
+                    } else if (isJavaDeclared(typeMirror)) {
+                        TypeElement typeElement = ((TypeElement) types.asElement(typeMirror));
+                        type = typeElement.getQualifiedName().toString();
+                        return true;
                     } else {
                         TypeElement typeElement = ((TypeElement) types.asElement(typeMirror));
                         type = typeElement.getQualifiedName().toString();
@@ -245,22 +250,92 @@ public class MapperMethodParser {
             return false;
         }
 
+        private boolean isJavaDeclared(TypeMirror typeMirror) {
+            TypeElement typeElement = (TypeElement) types.asElement(typeMirror);
+            String name = typeElement.getQualifiedName().toString();
+            return name.startsWith("java.applet")
+                    || name.startsWith("java.awt")
+                    || name.startsWith("java.beans")
+                    || name.startsWith("java.io")
+                    || name.startsWith("java.lang")
+                    || name.startsWith("java.math")
+                    || name.startsWith("java.net")
+                    || name.startsWith("java.nio")
+                    || name.startsWith("java.rmi")
+                    || name.startsWith("java.security")
+                    || name.startsWith("java.sql")
+                    || name.startsWith("java.text")
+                    || name.startsWith("java.time")
+                    || name.startsWith("java.util")
+//                    || name.startsWith("com.oracle")
+//                    || name.startsWith("com.sun")
+//                    || name.startsWith("javax.")
+//                    || name.startsWith("org.ietf.jgss")
+//                    || name.startsWith("org.jcp.xml.dsig.internal")
+//                    || name.startsWith("org.omg")
+//                    || name.startsWith("org.w3c.dom")
+//                    || name.startsWith("org.xml.sax")
+//                    || name.startsWith("sun.")
+                    ;
+        }
+
         // 解析JavaBean
-        private void parseJavaBean(TypeElement typeElement, NamingConverter fieldNamingConverter) {
-            beanFields = new ArrayList<>();
-            List<? extends Element> allMembers = elements.getAllMembers(typeElement);
-            for (Element element : allMembers) {
-                if (element.getKind() == ElementKind.FIELD) {
-                    VariableElement fieldElement = (VariableElement) element;
-                    String name = fieldElement.getSimpleName().toString();
-                    FieldName fieldNameAnnotation = fieldElement.getAnnotation(FieldName.class);
-                    String fieldName = fieldNameAnnotation != null ? fieldNameAnnotation.value()
-                            : fieldNamingConverter.convert(StringUtils.upperCamelToLowerCamel(name));
-                    UseGeneratedKeys useGeneratedKeysAnnotation = fieldElement.getAnnotation(UseGeneratedKeys.class);
-                    boolean useGeneratedKeys = useGeneratedKeysAnnotation != null;
-                    beanFields.add(new BeanField(name, fieldName, useGeneratedKeys));
+        private void parseJavaBean(TypeElement typeElement0, NamingConverter fieldNamingConverter) {
+            List<TypeElement> allTypeElements = collectSupertypes(typeElement0.asType()).stream()
+                    .map(types::asElement)
+                    .map(TypeElement.class::cast)
+                    .collect(Collectors.toList());
+            Collections.reverse(allTypeElements);
+            allTypeElements.add(typeElement0);
+
+            Map<String, BeanField> beanFieldMap = new LinkedHashMap<>();
+            for (TypeElement typeElement : allTypeElements) {
+                List<? extends Element> allMembers = elements.getAllMembers(typeElement);
+                for (Element element : allMembers) {
+                    if (element.getKind() == ElementKind.FIELD) {
+                        VariableElement fieldElement = (VariableElement) element;
+                        String name = fieldElement.getSimpleName().toString();
+                        if (!beanFieldMap.containsKey(name)) {
+                            FieldName fieldNameAnnotation = fieldElement.getAnnotation(FieldName.class);
+                            String fieldName = fieldNameAnnotation != null ? fieldNameAnnotation.value()
+                                    : fieldNamingConverter.convert(StringUtils.upperCamelToLowerCamel(name));
+                            UseGeneratedKeys useGeneratedKeysAnnotation = fieldElement.getAnnotation(UseGeneratedKeys.class);
+                            boolean useGeneratedKeys = useGeneratedKeysAnnotation != null;
+                            beanFieldMap.put(name, new BeanField(name, fieldName, useGeneratedKeys));
+                        }
+                    }
                 }
             }
+
+            Set<String> getterMatchers = new HashSet<>();
+            Set<String> setterMatchers = new HashSet<>();
+            for (TypeElement typeElement : allTypeElements) {
+                List<? extends Element> allMembers = elements.getAllMembers(typeElement);
+                for (Element element : allMembers) {
+                    if (element.getKind() == ElementKind.METHOD) {
+                        ExecutableElement methodElement = (ExecutableElement) element;
+                        String methodName = methodElement.getSimpleName().toString();
+                        Matcher getterMatcher = PATTERN_GETTER.matcher(methodName);
+                        if (getterMatcher.find()) {
+                            getterMatchers.add(Introspector.decapitalize(getterMatcher.group(1)));
+                        } else {
+                            Matcher setterMatcher = PATTERN_SETTER.matcher(methodName);
+                            if (setterMatcher.find()) {
+                                setterMatchers.add(Introspector.decapitalize(setterMatcher.group(1)));
+                            }
+                        }
+                    }
+                }
+            }
+
+            List<BeanField> beanFields = new ArrayList<>();
+            for (Map.Entry<String, BeanField> entry :beanFieldMap.entrySet()) {
+                if (getterMatchers.contains(entry.getKey()) && setterMatchers.contains(entry.getKey())) {
+                    beanFields.add(entry.getValue());
+                }
+            }
+
+            this.beanFields = beanFields;
         }
 
     }

@@ -12,20 +12,20 @@ import fun.fengwk.automapper.annotation.UseGeneratedKeys;
  *
  * @author fengwk
  */
-public class ExampleDO {
+public class ExampleDO extends BaseDO {
 
     @UseGeneratedKeys
-    private Long id;
+//    private Long id;
     private String name;
     private Integer sort;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+//    public Long getId() {
+//        return id;
+//    }
+//
+//    public void setId(Long id) {
+//        this.id = id;
+//    }
 
     public String getName() {
         return name;
@@ -45,6 +45,6 @@ public class ExampleDO {
 
     @Override
     public String toString() {
-        return String.format("<%d, %s, %d>", id, name, sort);
+        return String.format("<%d, %s, %d>", getId(), name, sort);
     }
 }
