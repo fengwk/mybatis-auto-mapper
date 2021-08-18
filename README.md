@@ -13,7 +13,7 @@ Mybatis在互联网企业被广泛使用，但使用过程中开发者却不得�
     <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.6</version>
+    <version>0.0.7</version>
 </dependency>
 ```
 

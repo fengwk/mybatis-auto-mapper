@@ -307,35 +307,38 @@ public class MapperMethodParser {
                 }
             }
 
-            Set<String> getterMatchers = new HashSet<>();
-            Set<String> setterMatchers = new HashSet<>();
-            for (TypeElement typeElement : allTypeElements) {
-                List<? extends Element> allMembers = elements.getAllMembers(typeElement);
-                for (Element element : allMembers) {
-                    if (element.getKind() == ElementKind.METHOD) {
-                        ExecutableElement methodElement = (ExecutableElement) element;
-                        String methodName = methodElement.getSimpleName().toString();
-                        Matcher getterMatcher = PATTERN_GETTER.matcher(methodName);
-                        if (getterMatcher.find()) {
-                            getterMatchers.add(Introspector.decapitalize(getterMatcher.group(1)));
-                        } else {
-                            Matcher setterMatcher = PATTERN_SETTER.matcher(methodName);
-                            if (setterMatcher.find()) {
-                                setterMatchers.add(Introspector.decapitalize(setterMatcher.group(1)));
-                            }
-                        }
-                    }
-                }
-            }
+            this.beanFields = new ArrayList<>(beanFieldMap.values());
 
-            List<BeanField> beanFields = new ArrayList<>();
-            for (Map.Entry<String, BeanField> entry :beanFieldMap.entrySet()) {
-                if (getterMatchers.contains(entry.getKey()) && setterMatchers.contains(entry.getKey())) {
-                    beanFields.add(entry.getValue());
-                }
-            }
-
-            this.beanFields = beanFields;
+            // 与lombok有执行顺序冲突，暂无法使用getter、setter方法校验bean字段正确性
+//            Set<String> getterMatchers = new HashSet<>();
+//            Set<String> setterMatchers = new HashSet<>();
+//            for (TypeElement typeElement : allTypeElements) {
+//                List<? extends Element> allMembers = elements.getAllMembers(typeElement);
+//                for (Element element : allMembers) {
+//                    if (element.getKind() == ElementKind.METHOD) {
+//                        ExecutableElement methodElement = (ExecutableElement) element;
+//                        String methodName = methodElement.getSimpleName().toString();
+//                        Matcher getterMatcher = PATTERN_GETTER.matcher(methodName);
+//                        if (getterMatcher.find()) {
+//                            getterMatchers.add(Introspector.decapitalize(getterMatcher.group(1)));
+//                        } else {
+//                            Matcher setterMatcher = PATTERN_SETTER.matcher(methodName);
+//                            if (setterMatcher.find()) {
+//                                setterMatchers.add(Introspector.decapitalize(setterMatcher.group(1)));
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//            List<BeanField> beanFields = new ArrayList<>();
+//            for (Map.Entry<String, BeanField> entry :beanFieldMap.entrySet()) {
+//                if (getterMatchers.contains(entry.getKey()) && setterMatchers.contains(entry.getKey())) {
+//                    beanFields.add(entry.getValue());
+//                }
+//            }
+//
+//            this.beanFields = beanFields;
         }
 
     }
