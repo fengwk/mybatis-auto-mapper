@@ -61,7 +61,7 @@ public class MySqlTranslatorTest {
                 "<insert id=\"insertAll\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
                 "    insert into demo (username, user_address) values\n" +
                 "    <foreach collection=\"collection\" item=\"item\" separator=\",\">\n" +
-                "        (#{username}, #{userAddress})\n" +
+                "        (#{item.username}, #{item.userAddress})\n" +
                 "    </foreach>\n" +
                 "</insert>\n" +
                 "</mapper>"

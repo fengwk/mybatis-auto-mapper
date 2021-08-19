@@ -129,7 +129,7 @@ public class MySqlTranslator extends Translator {
          * <insert id="insertAll" useGeneratedKeys="true" keyProperty="id">
          *     insert into {table} (f1, f2, f3...) values
          *     <foreach collection="collection" item="item" separator=",">
-         *         (#{jf1}, #{jf2}, #{jf3}...)
+         *         (#{item.jf1}, #{item.jf2}, #{item.jf3}...)
          *     </foreach>
          * </insert>
          */
@@ -157,7 +157,7 @@ public class MySqlTranslator extends Translator {
 
         String foreachText = LF + INDENT + INDENT + "(" + param.getBeanFields().stream()
                 .filter(bf -> !bf.isUseGeneratedKeys())
-                .map(bf -> String.format("#{%s}", bf.getName()))
+                .map(bf -> String.format("#{item.%s}", bf.getName()))
                 .collect(Collectors.joining(", ")) + ")" + LF + INDENT;
         addTextNode(foreachElement, foreachText);
 
