@@ -11,9 +11,9 @@ Mybatis在互联网企业被广泛使用，但使用过程中开发者却不得�
 ```xml
 <dependency>
     <groupId>fun.fengwk.auto-mapper</groupId>
-    <artifactId>processor</artifactId>
+    <artifactId>auto-mapper-processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.8</version>
+    <version>0.0.9</version>
 </dependency>
 ```
 
@@ -56,10 +56,10 @@ public interface ExampleMapper {
 |      | findBy...OrderBy... | 多入参数时必须使用@Param注解绑定By后参数与入参关系           |
 | 计数 | countAll            | 无入参                                                       |
 |      | countBy...          | 多入参数时必须使用@Param注解绑定By后参数与入参关系           |
-| 分页 | pageAll             | 必须拥有offset和limit参数，必须使用@Param注解绑定By后参数与入参关系 |
-|      | pageAllOrderBy...   | 必须拥有offset和limit参数，必须使用@Param注解绑定By后参数与入参关系 |
-|      | pageBy...           | 必须拥有offset和limit参数，必须使用@Param注解绑定By后参数与入参关系 |
-|      | pageBy...OrderBy... | 必须拥有offset和limit参数，必须使用@Param注解绑定By后参数与入参关系 |
+| 分页 | pageAll             | 入参必须拥有limit，可选offset                            |
+|      | pageAllOrderBy...   | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系 |
+|      | pageBy...           | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系 |
+|      | pageBy...OrderBy... | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系 |
 
 下表格展示了当前支持的所有关键字：
 
@@ -270,7 +270,3 @@ AutoMapper解析父类泛型E得到ExampleDO，继而读取ExampleDO字段生成
 # 原理
 
 AutoMapper基于JSR 269 Annotation Processing API实现，Annotation Processing API是Javac程序的一个SPI扩展点，通过编译期读取原文件信息自动生成相应代码片段，类似原理实现的框架有Lombok、Google auto......
-
-# 结束语
-
-如果在使用过程中发现任何问题您可以报告issues或者提交PR，我会尽快处理这些问题。

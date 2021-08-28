@@ -7,10 +7,10 @@
     <parent>
         <groupId>fun.fengwk.auto-mapper</groupId>
         <artifactId>auto-mapper-parent</artifactId>
-        <version>0.0.8-SNAPSHOT</version>
+        <version>0.0.9-SNAPSHOT</version>
     </parent>
 
-    <artifactId>example</artifactId>
+    <artifactId>auto-mapper-example</artifactId>
 
     <dependencyManagement>
         <dependencies>
@@ -27,7 +27,7 @@
     <dependencies>
         <dependency>
             <groupId>fun.fengwk.auto-mapper</groupId>
-            <artifactId>processor</artifactId>
+            <artifactId>auto-mapper-processor</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

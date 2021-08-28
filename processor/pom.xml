@@ -7,19 +7,19 @@
     <parent>
         <groupId>fun.fengwk.auto-mapper</groupId>
         <artifactId>auto-mapper-parent</artifactId>
-        <version>0.0.8-SNAPSHOT</version>
+        <version>0.0.9-SNAPSHOT</version>
     </parent>
 
-    <artifactId>processor</artifactId>
+    <artifactId>auto-mapper-processor</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>fun.fengwk.auto-mapper</groupId>
-            <artifactId>annotation</artifactId>
+            <artifactId>auto-mapper-annotation</artifactId>
         </dependency>
         <dependency>
             <groupId>fun.fengwk.auto-mapper</groupId>
-            <artifactId>mybatis</artifactId>
+            <artifactId>auto-mapper-mybatis</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

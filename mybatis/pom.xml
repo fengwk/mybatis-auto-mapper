@@ -7,8 +7,8 @@
     <parent>
         <groupId>fun.fengwk.auto-mapper</groupId>
         <artifactId>auto-mapper-parent</artifactId>
-        <version>0.0.8-SNAPSHOT</version>
+        <version>0.0.9-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mybatis</artifactId>
+    <artifactId>auto-mapper-mybatis</artifactId>
 </project>
