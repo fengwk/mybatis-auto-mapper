@@ -40,7 +40,9 @@ public enum Keyword {
     CONTAINING("Containing"),
     NOT("Not"),
     IN("In"),
-    NOT_IN("NotIn");
+    NOT_IN("NotIn"),
+
+    SELECTIVE("Selective");
 
     private final String value;
 
@@ -70,7 +72,7 @@ public enum Keyword {
         };
     }
 
-    public static Keyword[] getByKeywords() {
+    public static Keyword[] getByOps() {
         return new Keyword[] {
                 Keyword.IS,
                 Keyword.EQUALS,
@@ -94,7 +96,7 @@ public enum Keyword {
         };
     }
 
-    public static Keyword[] getOrderByKeywords() {
+    public static Keyword[] getOrderByOps() {
         return new Keyword[] {
                 Keyword.ASC,
                 Keyword.DESC

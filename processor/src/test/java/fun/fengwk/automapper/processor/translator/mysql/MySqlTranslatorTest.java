@@ -1,7 +1,11 @@
 package fun.fengwk.automapper.processor.translator.mysql;
 
 import fun.fengwk.automapper.processor.naming.LowerUnderScoreCaseConverter;
-import fun.fengwk.automapper.processor.translator.*;
+import fun.fengwk.automapper.processor.translator.BeanField;
+import fun.fengwk.automapper.processor.translator.MethodInfo;
+import fun.fengwk.automapper.processor.translator.Param;
+import fun.fengwk.automapper.processor.translator.Return;
+import fun.fengwk.automapper.processor.translator.TranslateContext;
 import fun.fengwk.automapper.processor.util.DOMUtils;
 import org.junit.Test;
 
@@ -40,6 +44,41 @@ public class MySqlTranslatorTest {
     }
 
     @Test
+    public void testInsertSelective() {
+        String methodName = "insertSelective";
+
+        BeanField bf1 = new BeanField("id", "id", true);
+        BeanField bf2 = new BeanField("username", "username", false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false);
+
+        Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3));
+
+        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<insert id=\"insertSelective\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
+                "    insert into demo\n" +
+                "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                "        <if test=\"username != null\">username,</if>\n" +
+                "        <if test=\"userAddress != null\">user_address,</if>\n" +
+                "    </trim>\n" +
+                "    values\n" +
+                "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                "        <if test=\"username != null\">#{username},</if>\n" +
+                "        <if test=\"userAddress != null\">#{userAddress},</if>\n" +
+                "    </trim>\n" +
+                "</insert>\n" +
+                "</mapper>"
+        );
+    }
+
+    @Test
     public void testInsertAll() {
         String methodName = "insertAll";
 
@@ -62,6 +101,43 @@ public class MySqlTranslatorTest {
                 "    insert into demo (username, user_address) values\n" +
                 "    <foreach collection=\"collection\" item=\"item\" separator=\",\">\n" +
                 "        (#{item.username}, #{item.userAddress})\n" +
+                "    </foreach>\n" +
+                "</insert>\n" +
+                "</mapper>"
+        );
+    }
+
+    @Test
+    public void testInsertAllSelective() {
+        String methodName = "insertAllSelective";
+
+        BeanField bf1 = new BeanField("id", "id", true);
+        BeanField bf2 = new BeanField("username", "username", false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false);
+
+        Param param = new Param("demoDO", null, null, true, true, Arrays.asList(bf1, bf2, bf3));
+
+        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<insert id=\"insertAllSelective\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
+                "    <foreach collection=\"collection\" item=\"item\" separator=\";\">\n" +
+                "        insert into demo\n" +
+                "        <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                "            <if test=\"item.username != null\">username,</if>\n" +
+                "            <if test=\"item.userAddress != null\">user_address,</if>\n" +
+                "        </trim>\n" +
+                "        values\n" +
+                "        <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                "            <if test=\"item.username != null\">#{item.username},</if>\n" +
+                "            <if test=\"item.userAddress != null\">#{item.userAddress},</if>\n" +
+                "        </trim>\n" +
                 "    </foreach>\n" +
                 "</insert>\n" +
                 "</mapper>"
@@ -114,7 +190,7 @@ public class MySqlTranslatorTest {
     }
 
     @Test
-    public void testUpdateBy1() {
+    public void testUpdateBy() {
         String methodName = "updateByUsernameAndUserAddress";
 
         BeanField bf1 = new BeanField("id", "id", true);
@@ -134,6 +210,38 @@ public class MySqlTranslatorTest {
                 "<!--auto mapper generate-->\n" +
                 "<update id=\"updateByUsernameAndUserAddress\" parameterType=\"DemoDO\">\n" +
                 "    update demo set id=#{id}, username=#{username}, user_address=#{userAddress}\n" +
+                "    where username=#{username}\n" +
+                "    and user_address=#{userAddress}\n" +
+                "</update>\n" +
+                "</mapper>"
+        );
+    }
+
+    @Test
+    public void testUpdateBySelective() {
+        String methodName = "updateByUsernameAndUserAddressSelective";
+
+        BeanField bf1 = new BeanField("id", "id", true);
+        BeanField bf2 = new BeanField("username", "username", false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false);
+
+        Param p = new Param("DemoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3));
+
+        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p), null));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<update id=\"updateByUsernameAndUserAddressSelective\" parameterType=\"DemoDO\">\n" +
+                "    update demo set \n" +
+                "    <trim suffixOverrides=\",\">\n" +
+                "        <if test=\"username != null\">username=#{username},</if>\n" +
+                "        <if test=\"userAddress != null\">user_address=#{userAddress},</if>\n" +
+                "    </trim>\n" +
                 "    where username=#{username}\n" +
                 "    and user_address=#{userAddress}\n" +
                 "</update>\n" +

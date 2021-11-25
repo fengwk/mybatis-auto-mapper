@@ -31,4 +31,6 @@ public interface ASTVisitor {
 
     default void visit(All all) {}
 
+    default void visit(Selective selective) {}
+
 }

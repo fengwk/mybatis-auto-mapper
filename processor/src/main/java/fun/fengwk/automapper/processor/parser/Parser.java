@@ -3,33 +3,55 @@ package fun.fengwk.automapper.processor.parser;
 import fun.fengwk.automapper.processor.lexer.Keyword;
 import fun.fengwk.automapper.processor.lexer.Token;
 import fun.fengwk.automapper.processor.lexer.TokenType;
-import fun.fengwk.automapper.processor.parser.ast.*;
+import fun.fengwk.automapper.processor.parser.ast.ASTNode;
+import fun.fengwk.automapper.processor.parser.ast.All;
+import fun.fengwk.automapper.processor.parser.ast.By;
+import fun.fengwk.automapper.processor.parser.ast.ByOp;
+import fun.fengwk.automapper.processor.parser.ast.ConnectOp;
+import fun.fengwk.automapper.processor.parser.ast.Count;
+import fun.fengwk.automapper.processor.parser.ast.Delete;
+import fun.fengwk.automapper.processor.parser.ast.Find;
+import fun.fengwk.automapper.processor.parser.ast.Insert;
+import fun.fengwk.automapper.processor.parser.ast.OrderBy;
+import fun.fengwk.automapper.processor.parser.ast.OrderByOp;
+import fun.fengwk.automapper.processor.parser.ast.Page;
+import fun.fengwk.automapper.processor.parser.ast.Selective;
+import fun.fengwk.automapper.processor.parser.ast.Update;
+import fun.fengwk.automapper.processor.parser.ast.Variable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * 产生式：
  * {@code
- * e0 -> insert e1 | delete e2 | update e4 | find e3 | count e2 | page e3
- * e1 -> All | ε
- * e2 -> All | e4
- * e3 -> All | All e5 | e4 | e4 e5
- * e4 -> By e6
- * e5 -> OrderBy e7
- * e6 -> Variable ByOp | Variable | Variable ByOp And e5 | Variable And e5 | Variable ByOp Or e5 | Variable Or e5
- * e7 -> Variable OrderByOp | Variable | Variable OrderByOp And e5 | Variable And e5 | Variable OrderByOp Or e5 | Variable Or e5
+ * e0  -> insert e1 | delete e2 | update e3 | find e4 | count e2 | page e4
+ * e1  -> All e5 | e5 | ε
+ * e2  -> All | By e6
+ * e3  -> By e7
+ * e4  -> All e8 | By e9
+ * e5  -> Selective | ε
+ * e6  -> byTerm (byOp){0,1} (And|Or) e6 | byTerm (byOp){0,1}
+ * e7  -> byTerm (byOp){0,1} (And|Or) e7 | byTerm (byOp){0,1} Selective | byTerm (byOp){0,1}
+ * e8  -> OrderBy e10 | ε
+ * e9  -> byTerm (byOp){0,1} (And|Or) e9 | byTerm (byOp){0,1} OrderBy e10 | byTerm (byOp){0,1}
+ * e10 -> orderByTerm (orderByOp){0,1} And e10 | orderByTerm (orderByOp){0,1}
  * }
  *
  * @author fengwk
  */
 public class Parser {
 
-    private static final Set<String> AND_OR_KEYWORD_SET = Arrays.asList(Keyword.getAndOr()).stream()
+    private static final Set<String> AND_OR_KEYWORD_SET = Arrays.stream(Keyword.getAndOr())
             .map(Keyword::getValue).collect(Collectors.toSet());
-    private static final Set<String> BY_KEYWORD_SET = Arrays.asList(Keyword.getByKeywords()).stream()
+    private static final Set<String> BY_OP_SET = Arrays.stream(Keyword.getByOps())
             .map(Keyword::getValue).collect(Collectors.toSet());
-    private static final Set<String> ORDER_BY_KEYWORD_SET = Arrays.asList(Keyword.getOrderByKeywords()).stream()
+    private static final Set<String> ORDER_BY_OP_SET = Arrays.stream(Keyword.getOrderByOps())
             .map(Keyword::getValue).collect(Collectors.toSet());
 
     private TokenIterator iterator;
@@ -39,35 +61,33 @@ public class Parser {
         return e0();
     }
 
+    // e0  -> insert e1 | delete e2 | update e3 | find e4 | count e2 | page e4
     private ASTNode e0() {
         ASTNode node;
         Token token = iterator.next();
         if (token.isKeyword(Keyword.INSERT)) {
             Insert insert = new Insert(token);
-            ASTNode e1 = e1();
-            if (e1 != null) {
-                insert.addChild(e1);
-            }
+            insert.addChildren(e1());
             node = insert;
         } else if (token.isKeyword(Keyword.DELETE)) {
             Delete delete = new Delete(token);
-            delete.addChild(e2());
+            delete.addChildren(e2());
             node = delete;
         } else if (token.isKeyword(Keyword.UPDATE)) {
             Update update = new Update(token);
-            update.addChild(e4());
+            update.addChildren(e3());
             node = update;
         } else if (token.isKeyword(Keyword.FIND)) {
             Find find = new Find(token);
-            find.addChildren(e3());
+            find.addChildren(e4());
             node = find;
         } else if (token.isKeyword(Keyword.COUNT)) {
             Count count = new Count(token);
-            count.addChild(e2());
+            count.addChildren(e2());
             node = count;
         } else if (token.isKeyword(Keyword.PAGE)) {
             Page page = new Page(token);
-            page.addChildren(e3());
+            page.addChildren(e4());
             node = page;
         } else {
             throw new ParseException(token);
@@ -80,70 +100,67 @@ public class Parser {
         return node;
     }
 
-    private ASTNode e1() {
+    // e1  -> All e5 | ε
+    private List<ASTNode> e1() {
         if (!iterator.hasNext()) {
-            return null;
+            return Collections.emptyList();
         }
-
-        Token token = iterator.nextMatch(Keyword.ALL.getValue());
-        return new All(token);
-    }
-
-    private ASTNode e2() {
-        if (iterator.peek().isKeyword(Keyword.ALL)) {
-            return new All(iterator.next());
-        } else {
-            return e4();
-        }
-    }
-
-    private List<ASTNode> e3() {
         List<ASTNode> nodes = new ArrayList<>();
-
         if (iterator.peek().isKeyword(Keyword.ALL)) {
-            nodes.add(new All(iterator.next()));
-            if (iterator.hasNext()) {
-                nodes.add(e5());
-            }
-        } else {
-            nodes.add(e4());
-            ASTNode e5 = tryE5();
-            if (e5 != null) {
-                nodes.add(e5);
-            }
+            Token token = iterator.nextMatch(Keyword.ALL.getValue());
+            nodes.add(new All(token));
         }
-
+        nodes.addAll(e5());
         return nodes;
     }
 
-    private ASTNode tryE5() {
-        if (!iterator.hasNext() || !iterator.peek().isKeyword(Keyword.ORDER_BY)) {
-            return null;
+    // e2  -> All | By e6
+    private List<ASTNode> e2() {
+        if (iterator.peek().isKeyword(Keyword.ALL)) {
+            return Collections.singletonList(new All(iterator.next()));
+        } else {
+            By by = new By(iterator.nextMatch(Keyword.BY.getValue()));
+            return e6(by);
         }
-
-        return e5();
     }
 
-    private ASTNode e4() {
+    // e3  -> By e7
+    private List<ASTNode> e3() {
         By by = new By(iterator.nextMatch(Keyword.BY.getValue()));
-        by.addChild(e6());
-        return by;
+        return e7(by);
     }
 
-    private ASTNode e5() {
-        OrderBy orderBy = new OrderBy(iterator.nextMatch(Keyword.ORDER_BY.getValue()));
-        orderBy.addChild(e7());
-        return orderBy;
+    // e4  -> All e8 | By e9
+    private List<ASTNode> e4() {
+        if (iterator.peek().isKeyword(Keyword.ALL)) {
+            List<ASTNode> nodes = new ArrayList<>();
+            nodes.add(new All(iterator.next()));
+            nodes.addAll(e8());
+            return nodes;
+        } else {
+            By by = new By(iterator.nextMatch(Keyword.BY.getValue()));
+            return e9(by);
+        }
     }
 
-    private ASTNode e6() {
+    // e5  -> Selective | ε
+    private List<ASTNode> e5() {
+        if (iterator.hasNext()) {
+            return Collections.singletonList(new Selective(iterator.nextMatch(Keyword.SELECTIVE.getValue())));
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    // e6  -> byTerm (byOp){0,1} (And|Or) e6 | byTerm (byOp){0,1}
+    private List<ASTNode> e6(By by) {
         ConnectOp prevConnectOp = null;
         LinkedList<ASTNode> output = new LinkedList<>();
 
         for (;;) {
             Token varToken = iterator.nextMatch(TokenType.VARIABLE);
             Variable variable = new Variable(varToken);
-            if (iterator.hasNext() && BY_KEYWORD_SET.contains(iterator.peek().getValue())) {
+            if (iterator.hasNext() && BY_OP_SET.contains(iterator.peek().getValue())) {
                 ByOp byOp = new ByOp(iterator.next());
                 byOp.addChild(variable);
                 output.push(byOp);
@@ -160,6 +177,7 @@ public class Parser {
             if (prevConnectOp != null) {
                 connect(prevConnectOp, output);
             }
+
             prevConnectOp = new ConnectOp(iterator.next());
         }
 
@@ -171,17 +189,52 @@ public class Parser {
             throw new ParseException("Syntax error");
         }
 
-        return output.pop();
+        by.addChild(output.pop());
+        return Collections.singletonList(by);
     }
 
-    private ASTNode e7() {
+    // e7  -> byTerm (byOp){0,1} (And|Or) e7 | byTerm (byOp){0,1} Selective | byTerm (byOp){0,1}
+    // e7  -> e6 | e6 Selective
+    private List<ASTNode> e7(By by) {
+        List<ASTNode> e6 = e6(by);
+        if (!iterator.hasNext()) {
+            return e6;
+        }
+        List<ASTNode> nodes = new ArrayList<>(e6);
+        nodes.add(new Selective(iterator.nextMatch(Keyword.SELECTIVE.getValue())));
+        return nodes;
+    }
+
+    // e8  -> OrderBy e10 | ε
+    private List<ASTNode> e8() {
+        if (iterator.hasNext()) {
+            return e10(new OrderBy(iterator.nextMatch(Keyword.ORDER_BY.getValue())));
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    // e9  -> byTerm (byOp){0,1} (And|Or) e9 | byTerm (byOp){0,1} OrderBy e10 | byTerm (byOp){0,1}
+    // e9  -> e6 | e6 OrderBy e10
+    private List<ASTNode> e9(By by) {
+        List<ASTNode> e6 = e6(by);
+        if (!iterator.hasNext()) {
+            return e6;
+        }
+        List<ASTNode> nodes = new ArrayList<>(e6);
+        nodes.addAll(e10(new OrderBy(iterator.nextMatch(Keyword.ORDER_BY.getValue()))));
+        return nodes;
+    }
+
+    // e10 -> orderByTerm (orderByOp){0,1} And e10 | orderByTerm (orderByOp){0,1}
+    private List<ASTNode> e10(OrderBy orderBy) {
         ConnectOp prevConnectOp = null;
         LinkedList<ASTNode> output = new LinkedList<>();
 
         for (;;) {
             Token varToken = iterator.nextMatch(TokenType.VARIABLE);
             Variable variable = new Variable(varToken);
-            if (iterator.hasNext() && ORDER_BY_KEYWORD_SET.contains(iterator.peek().getValue())) {
+            if (iterator.hasNext() && ORDER_BY_OP_SET.contains(iterator.peek().getValue())) {
                 OrderByOp orderByOp = new OrderByOp(iterator.next());
                 orderByOp.addChild(variable);
                 output.push(orderByOp);
@@ -198,6 +251,7 @@ public class Parser {
             if (prevConnectOp != null) {
                 connect(prevConnectOp, output);
             }
+
             prevConnectOp = new ConnectOp(iterator.next());
         }
 
@@ -209,7 +263,8 @@ public class Parser {
             throw new ParseException("Syntax error");
         }
 
-        return output.pop();
+        orderBy.addChild(output.pop());
+        return Collections.singletonList(orderBy);
     }
 
     private void connect(ConnectOp connectOp, LinkedList<ASTNode> output) {

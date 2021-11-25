@@ -1,7 +1,5 @@
 package fun.fengwk.automapper.example.model;
 
-import fun.fengwk.automapper.annotation.UseGeneratedKeys;
-
 /**
  * create table example (
  *   id bigint not null auto_increment,
@@ -14,7 +12,7 @@ import fun.fengwk.automapper.annotation.UseGeneratedKeys;
  */
 public class ExampleDO extends BaseDO {
 
-    @UseGeneratedKeys
+//    @UseGeneratedKeys
 //    private Long id;
     private String name;
     private Integer sort;

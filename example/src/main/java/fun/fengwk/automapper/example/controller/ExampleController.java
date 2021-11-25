@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author fengwk
@@ -33,6 +35,47 @@ public class ExampleController {
         return exampleDO.toString();
     }
 
+    // curl http://localhost:8080/insertSelective?sort=10
+    @GetMapping("/insertSelective")
+    public String insertSelective(@RequestParam(value = "name", required = false) String name,
+                                  @RequestParam(value = "sort", required = false) Integer sort) {
+        ExampleDO exampleDO = new ExampleDO();
+        exampleDO.setName(name);
+        exampleDO.setSort(sort);
+        exampleMapper.insertSelective(exampleDO);
+        return exampleDO.toString();
+    }
+
+    // curl http://localhost:8080/insertAllSelective?sort=10
+    @GetMapping("/insertAll")
+    public String insertAll(@RequestParam(value = "name", required = false) String name,
+                            @RequestParam(value = "sort", required = false) Integer sort) {
+        List<ExampleDO> exampleDOList = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            ExampleDO exampleDO = new ExampleDO();
+            exampleDO.setName(name);
+            exampleDO.setSort(sort);
+            exampleDOList.add(exampleDO);
+        }
+        exampleMapper.insertAll(exampleDOList);
+        return exampleDOList.toString();
+    }
+
+    // curl http://localhost:8080/insertAllSelective?sort=10
+    @GetMapping("/insertAllSelective")
+    public String insertAllSelective(@RequestParam(value = "name", required = false) String name,
+                                     @RequestParam(value = "sort", required = false) Integer sort) {
+        List<ExampleDO> exampleDOList = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            ExampleDO exampleDO = new ExampleDO();
+            exampleDO.setName(name);
+            exampleDO.setSort(sort);
+            exampleDOList.add(exampleDO);
+        }
+        exampleMapper.insertAllSelective(exampleDOList);
+        return exampleDOList.toString();
+    }
+
     // curl http://localhost:8080/deleteById?id=1
     @GetMapping("/deleteById")
     public String deleteById(@RequestParam("id") Long id) {
@@ -50,6 +93,19 @@ public class ExampleController {
         exampleDO.setName(name);
         exampleDO.setSort(sort);
         int result = exampleMapper.updateById(exampleDO);
+        return result == 1 ? "success" : "failure";
+    }
+
+    // curl http://localhost:8080/updateById?id=1&sort=1
+    @GetMapping("/updateByIdSelective")
+    public String updateByIdSelective(@RequestParam("id") Long id,
+                                      @RequestParam(value = "name", required = false) String name,
+                                      @RequestParam(value = "sort", required = false) Integer sort) {
+        ExampleDO exampleDO = new ExampleDO();
+        exampleDO.setId(id);
+        exampleDO.setName(name);
+        exampleDO.setSort(sort);
+        int result = exampleMapper.updateByIdSelective(exampleDO);
         return result == 1 ? "success" : "failure";
     }
 

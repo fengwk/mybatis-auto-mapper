@@ -11,19 +11,25 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * 词法分析器，状态转移见doc/MapperMethodStateMachine.drawio
+ *
  * @author fengwk
  */
 public class Lexer {
 
+    private static final String SELECTIVE = "Selective";
     private static final char EOF = 0;
+    private static final String SELECTIVE_EOF = SELECTIVE + EOF;
 
     private static final Pattern PATTERN_TERM_AND = Pattern.compile("^([_0-9a-zA-Z]+?)" + Keyword.AND.getValue());
     private static final Pattern PATTERN_TERM_AND_OR = Pattern.compile("^([_0-9a-zA-Z]+?)(" + Keyword.AND.getValue() + "|" + Keyword.OR.getValue() + ")");
     private static final Pattern PATTERN_TERM_ORDER_BY_AND_OR = Pattern.compile("^([_0-9a-zA-Z]+?)(" + Keyword.ORDER_BY.getValue() + "|" + Keyword.AND.getValue() + "|" + Keyword.OR.getValue() + ")");
-    private static final Pattern PATTERN_TERM_EOF = Pattern.compile("^([_0-9a-zA-Z]+?)" + EOF);
 
-    private static final Keyword[] BY_KEYWORDS = sortByValueLengthDesc(Keyword.getByKeywords());
-    private static final Keyword[] ORDER_BY_KEYWORDS = sortByValueLengthDesc(Keyword.getOrderByKeywords());
+    private static final Pattern PATTERN_TERM_EOF = Pattern.compile("^([_0-9a-zA-Z]+?)" + EOF);
+    private static final Pattern PATTERN_TERM_SELECTIVE_EOF = Pattern.compile("^([_0-9a-zA-Z]+?)" + SELECTIVE_EOF);
+
+    private static final Keyword[] BY_KEYWORDS = sortByValueLengthDesc(Keyword.getByOps());
+    private static final Keyword[] ORDER_BY_KEYWORDS = sortByValueLengthDesc(Keyword.getOrderByOps());
 
     private String expression;
     private int offset;
@@ -35,6 +41,12 @@ public class Lexer {
         return keywords;
     }
 
+    /**
+     * 将表达式分解为token
+     *
+     * @param expression
+     * @return
+     */
     public List<Token> analyse(String expression) {
         // reset
         this.expression = appendEOF(expression);
@@ -50,131 +62,127 @@ public class Lexer {
             Keyword eaten;
             switch (state) {
                 case 0:
-                    eaten = eatKeyword(new Keyword[] {
-                            Keyword.INSERT, Keyword.DELETE, Keyword.UPDATE, Keyword.FIND, Keyword.COUNT, Keyword.PAGE });
-
-                    if (eaten == null) {
-                        throw new LexicalException("Expressions must begin with %s|%s|%s|%s|%s|%s",
-                                Keyword.INSERT.getValue(), Keyword.DELETE.getValue(), Keyword.UPDATE.getValue(),
-                                Keyword.FIND.getValue(), Keyword.COUNT.getValue(), Keyword.PAGE.getValue());
-                    }
-
-                    if (eaten == Keyword.INSERT) {
+                    if (tryEatKeyword(Keyword.INSERT)) {
                         state = 1;
-                    } else if (eaten == Keyword.DELETE) {
-                        state = 2;
-                    } else if (eaten == Keyword.UPDATE) {
-                        state = 3;
-                    } else if (eaten == Keyword.FIND) {
-                        state = 4;
-                    } else if (eaten == Keyword.COUNT) {
-                        state = 5;
-                    } else {// eatResult.eaten == Keyword.PAGE
-                        state = 6;
-                    }
-
-                    break;
-
-                case 1:
-                    if (!eatEOF()) {
-                        eaten = eatKeyword(Keyword.ALL);
-
-                        if (eaten == null) {
-                            throw new LexicalException("Expression failed to parse after %s",
-                                    tokens.get(tokens.size() - 1).getValue());
-                        }
-
-                        if (!eatEOF()) {
-                            throw new LexicalException("Expressions should end after %s",
-                                    Keyword.ALL.getValue());
-                        }
-                    }
-                    break;
-
-                case 2:
-                    eaten = eatKeyword(new Keyword[] { Keyword.ALL, Keyword.BY });
-
-                    if (eaten == null) {
-                        throw new LexicalException("Expression failed to parse after %s",
-                                tokens.get(tokens.size() - 1).getValue());
-                    }
-
-                    if (eaten == Keyword.ALL) {
-                        if (!eatEOF()) {
-                            throw new LexicalException("Expressions should end after %s",
-                                    Keyword.ALL.getValue());
-                        }
-                    } else {// eaten == Keyword.BY
-                        state = 7;
-                    }
-                    break;
-
-                case 3:
-                    eaten = eatKeyword(Keyword.BY);
-
-                    if (eaten == null) {
-                        throw new LexicalException("Expression failed to parse after %s",
-                                tokens.get(tokens.size() - 1).getValue());
-                    }
-
-                    state = 7;
-                    break;
-
-                case 4:
-                    eaten = eatKeyword(new Keyword[] { Keyword.ALL, Keyword.BY });
-
-                    if (eaten == null) {
-                        throw new LexicalException("Expression failed to parse after %s",
-                                tokens.get(tokens.size() - 1).getValue());
-                    }
-
-                    if (eaten == Keyword.ALL) {
-                        state = 10;
-                    } else {// eaten == Keyword.BY
-                        state = 8;
-                    }
-                    break;
-
-                case 5:
-                    eaten = eatKeyword(new Keyword[] { Keyword.ALL, Keyword.BY });
-
-                    if (eaten == null) {
-                        throw new LexicalException("Expression failed to parse after %s",
-                                tokens.get(tokens.size() - 1).getValue());
-                    }
-
-                    if (eaten == Keyword.ALL) {
-                        if (!eatEOF()) {
-                            throw new LexicalException("Expressions should end after %s",
-                                    Keyword.ALL.getValue());
-                        }
-                    } else {// eaten == Keyword.BY
-                        state = 7;
-                    }
-                    break;
-
-                case 6:
-                    eaten = eatKeyword(new Keyword[] { Keyword.ALL, Keyword.BY });
-
-                    if (eaten == null) {
-                        throw new LexicalException("Expression failed to parse after %s",
-                                tokens.get(tokens.size() - 1).getValue());
-                    }
-
-                    if (eaten == Keyword.ALL) {
-                        state = 10;
-                    } else if (eaten == Keyword.BY) {// eaten == Keyword.BY
-                        state = 8;
-                    }
-                    break;
-
-                case 7:
-                    if (eatTermAndOr(this::parseByTerm)) {
                         break;
                     }
 
-                    if (eatTermEOF(this::parseByTerm)) {
-                        // is end
+                    if (tryEatKeyword(Keyword.DELETE)) {
+                        state = 2;
+                        break;
+                    }
+
+                    if (tryEatKeyword(Keyword.UPDATE)) {
+                        state = 3;
+                        break;
+                    }
+
+                    if (tryEatKeyword(Keyword.FIND)) {
+                        state = 4;
+                        break;
+                    }
+
+                    if (tryEatKeyword(Keyword.COUNT)) {
+                        state = 2;
+                        break;
+                    }
+
+                    if (tryEatKeyword(Keyword.PAGE)) {
+                        state = 4;
+                        break;
+                    }
+
+                    throw new LexicalException("Expressions must begin with %s|%s|%s|%s|%s|%s",
+                            Keyword.INSERT.getValue(), Keyword.DELETE.getValue(), Keyword.UPDATE.getValue(),
+                            Keyword.FIND.getValue(), Keyword.COUNT.getValue(), Keyword.PAGE.getValue());
+
+                case 1:
+                    if (tryEatSelectiveEOF()) {
+                        break;
+                    }
+
+                    if (tryEatEOF()) {
+                        break;
+                    }
+
+                    if (tryEatKeyword(Keyword.ALL)) {
+                        state = 5;
+                        break;
+                    }
+
+                    throw new LexicalException("Expression failed to parse after %s",
+                            tokens.get(tokens.size() - 1).getValue());
+
+                case 2:
+                    if (tryEatKeyword(Keyword.ALL)) {
+                        if (tryEatEOF()) {
+                            break;
+                        }
+                    } else if (tryEatKeyword(Keyword.BY)) {
+                        state = 6;
+                        break;
+                    }
+
+                    throw new LexicalException("Expression failed to parse after %s",
+                            tokens.get(tokens.size() - 1).getValue());
+
+                case 3:
+                    if (tryEatKeyword(Keyword.BY)) {
+                        state = 7;
+                        break;
+                    }
+
+                    throw new LexicalException("Expression failed to parse after %s",
+                            tokens.get(tokens.size() - 1).getValue());
+
+                case 4:
+                    if (tryEatKeyword(Keyword.ALL)) {
+                        state = 8;
+                        break;
+                    }
+
+                    if (tryEatKeyword(Keyword.BY)) {
+                        state = 9;
+                        break;
+                    }
+
+                    throw new LexicalException("Expression failed to parse after %s",
+                            tokens.get(tokens.size() - 1).getValue());
+
+                case 5:
+                    if (tryEatSelectiveEOF()) {
+                        break;
+                    }
+
+                    if (tryEatEOF()) {
+                        break;
+                    }
+
+                    throw new LexicalException("Expression failed to parse after %s",
+                            tokens.get(tokens.size() - 1).getValue());
+
+                case 6:
+                    if (tryEatTermAndOr(this::parseByTerm)) {
+                        break;
+                    }
+
+                    if (tryEatTermEOF(this::parseByTerm)) {
+                        break;
+                    }
+
+                    throw new LexicalException("Expression failed to parse after %s",
+                            tokens.get(tokens.size() - 1).getValue());
+
+                case 7:
+                    if (tryEatTermAndOr(this::parseByTerm)) {
+                        break;
+                    }
+
+                    if (tryEatTermSelectiveEOF(this::parseByTerm)) {
+                        break;
+                    }
+
+                    if (tryEatTermEOF(this::parseByTerm)) {
                         break;
                     }
 
@@ -182,15 +190,12 @@ public class Lexer {
                             tokens.get(tokens.size() - 1).getValue());
 
                 case 8:
-                    if (eatTermOrderByAndOr(this::parseByTerm)) {
-                        if (tokens.get(tokens.size() - 1).isKeyword(Keyword.ORDER_BY)) {
-                            state = 9;
-                        }
+                    if (tryEatEOF()) {
                         break;
                     }
 
-                    if (eatTermEOF(this::parseByTerm)) {
-                        // is end
+                    if (tryEatKeyword(Keyword.ORDER_BY)) {
+                        state = 10;
                         break;
                     }
 
@@ -198,12 +203,16 @@ public class Lexer {
                             tokens.get(tokens.size() - 1).getValue());
 
                 case 9:
-                    if (eatTermAnd(this::parseOrderByTerm)) {
+                    int res = tryEatTermOrderByAndOr(this::parseByTerm);
+                    if (res == 1) {
+                        state = 10;
+                        break;
+                    }
+                    if (res == 2) {
                         break;
                     }
 
-                    if (eatTermEOF(this::parseOrderByTerm)) {
-                        // is end
+                    if (tryEatTermEOF(this::parseByTerm)) {
                         break;
                     }
 
@@ -211,17 +220,16 @@ public class Lexer {
                             tokens.get(tokens.size() - 1).getValue());
 
                 case 10:
-                    if (!eatEOF()) {
-                        eaten = eatKeyword(Keyword.ORDER_BY);
-
-                        if (eaten == null) {
-                            throw new LexicalException("Expression failed to parse after %s",
-                                    tokens.get(tokens.size() - 1).getValue());
-                        }
-
-                        state = 9;
+                    if (tryEatTermAnd(this::parseOrderByTerm)) {
+                        break;
                     }
-                    break;
+
+                    if (tryEatTermEOF(this::parseOrderByTerm)) {
+                        break;
+                    }
+
+                    throw new LexicalException("Expression failed to parse after %s",
+                            tokens.get(tokens.size() - 1).getValue());
 
                 default:
                     throw new AssertionError();
@@ -235,69 +243,95 @@ public class Lexer {
         return str + EOF;
     }
 
-    public boolean eatEOF() {
+    /**
+     * 尝试吃掉一个EOF符号，成功返回true，失败返回false
+     *
+     * @return
+     */
+    public boolean tryEatEOF() {
         if (expression.charAt(offset) == EOF) {
             offset++;
             return true;
         }
+
         return false;
     }
 
-    private Keyword eatKeyword(Keyword[] starts) {
-        for (Keyword start : starts) {
-            Keyword eaten = eatKeyword(start);
-            if (eaten != null) {
-                return eaten;
-            }
+    /**
+     * 尝试吃掉一个SelectiveEOF，成功返回true，失败返回false
+     *
+     * @return
+     */
+    public boolean tryEatSelectiveEOF() {
+        if (SELECTIVE_EOF.equals(expression.substring(offset))) {
+            tokens.add(new Token(TokenType.KEYWORD, SELECTIVE));
+            offset += SELECTIVE_EOF.length();
+            return true;
         }
-        return null;
+
+        return false;
     }
 
-    private Keyword eatKeyword(Keyword start) {
-        String startValue = start.getValue();
+    /**
+     * 尝试吃掉一个指定的关键码，成功返回true，失败返回false
+     *
+     * @param kw
+     * @return
+     */
+    private boolean tryEatKeyword(Keyword kw) {
+        String startValue = kw.getValue();
         if (expression.startsWith(startValue, offset)) {
             offset += startValue.length();
             tokens.add(new Token(TokenType.KEYWORD, startValue));
-            return start;
+            return true;
         }
-        return null;
+
+        return false;
     }
 
-    private boolean eatTermOrderByAndOr(Consumer<String> termParser) {
+    /**
+     * 尝试吃掉[_0-9a-zA-Z]+?(OrderBy|And|Or)，成功匹配到OrderBy返回1，成功匹配到And|Or返回2，失败返回0
+     *
+     * @param termParser
+     * @return
+     */
+    private int tryEatTermOrderByAndOr(Consumer<String> termParser) {
         CharSequence expression = new StringCharSequenceView(this.expression, offset);
         Matcher m = PATTERN_TERM_ORDER_BY_AND_OR.matcher(expression);
         if (m.find()) {
-            Keyword kw = Keyword.of(m.group(2));
-            if (kw == null || (kw != Keyword.ORDER_BY && kw != Keyword.AND && kw != Keyword.OR)) {
-                return false;
-            }
-
             termParser.accept(m.group(1));
-            tokens.add(new Token(TokenType.KEYWORD, kw.getValue()));
+            tokens.add(new Token(TokenType.KEYWORD, m.group(2)));
             offset += m.group().length();
-            return true;
+            return Keyword.ORDER_BY.getValue().equals(m.group(2)) ? 1 : 2;
         }
-        return false;
+        return 0;
     }
 
-    private boolean eatTermAndOr(Consumer<String> termParser) {
+    /**
+     * 尝试吃掉[_0-9a-zA-Z]+?(And|Or)，成功返回true，失败返回false
+     *
+     * @param termParser
+     * @return
+     */
+    private boolean tryEatTermAndOr(Consumer<String> termParser) {
         CharSequence expression = new StringCharSequenceView(this.expression, offset);
         Matcher m = PATTERN_TERM_AND_OR.matcher(expression);
         if (m.find()) {
-            Keyword kw = Keyword.of(m.group(2));
-            if (kw == null || (kw != Keyword.ORDER_BY && kw != Keyword.AND && kw != Keyword.OR)) {
-                return false;
-            }
-
             termParser.accept(m.group(1));
-            tokens.add(new Token(TokenType.KEYWORD, kw.getValue()));
+            tokens.add(new Token(TokenType.KEYWORD, m.group(2)));
             offset += m.group().length();
             return true;
         }
         return false;
     }
 
-    private boolean eatTermAnd(Consumer<String> termParser) {
+    /**
+     * 尝试吃掉[_0-9a-zA-Z]+?And，成功返回true，失败返回false
+     *
+     * @param termParser
+     * @return
+     */
+    private boolean tryEatTermAnd(Consumer<String> termParser) {
         CharSequence expression = new StringCharSequenceView(this.expression, offset);
         Matcher m = PATTERN_TERM_AND.matcher(expression);
         if (m.find()) {
@@ -309,7 +343,13 @@ public class Lexer {
         return false;
     }
 
-    private boolean eatTermEOF(Consumer<String> termParser) {
+    /**
+     * 尝试吃掉[_0-9a-zA-Z]+?EOF，成功返回true，失败返回false
+     *
+     * @param termParser
+     * @return
+     */
+    private boolean tryEatTermEOF(Consumer<String> termParser) {
         CharSequence expression = new StringCharSequenceView(this.expression, offset);
         Matcher m = PATTERN_TERM_EOF.matcher(expression);
         if (m.find()) {
@@ -320,6 +360,29 @@ public class Lexer {
         return false;
     }
 
+    /**
+     * 尝试吃掉[_0-9a-zA-Z]+?SelectiveEOF，成功返回true，失败返回false
+     *
+     * @param termParser
+     * @return
+     */
+    private boolean tryEatTermSelectiveEOF(Consumer<String> termParser) {
+        CharSequence expression = new StringCharSequenceView(this.expression, offset);
+        Matcher m = PATTERN_TERM_SELECTIVE_EOF.matcher(expression);
+        if (m.find()) {
+            termParser.accept(m.group(1));
+            tokens.add(new Token(TokenType.KEYWORD, SELECTIVE));
+            offset += m.group().length();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 解析By语句后的短语
+     *
+     * @param term
+     */
     private void parseByTerm(String term) {
         for (Keyword keyword : BY_KEYWORDS) {
             String keywordValue = keyword.getValue();
@@ -332,6 +395,11 @@ public class Lexer {
         tokens.add(new Token(TokenType.VARIABLE, term));
     }
 
+    /**
+     * 解析OrderBy语句后的短语
+     *
+     * @param term
+     */
     private void parseOrderByTerm(String term) {
         for (Keyword keyword : ORDER_BY_KEYWORDS) {
             String keywordValue = keyword.getValue();

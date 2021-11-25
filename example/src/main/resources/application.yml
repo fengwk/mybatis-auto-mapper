@@ -2,7 +2,7 @@ spring:
   datasource:
     username: fengwk
     password: a123
-    url: jdbc:mysql://mysql.centos7:3306/test
+    url: jdbc:mysql://mysql.fengwk.fun:3306/test?allowMultiQueries=true
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis:

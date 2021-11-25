@@ -2,8 +2,27 @@ package fun.fengwk.automapper.processor.translator.mysql;
 
 import fun.fengwk.automapper.processor.lexer.Keyword;
 import fun.fengwk.automapper.processor.lexer.Token;
-import fun.fengwk.automapper.processor.parser.ast.*;
-import fun.fengwk.automapper.processor.translator.*;
+import fun.fengwk.automapper.processor.parser.ast.ASTNode;
+import fun.fengwk.automapper.processor.parser.ast.By;
+import fun.fengwk.automapper.processor.parser.ast.ByOp;
+import fun.fengwk.automapper.processor.parser.ast.ConnectOp;
+import fun.fengwk.automapper.processor.parser.ast.Count;
+import fun.fengwk.automapper.processor.parser.ast.Delete;
+import fun.fengwk.automapper.processor.parser.ast.Find;
+import fun.fengwk.automapper.processor.parser.ast.Insert;
+import fun.fengwk.automapper.processor.parser.ast.OrderBy;
+import fun.fengwk.automapper.processor.parser.ast.OrderByOp;
+import fun.fengwk.automapper.processor.parser.ast.Page;
+import fun.fengwk.automapper.processor.parser.ast.Update;
+import fun.fengwk.automapper.processor.parser.ast.Variable;
+import fun.fengwk.automapper.processor.translator.BeanField;
+import fun.fengwk.automapper.processor.translator.MethodInfo;
+import fun.fengwk.automapper.processor.translator.NameEntry;
+import fun.fengwk.automapper.processor.translator.Param;
+import fun.fengwk.automapper.processor.translator.Return;
+import fun.fengwk.automapper.processor.translator.TranslateContext;
+import fun.fengwk.automapper.processor.translator.TranslateException;
+import fun.fengwk.automapper.processor.translator.Translator;
 import fun.fengwk.automapper.processor.util.StringUtils;
 import org.w3c.dom.Element;
 
@@ -88,7 +107,11 @@ public class MySqlTranslator extends Translator {
         } else if (node instanceof Delete) {
             translateDelete((Delete) node, methodName, params);
         } else if (node instanceof Update) {
-            translateUpdate((Update) node, methodName, params);
+            if (isSelective(node)) {
+                translateUpdateSelective((Update) node, methodName, params);
+            } else {
+                translateUpdate((Update) node, methodName, params);
+            }
         } else if (node instanceof Find) {
             translateFind((Find) node, methodName, params, ret);
         } else if (node instanceof Count) {
@@ -111,9 +134,17 @@ public class MySqlTranslator extends Translator {
         if (insert.childrenSize() > 0
                 && (child = insert.getChild(0)) != null
                 && child.getLexeme().isKeyword(Keyword.ALL)) {
-            translateInsertAll(methodName, param);
+            if (isSelective(insert)) {
+                translateInsertAllSelective(methodName, param);
+            } else {
+                translateInsertAll(methodName, param);
+            }
         } else {
-            translateInsertOne(methodName, param);
+            if (isSelective(insert)) {
+                translateInsertOneSelective(methodName, param);
+            } else {
+                translateInsertOne(methodName, param);
+            }
         }
     }
 
@@ -164,6 +195,56 @@ public class MySqlTranslator extends Translator {
         insertStmtElement.append();
     }
 
+    private void translateInsertAllSelective(String methodName, Param param) {
+        if (!param.isIterable()) {
+            throw new TranslateException("%s should have iterable param", methodName);
+        }
+        if (!param.isJavaBean()) {
+            throw new TranslateException("%s should have java bean param", methodName);
+        }
+
+        StmtElement insertStmtElement = addInsertElement(methodName, param.getType(), param.findUseGeneratedKeysField());
+        Element insertElement = insertStmtElement.getElement();
+
+        addTextNode(insertElement, LF, INDENT);
+        Element foreachElement = addElement(insertElement, "foreach");
+        foreachElement.setAttribute("collection", "collection");
+        foreachElement.setAttribute("item", "item");
+        foreachElement.setAttribute("separator", ";");
+        addTextNode(foreachElement, LF, INDENT, INDENT, "insert into ", tableName, LF, INDENT, INDENT);
+        Element trimElement = addElement(foreachElement, "trim");
+        trimElement.setAttribute("prefix", "(");
+        trimElement.setAttribute("suffix", ")");
+        trimElement.setAttribute("suffixOverrides", ",");
+        for (BeanField bf : param.getBeanFields()) {
+            if (!bf.isUseGeneratedKeys()) {
+                addTextNode(trimElement, LF, INDENT, INDENT, INDENT);
+                Element ifElement = addElement(trimElement, "if");
+                ifElement.setAttribute("test", String.format("item.%s != null", bf.getName()));
+                addTextNode(ifElement, bf.getFieldName(), ",");
+            }
+        }
+        addTextNode(trimElement, LF, INDENT, INDENT);
+        addTextNode(foreachElement, LF, INDENT, INDENT, "values", LF, INDENT, INDENT);
+
+        trimElement = addElement(foreachElement, "trim");
+        trimElement.setAttribute("prefix", "(");
+        trimElement.setAttribute("suffix", ")");
+        trimElement.setAttribute("suffixOverrides", ",");
+        for (BeanField bf : param.getBeanFields()) {
+            if (!bf.isUseGeneratedKeys()) {
+                addTextNode(trimElement, LF, INDENT, INDENT, INDENT);
+                Element ifElement = addElement(trimElement, "if");
+                ifElement.setAttribute("test", String.format("item.%s != null", bf.getName()));
+                addTextNode(ifElement, "#{item.", bf.getName(), "},");
+            }
+        }
+        addTextNode(trimElement, LF, INDENT, INDENT);
+        addTextNode(foreachElement, LF, INDENT);
+
+        insertStmtElement.append();
+    }
+
     private void translateInsertOne(String methodName, Param param) {
         if (!param.isJavaBean()) {
             throw new TranslateException("% should have java bean param", methodName);
@@ -188,6 +269,47 @@ public class MySqlTranslator extends Translator {
                         .map(bf -> String.format("#{%s}", bf.getName()))
                         .collect(Collectors.joining(", ")),
                 ")", LF);
+
+        insertStmtElement.append();
+    }
+
+    private void translateInsertOneSelective(String methodName, Param param) {
+        if (!param.isJavaBean()) {
+            throw new TranslateException("% should have java bean param", methodName);
+        }
+
+        StmtElement insertStmtElement = addInsertElement(methodName, param.getType(), param.findUseGeneratedKeysField());
+        Element insertElement = insertStmtElement.getElement();
+
+        addTextNode(insertElement, LF, INDENT, "insert into ", tableName, LF, INDENT);
+        Element trimElement = addElement(insertElement, "trim");
+        trimElement.setAttribute("prefix", "(");
+        trimElement.setAttribute("suffix", ")");
+        trimElement.setAttribute("suffixOverrides", ",");
+        for (BeanField bf : param.getBeanFields()) {
+            if (!bf.isUseGeneratedKeys()) {
+                addTextNode(trimElement, LF, INDENT, INDENT);
+                Element ifElement = addElement(trimElement, "if");
+                ifElement.setAttribute("test", String.format("%s != null", bf.getName()));
+                addTextNode(ifElement, bf.getFieldName(), ",");
+            }
+        }
+        addTextNode(trimElement, LF, INDENT);
+        addTextNode(insertElement, LF, INDENT, "values", LF, INDENT);
+        trimElement = addElement(insertElement, "trim");
+        trimElement.setAttribute("prefix", "(");
+        trimElement.setAttribute("suffix", ")");
+        trimElement.setAttribute("suffixOverrides", ",");
+        for (BeanField bf : param.getBeanFields()) {
+            if (!bf.isUseGeneratedKeys()) {
+                addTextNode(trimElement, LF, INDENT, INDENT);
+                Element ifElement = addElement(trimElement, "if");
+                ifElement.setAttribute("test", String.format("%s != null", bf.getName()));
+                addTextNode(ifElement, "#{", bf.getName(), "},");
+            }
+        }
+        addTextNode(trimElement, LF, INDENT);
+        addTextNode(insertElement, LF);
 
         insertStmtElement.append();
     }
@@ -265,6 +387,45 @@ public class MySqlTranslator extends Translator {
                         .collect(Collectors.joining(", ")),
                 LF, INDENT
                 );
+        translateBy(updateElement, (By) update.getChild(0), asNameMap(param.getBeanFields()));
+        addTextNode(updateElement, LF);
+
+        updateStmtElement.append();
+    }
+
+    private void translateUpdateSelective(Update update, String methodName, List<Param> params) {
+        if (params.size() != 1) {
+            throw new TranslateException("%s should have only one param", methodName);
+        }
+
+        Param param = params.get(0);
+        if (!param.isJavaBean()) {
+            throw new TranslateException("%s should have java bean param", methodName);
+        }
+
+        if (param.getBeanFields().isEmpty()) {
+            throw new TranslateException("can not found update field in ", param);
+        }
+
+        StmtElement updateStmtElement = addUpdateElement(methodName, param.getType());
+        Element updateElement = updateStmtElement.getElement();
+
+        addTextNode(updateElement, LF, INDENT, "update ", tableName, " set ", LF, INDENT);
+        Element trimElement = addElement(updateElement, "trim");
+        trimElement.setAttribute("suffixOverrides", ",");
+        List<BeanField> bfs = param.getBeanFields();
+        for (int i = 0; i < bfs.size(); i++) {
+            BeanField bf = bfs.get(i);
+            if (!bf.isUseGeneratedKeys()) {
+                addTextNode(trimElement, LF, INDENT, INDENT);
+                Element ifElement = addElement(trimElement, "if");
+                ifElement.setAttribute("test", String.format("%s != null", bf.getName()));
+                addTextNode(ifElement, String.format("%s=#{%s},", bf.getFieldName(), bf.getName()));
+            }
+        }
+        addTextNode(trimElement, LF, INDENT);
+        addTextNode(updateElement, LF, INDENT);
+
         translateBy(updateElement, (By) update.getChild(0), asNameMap(param.getBeanFields()));
         addTextNode(updateElement, LF);
 

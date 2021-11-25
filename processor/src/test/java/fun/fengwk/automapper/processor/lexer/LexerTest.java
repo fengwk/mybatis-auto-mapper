@@ -33,7 +33,8 @@ public class LexerTest {
     @Test(expected = LexicalException.class)
     public void test4() {
         Lexer lexer = new Lexer();
-        lexer.analyse("insertAllEntity");
+        List<Token> insertAllEntity = lexer.analyse("insertAllEntity");
+        System.out.println(insertAllEntity);
     }
 
     @Test(expected = LexicalException.class)

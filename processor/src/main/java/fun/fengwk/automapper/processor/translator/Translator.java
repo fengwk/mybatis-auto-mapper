@@ -7,7 +7,15 @@ import fun.fengwk.automapper.processor.parser.ParseException;
 import fun.fengwk.automapper.processor.parser.Parser;
 import fun.fengwk.automapper.processor.parser.TokenIterator;
 import fun.fengwk.automapper.processor.parser.ast.ASTNode;
-import org.w3c.dom.*;
+import fun.fengwk.automapper.processor.parser.ast.Selective;
+import org.w3c.dom.Comment;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -64,6 +72,7 @@ public abstract class Translator {
      * @param methodInfo
      */
     public void translate(MethodInfo methodInfo) {
+
         ASTNode node = parse(methodInfo.getMethodName());
         doTranslate(node, methodInfo);
     }
@@ -126,6 +135,15 @@ public abstract class Translator {
 
     public Document getDocument() {
         return document;
+    }
+
+    protected boolean isSelective(ASTNode node) {
+        for (int i = 0; i < node.childrenSize(); i++) {
+            if (node.getChild(i) instanceof Selective) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected boolean existsStmtElement(String id) {

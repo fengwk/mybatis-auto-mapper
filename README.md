@@ -13,7 +13,7 @@ Mybatis在互联网企业被广泛使用，但使用过程中开发者却不得�
     <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>auto-mapper-processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.9</version>
+    <version>0.0.10</version>
 </dependency>
 ```
 
@@ -43,23 +43,19 @@ public interface ExampleMapper {
 
 下标站时刻展示了当前支持的所有模式（如果您了解状态机可以直接查看`doc/MapperMethodStateMachine.drawio`）：
 
-| 描述 | 模式                | 约束                                                         |
-| ---- | ------------------- | ------------------------------------------------------------ |
-| 新增 | insert              | 单个JavaBean入参                                             |
-|      | insertAll           | 可迭代的JavaBean入参                                         |
-| 删除 | deleteAll           | 无入参                                                       |
-|      | deleteBy...         | 多入参数时必须使用@Param注解绑定By后参数与入参关系           |
-| 修改 | updateBy...         | 多入参数时必须使用@Param注解绑定By后参数与入参关系           |
-| 查询 | findAll             | 无入参                                                       |
-|      | findAllOrderBy...   | 无入参                                                       |
-|      | findBy...           | 多入参数时必须使用@Param注解绑定By后参数与入参关系           |
-|      | findBy...OrderBy... | 多入参数时必须使用@Param注解绑定By后参数与入参关系           |
-| 计数 | countAll            | 无入参                                                       |
-|      | countBy...          | 多入参数时必须使用@Param注解绑定By后参数与入参关系           |
-| 分页 | pageAll             | 入参必须拥有limit，可选offset                            |
-|      | pageAllOrderBy...   | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系 |
-|      | pageBy...           | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系 |
-|      | pageBy...OrderBy... | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系 |
+| 描述 | 模式                    | 约束                                                                                                                                                                                                                      |
+| ---- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 新增 | insert[Selective]       | 单个JavaBean入参                                                                                                                                                                                                          |
+|      | insertAll[Selective]    | 可迭代的JavaBean入参，如果在该场景下使用了Selective，则需要在jdbc参数中追加`allowMultiQueries=true`，并且UseGeneratedKeys会失效（确切的来说只会返回第一个SQL的自增键，这是由jdbc的特性决定的，详见JdbcGeneratedKeysTest）|
+| 删除 | deleteAll               | 无入参                                                                                                                                                                                                                    |
+|      | deleteBy...             | 多入参数时必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                                        |
+| 修改 | updateBy...[Selectivce] | 多入参数时必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                                        |
+| 查询 | findAll[OrderBy...]     | 无入参                                                                                                                                                                                                                    |
+|      | findBy...[OrderBy...]   | 多入参数时必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                                        |
+| 计数 | countAll                | 无入参                                                                                                                                                                                                                    |
+|      | countBy...              | 多入参数时必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                                        |
+| 分页 | pageAll[OrderBy...]     | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                   |
+|      | pageBy...[OrderBy...]   | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                   |
 
 下表格展示了当前支持的所有关键字：
 

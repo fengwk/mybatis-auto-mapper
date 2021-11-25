@@ -15,9 +15,17 @@ public interface ExampleMapper extends BaseMapper<ExampleDO> {
 
     int insert(ExampleDO exampleDO);
 
+    int insertSelective(ExampleDO exampleDO);
+
+    int insertAll(List<ExampleDO> exampleDOs);
+
+    int insertAllSelective(List<ExampleDO> exampleDOs);
+
     int deleteById(long id);
 
     int updateById(ExampleDO exampleDO);
+
+    int updateByIdSelective(ExampleDO exampleDO);
 
     ExampleDO findById(long id);
 

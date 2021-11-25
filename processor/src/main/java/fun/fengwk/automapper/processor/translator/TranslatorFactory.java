@@ -17,7 +17,7 @@ public class TranslatorFactory {
 
     static {
         Map<DBType, Function<TranslateContext, Translator>> registry = new HashMap<>();
-        registry.put(DBType.MYSQL, ctx -> new MySqlTranslator(ctx));
+        registry.put(DBType.MYSQL, MySqlTranslator::new);
         REGISTRY = registry;
     }
 
