@@ -7,6 +7,8 @@ import fun.fengwk.automapper.annotation.UseGeneratedKeys;
  */
 public class BaseDO {
 
+    private static final int IS_DELETED = 1;
+
     @UseGeneratedKeys
     private Long id;
 

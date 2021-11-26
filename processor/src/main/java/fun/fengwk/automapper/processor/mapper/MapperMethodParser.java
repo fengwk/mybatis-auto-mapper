@@ -306,14 +306,16 @@ public class MapperMethodParser {
                 for (Element element : allMembers) {
                     if (element.getKind() == ElementKind.FIELD) {
                         VariableElement fieldElement = (VariableElement) element;
-                        String name = fieldElement.getSimpleName().toString();
-                        if (!beanFieldMap.containsKey(name)) {
-                            FieldName fieldNameAnnotation = fieldElement.getAnnotation(FieldName.class);
-                            String fieldName = fieldNameAnnotation != null ? fieldNameAnnotation.value()
-                                    : fieldNamingConverter.convert(StringUtils.upperCamelToLowerCamel(name));
-                            UseGeneratedKeys useGeneratedKeysAnnotation = fieldElement.getAnnotation(UseGeneratedKeys.class);
-                            boolean useGeneratedKeys = useGeneratedKeysAnnotation != null;
-                            beanFieldMap.put(name, new BeanField(name, fieldName, useGeneratedKeys));
+                        if (!fieldElement.getModifiers().contains(Modifier.STATIC)) {
+                            String name = fieldElement.getSimpleName().toString();
+                            if (!beanFieldMap.containsKey(name)) {
+                                FieldName fieldNameAnnotation = fieldElement.getAnnotation(FieldName.class);
+                                String fieldName = fieldNameAnnotation != null ? fieldNameAnnotation.value()
+                                        : fieldNamingConverter.convert(StringUtils.upperCamelToLowerCamel(name));
+                                UseGeneratedKeys useGeneratedKeysAnnotation = fieldElement.getAnnotation(UseGeneratedKeys.class);
+                                boolean useGeneratedKeys = useGeneratedKeysAnnotation != null;
+                                beanFieldMap.put(name, new BeanField(name, fieldName, useGeneratedKeys));
+                            }
                         }
                     }
                 }
