@@ -416,12 +416,10 @@ public class MySqlTranslator extends Translator {
         List<BeanField> bfs = param.getBeanFields();
         for (int i = 0; i < bfs.size(); i++) {
             BeanField bf = bfs.get(i);
-            if (!bf.isUseGeneratedKeys()) {
-                addTextNode(trimElement, LF, INDENT, INDENT);
-                Element ifElement = addElement(trimElement, "if");
-                ifElement.setAttribute("test", String.format("%s != null", bf.getName()));
-                addTextNode(ifElement, String.format("%s=#{%s},", bf.getFieldName(), bf.getName()));
-            }
+            addTextNode(trimElement, LF, INDENT, INDENT);
+            Element ifElement = addElement(trimElement, "if");
+            ifElement.setAttribute("test", String.format("%s != null", bf.getName()));
+            addTextNode(ifElement, String.format("%s=#{%s},", bf.getFieldName(), bf.getName()));
         }
         addTextNode(trimElement, LF, INDENT);
         addTextNode(updateElement, LF, INDENT);

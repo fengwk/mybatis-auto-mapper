@@ -17,9 +17,6 @@ public class ExampleDO extends BaseDO {
     private String name;
     private Integer sort;
 
-    private String f1;
-    private String f2;
-
 //    public Long getId() {
 //        return id;
 //    }

@@ -263,6 +263,52 @@ SQL片段
 
 AutoMapper解析父类泛型E得到ExampleDO，继而读取ExampleDO字段生成select语句，由于是page方法，必须添加offset和limit参数。
 
+## 示例八
+
+方法
+
+```java
+@ExcludeField("name")
+int insert(ExampleDO exampleDO);
+```
+
+SQL片段
+
+```xml
+<!--auto mapper generate-->
+<insert id="insert" keyProperty="id" parameterType="fun.fengwk.automapper.example.model.ExampleDO" useGeneratedKeys="true">
+    insert into example (sort) values
+    (#{sort})
+</insert>
+```
+
+说明
+
+使用`@ExcludeField`注解可以去除insert和update语句中不需要的字段。
+
+## 示例九
+
+方法
+
+```java
+@IncludeField("name")
+int insert(ExampleDO exampleDO);
+```
+
+SQL片段
+
+```xml
+<!--auto mapper generate-->
+<insert id="insert" keyProperty="id" parameterType="fun.fengwk.automapper.example.model.ExampleDO" useGeneratedKeys="true">
+    insert into example (name) values
+    (#{name})
+</insert>
+```
+
+说明
+
+使用`@IncludeField`注解可以在insert和update语句中仅引入需要的字段。
+
 # 原理
 
 AutoMapper基于JSR 269 Annotation Processing API实现，Annotation Processing API是Javac程序的一个SPI扩展点，通过编译期读取原文件信息自动生成相应代码片段，类似原理实现的框架有Lombok、Google auto......

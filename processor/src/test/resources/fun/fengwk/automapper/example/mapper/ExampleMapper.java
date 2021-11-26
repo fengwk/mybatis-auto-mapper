@@ -1,10 +1,9 @@
 package fun.fengwk.automapper.example.mapper;
 
 import fun.fengwk.automapper.annotation.AutoMapper;
-import fun.fengwk.automapper.annotation.ExcludeField;
-import fun.fengwk.automapper.annotation.IncludeField;
 import fun.fengwk.automapper.example.model.ExampleDO;
 import org.apache.ibatis.annotations.Param;
+import fun.fengwk.automapper.annotation.ExcludeField;
 
 import java.util.List;
 
@@ -15,18 +14,12 @@ import java.util.List;
 @AutoMapper
 public interface ExampleMapper extends BaseMapper<ExampleDO> {
 
-    @ExcludeField("f1")
+    @ExcludeField("age")
+    @ExcludeField("name")
     int insert(ExampleDO exampleDO);
 
-    @IncludeField("f1")
-    @IncludeField("f2")
-    @ExcludeField("f1")
     int insertSelective(ExampleDO exampleDO);
 
-    @ExcludeField.List({
-            @ExcludeField("f1"),
-            @ExcludeField("f2")
-    })
     int insertAll(List<ExampleDO> exampleDOs);
 
     int insertAllSelective(List<ExampleDO> exampleDOs);

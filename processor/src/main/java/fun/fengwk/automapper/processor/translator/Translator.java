@@ -8,6 +8,7 @@ import fun.fengwk.automapper.processor.parser.Parser;
 import fun.fengwk.automapper.processor.parser.TokenIterator;
 import fun.fengwk.automapper.processor.parser.ast.ASTNode;
 import fun.fengwk.automapper.processor.parser.ast.Selective;
+import fun.fengwk.automapper.processor.util.LocalEntityResolver;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
@@ -97,6 +98,7 @@ public abstract class Translator {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
+            db.setEntityResolver(LocalEntityResolver.getInstance());
             return db.parse(input);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             throw new ParseException(e);
@@ -107,6 +109,7 @@ public abstract class Translator {
         try {
             DocumentBuilderFactory dbf= DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
+            db.setEntityResolver(LocalEntityResolver.getInstance());
             Document document = db.newDocument();
             DocumentType docType = document.getImplementation().createDocumentType("mapper", "-//mybatis.org//DTD Mapper 3.0//EN", "http://mybatis.org/dtd/mybatis-3-mapper.dtd");
             document.appendChild(docType);

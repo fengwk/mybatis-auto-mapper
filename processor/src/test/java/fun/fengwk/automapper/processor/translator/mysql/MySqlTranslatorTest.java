@@ -239,6 +239,7 @@ public class MySqlTranslatorTest {
                 "<update id=\"updateByUsernameAndUserAddressSelective\" parameterType=\"DemoDO\">\n" +
                 "    update demo set \n" +
                 "    <trim suffixOverrides=\",\">\n" +
+                "        <if test=\"id != null\">id=#{id},</if>\n" +
                 "        <if test=\"username != null\">username=#{username},</if>\n" +
                 "        <if test=\"userAddress != null\">user_address=#{userAddress},</if>\n" +
                 "    </trim>\n" +

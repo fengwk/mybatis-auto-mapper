@@ -1,6 +1,8 @@
 package fun.fengwk.automapper.processor.mapper;
 
 import fun.fengwk.automapper.annotation.FieldName;
+import fun.fengwk.automapper.annotation.ExcludeField;
+import fun.fengwk.automapper.annotation.IncludeField;
 import fun.fengwk.automapper.annotation.UseGeneratedKeys;
 import fun.fengwk.automapper.processor.naming.NamingConverter;
 import fun.fengwk.automapper.processor.translator.BeanField;
@@ -8,7 +10,10 @@ import fun.fengwk.automapper.processor.translator.MethodInfo;
 import fun.fengwk.automapper.processor.translator.Param;
 import fun.fengwk.automapper.processor.translator.Return;
 import fun.fengwk.automapper.processor.util.StringUtils;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -107,16 +112,19 @@ public class MapperMethodParser {
 
     // 将methodElement转换为MethodInfo
     private MethodInfo convert(ExecutableElement methodElement, TypeElement mapperElement, NamingConverter fieldNamingConverter) {
-        Select selectAnnotation = methodElement.getAnnotation(Select.class);
-        if (selectAnnotation != null) {
+        if (methodElement.getAnnotation(Insert.class) != null
+                || methodElement.getAnnotation(Delete.class) != null
+                || methodElement.getAnnotation(Update.class) != null
+                || methodElement.getAnnotation(Select.class) != null) {
             return null;
         }
 
         String methodName = methodElement.getSimpleName().toString();
-
+        Set<String> includeFieldNames = getIncludeFieldNames(methodElement);
+        Set<String> excludeFieldNames = getExcludeFieldNames(methodElement);
         List<Param> params = new ArrayList<>();
         List<? extends VariableElement> methodParameters = methodElement.getParameters();
-        if (methodParameters != null) {
+        if (methodParameters != null) { 
             for (VariableElement methodParameter : methodParameters) {
                 TypeDescriptor desc = new TypeDescriptor();
                 if (desc.init(mapperElement, methodParameter.asType(), fieldNamingConverter, 0)) {
@@ -128,7 +136,8 @@ public class MapperMethodParser {
                     FieldName fieldNameAnnotation = methodParameter.getAnnotation(FieldName.class);
                     String fieldName = fieldNameAnnotation != null ? fieldNameAnnotation.value()
                             : fieldNamingConverter.convert(StringUtils.upperCamelToLowerCamel(name));
-                    params.add(new Param(desc.type, name, fieldName, desc.isIterable, desc.isJavaBean, desc.beanFields));
+//                    params.add(new Param(desc.type, name, fieldName, desc.isIterable, desc.isJavaBean, desc.beanFields));
+                    params.add(new Param(desc.type, name, fieldName, desc.isIterable, desc.isJavaBean, getAndFilterBeanFields(desc, includeFieldNames, excludeFieldNames)));
                 }
             }
         }
@@ -144,6 +153,76 @@ public class MapperMethodParser {
         }
 
         return new MethodInfo(methodName, params, ret);
+    }
+
+    private Set<String> getIncludeFieldNames(ExecutableElement methodElement) {
+        IncludeField includeField = methodElement.getAnnotation(IncludeField.class);
+        IncludeField.List includeFieldList = methodElement.getAnnotation(IncludeField.List.class);
+        if (includeField == null && includeFieldList == null) {
+            return null;
+        }
+
+        Set<String> includeFieldNames = new HashSet<>();
+        if (includeField != null && includeField.value() != null) {
+            includeFieldNames.add(includeField.value());
+        }
+        if (includeFieldList != null) {
+            IncludeField[] includeFieldInListArray = includeFieldList.value();
+            if (includeFieldInListArray != null) {
+                for (IncludeField includeFieldInList : includeFieldInListArray) {
+                    if (includeFieldInList != null && includeFieldInList.value() != null) {
+                        includeFieldNames.add(includeFieldInList.value());
+                    }
+                }
+            }
+        }
+        return includeFieldNames;
+    }
+
+    private Set<String> getExcludeFieldNames(ExecutableElement methodElement) {
+        ExcludeField excludeField = methodElement.getAnnotation(ExcludeField.class);
+        ExcludeField.List excludeFieldList = methodElement.getAnnotation(ExcludeField.List.class);
+        if (excludeField == null && excludeFieldList == null) {
+            return null;
+        }
+
+        Set<String> excludeFieldNames = new HashSet<>();
+        if (excludeField != null && excludeField.value() != null) {
+            excludeFieldNames.add(excludeField.value());
+        }
+        if (excludeFieldList != null) {
+            ExcludeField[] excludeFieldInListArray = excludeFieldList.value();
+            if (excludeFieldInListArray != null) {
+                for (ExcludeField excludeFieldInList : excludeFieldInListArray) {
+                    if (excludeFieldInList != null && excludeFieldInList.value() != null) {
+                        excludeFieldNames.add(excludeFieldInList.value());
+                    }
+                }
+            }
+        }
+        return excludeFieldNames;
+    }
+
+    private List<BeanField> getAndFilterBeanFields(TypeDescriptor desc, Set<String> includeFieldNames, Set<String> excludeFieldNames) {
+        if (!desc.isJavaBean) {
+            return null;
+        }
+
+        List<BeanField> result = new ArrayList<>();
+        for (BeanField bf : desc.beanFields) {
+            if (includeFieldNames != null) {
+                if (!includeFieldNames.contains(bf.getName())) {
+                    continue;
+                }
+            }
+            if (excludeFieldNames != null) {
+                if (excludeFieldNames.contains(bf.getName())) {
+                    continue;
+                }
+            }
+            result.add(bf);
+        }
+        return result;
     }
 
     class TypeDescriptor {
