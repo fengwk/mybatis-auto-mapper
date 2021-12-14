@@ -309,6 +309,33 @@ SQL片段
 
 使用`@IncludeField`注解可以在insert和update语句中仅引入需要的字段。
 
+## 示例十
+
+方法
+
+```java
+List<ExampleDO> findByIdInAndIsDeleted(@Param("id") Collection<Long> ids, @Param("isDeleted") int isDeleted);
+```
+
+SQL片段
+
+```xml
+<!--auto mapper generate-->
+<select id="findByIdInAndIsDeleted" resultType="fun.fengwk.automapper.example.model.ExampleDO">
+    select id, name, sort, f1, f2, is_deleted as isDeleted
+    from example
+    where id in
+    <foreach close=")" collection="id" item="item" open="(" separator=",">
+        #{item}
+    </foreach>
+    and is_deleted=#{isDeleted}
+</select>
+```
+
+说明
+
+注意在当前版本中@Param的value值要与对象字段和接口定义表达式中的值（这里是id）保持一致。
+
 # 原理
 
 AutoMapper基于JSR 269 Annotation Processing API实现，Annotation Processing API是Javac程序的一个SPI扩展点，通过编译期读取原文件信息自动生成相应代码片段，类似原理实现的框架有Lombok、Google auto......

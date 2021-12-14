@@ -6,6 +6,7 @@ import fun.fengwk.automapper.annotation.IncludeField;
 import fun.fengwk.automapper.example.model.ExampleDO;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -44,5 +45,7 @@ public interface ExampleMapper extends BaseMapper<ExampleDO> {
     List<ExampleDO> findByNameStartingWithAndSortGreaterThanEqualsOrderBySortDesc(@Param("name") String name, @Param("sort") int sort);
 
     List<ExampleDO> pageByNameStartingWithAndSortGreaterThanEqualsOrderBySortDesc(@Param("name") String name, @Param("sort") int sort, @Param("limit") int limit);
+
+    List<ExampleDO> findByIdInAndIsDeleted(@Param("id") Collection<Long> ids, int isDeleted);
 
 }

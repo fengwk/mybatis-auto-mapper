@@ -20,6 +20,8 @@ public class ExampleDO extends BaseDO {
     private String f1;
     private String f2;
 
+    private Integer isDeleted;
+
 //    public Long getId() {
 //        return id;
 //    }
