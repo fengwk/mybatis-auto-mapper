@@ -29,7 +29,7 @@ public class LocalEntityResolver implements EntityResolver {
                 systemId = systemId.substring(index + 1);
             }
             // 此处使用当前类的类加载器，否则在一些场景下，例如idea环境的rebuild，会使用其他类加载器导致无法加载到本地文件
-            InputStream input = LocalEntityResolver.class.getResourceAsStream(systemId);
+            InputStream input = LocalEntityResolver.class.getClassLoader().getResourceAsStream(systemId);
             if (input != null) {
                 return new InputSource(input);
             }
