@@ -16,12 +16,7 @@
     <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>
-        Automapper is a MyBatis SQL generation tool,
-        it provides a JPA-like interface method to SQL ability,
-        only rely on a compile time JAR package can avoid a lot of simple
-        and similar to the repeated writing of SQL work.
-    </description>
+    <description>AutoMapper is a SQL generation framework for Mybatis.</description>
     <url>https://github.com/fengwk/auto-mapper</url>
     <licenses>
         <license>

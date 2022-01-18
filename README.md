@@ -1,8 +1,6 @@
 # AutoMapper
 
-AutoMapper是一款Mybatis SQL生成框架提供了类似JPA的接口方法转SQL能力，仅需依赖一个编译期Jar包就能避免大量简单且类似SQL的重复编写工作。
-
-Mybatis在互联网企业被广泛使用，但使用过程中开发者却不得不机械地编写一些简单的模板SQL，例如`insert into table (field1, field2, field3...) values (#{var1}, #{var2}, #{var3}...)`或者`select field1 as var1, field2 as var2, field3 as var3 from table where ...`，这些SQL简单却使用频繁，因此不得不在每一个实体（表）的xml文件中进行类似的工作，如果实体中具有众多字段那这样的重复劳动就显得格外枯燥乏味。AutoMapper就是专门为解决这种重复工作而设计的，它能应对80%的SQL编写工作（tips：出于性能考虑互联网企业的大部分SQL都只会对单表进行简单操作）。
+AutoMapper是一款适用于Mybatis的SQL生成框架，提供了JPA风格的SQL语句生成能力，用户仅需依赖一个编译期jar包就能在编译期根据Mapper接口中的方法定义生成相应的XML文件和SQL语句。就像流行的Lombok一样，一切发生在编译期间，因此不会对软件性能造成任何影响，并且用户可以直接在编译完成的target目录或jar中看到生成的SQL语句。
 
 # 开始使用
 
@@ -17,7 +15,7 @@ Mybatis在互联网企业被广泛使用，但使用过程中开发者却不得�
 </dependency>
 ```
 
-常见的Mybatis使用方式是编写一个`*Mapper.java`文件在其中定义接口方法，然后编写一个`*Mapper.xml`文件实现接口方法的SQL语句。例如example模块中（tips：example模块中展示了如何在spring-boot项目里使用AutoMapper）就有`ExampleMapper.java`文件和`ExampleMapper.xml`文件，但只要在`ExampleMapper`类上标记`@AutoMapper`注解，AutoMapper就可以在编译期间帮助您生成相应符合Mybatis规范的Mybatis SQL片段语句到相同包路径下的xml文件中。
+常见的Mybatis使用方式是编写一个`*Mapper.java`文件在其中定义接口方法，然后编写一个`*Mapper.xml`文件实现接口方法的SQL语句。例如example模块中（tips：example模块中展示了如何在spring-boot项目里使用AutoMapper）就有`ExampleMapper.java`文件和`ExampleMapper.xml`文件，但只要在`ExampleMapper`类上标记`@AutoMapper`注解，AutoMapper就可以在编译期间帮助您生成相应符合规范的Mybatis SQL片段语句到相同包路径下的xml文件中（如果已经手动编写了相应方法定义的SQL，那么框架会跳过该方法的自动生成工作）。
 
 ```java
 @AutoMapper
