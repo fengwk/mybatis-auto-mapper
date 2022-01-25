@@ -43,39 +43,39 @@ public class MySqlTranslator extends Translator {
 
     static {
         Map<Keyword, ByTranslator> byTranslatorMap = new HashMap<>();
-        byTranslatorMap.put(Keyword.IS, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.EQUALS, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.LESS_THAN, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s<#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.LESS_THAN_EQUALS, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s<=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.GREATER_THAN, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s>#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.GREATER_THAN_EQUALS, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s>=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.AFTER, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s>#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.BEFORE, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s<#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.IS_NULL, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s is null", nameEntry.getFieldName())));
-        byTranslatorMap.put(Keyword.IS_NOT_NULL, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s is not null", nameEntry.getFieldName())));
-        byTranslatorMap.put(Keyword.NOT_NULL, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s is not null", nameEntry.getFieldName())));
-        byTranslatorMap.put(Keyword.LIKE, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s like #{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.NOT_LIKE, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s not like #{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.STARTING_WITH, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s like concat(#{%s}, '%%')", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.ENDING_WITH, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s like concat('%%', #{%s})", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.CONTAINING, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s like concat('%%', #{%s}, '%%')", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.NOT, (nameEntry, addElement, addTextNode) -> addTextNode.accept(String.format("%s != #{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.IN, (nameEntry, addElement, addTextNode) -> {
+        byTranslatorMap.put(Keyword.IS, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.EQUALS, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.LESS_THAN, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s<#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.LESS_THAN_EQUALS, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s<=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.GREATER_THAN, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s>#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.GREATER_THAN_EQUALS, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s>=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.AFTER, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s>#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.BEFORE, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s<#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.IS_NULL, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s is null", nameEntry.getFieldName())));
+        byTranslatorMap.put(Keyword.IS_NOT_NULL, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s is not null", nameEntry.getFieldName())));
+        byTranslatorMap.put(Keyword.NOT_NULL, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s is not null", nameEntry.getFieldName())));
+        byTranslatorMap.put(Keyword.LIKE, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s like #{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.NOT_LIKE, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s not like #{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.STARTING_WITH, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s like concat(#{%s}, '%%')", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.ENDING_WITH, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s like concat('%%', #{%s})", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.CONTAINING, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s like concat('%%', #{%s}, '%%')", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.NOT, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s != #{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.IN, (nameEntry, addElement, addTextNode, isSingleParam) -> {
             addTextNode.accept(nameEntry.getFieldName(), " in", LF, INDENT);
             String itemName = "item".equals(nameEntry.getName()) ? "item0" : "item";
             Element foreachElement = addElement.apply("foreach");
-            foreachElement.setAttribute("collection", nameEntry.getName());
+            foreachElement.setAttribute("collection", isSingleParam ? "collection" : nameEntry.getName());
             foreachElement.setAttribute("item", itemName);
             foreachElement.setAttribute("separator", ",");
             foreachElement.setAttribute("open", "(");
             foreachElement.setAttribute("close", ")");
             foreachElement.setTextContent(String.format("%s%s%s#{%s}%s%s", LF, INDENT, INDENT, itemName, LF, INDENT));
         });
-        byTranslatorMap.put(Keyword.NOT_IN, (nameEntry, addElement, addTextNode) -> {
+        byTranslatorMap.put(Keyword.NOT_IN, (nameEntry, addElement, addTextNode, isSingleParam) -> {
             addTextNode.accept(nameEntry.getFieldName(), " not in", LF, INDENT);
             String itemName = "item".equals(nameEntry.getName()) ? "item0" : "item";
             Element foreachElement = addElement.apply("foreach");
-            foreachElement.setAttribute("collection", nameEntry.getName());
+            foreachElement.setAttribute("collection", isSingleParam ? "collection" : nameEntry.getName());
             foreachElement.setAttribute("item", itemName);
             foreachElement.setAttribute("separator", ",");
             foreachElement.setAttribute("open", "(");
@@ -593,16 +593,17 @@ public class MySqlTranslator extends Translator {
 
         Variable variable = (Variable) byOp.getChild(0);
         NameEntry nameEntry = nameMap.get(StringUtils.upperCamelToLowerCamel(variable.getLexeme().getValue()));
+        boolean isSingleParam = nameMap.size() == 1;
         if (nameEntry == null) {
-            if (nameMap.size() != 1) {
-                throw new TranslateException("Can not found name entry %s", variable.getLexeme().getValue());
-            } else {
+            if (isSingleParam) {
                 // 采用降级策略，使用该策略必须确保在之前的代码中设置了parameterType
                 nameEntry = nameMap.entrySet().iterator().next().getValue();
+            } else {
+                throw new TranslateException("Can not found name entry %s", variable.getLexeme().getValue());
             }
         }
 
-        translator.translate(nameEntry, tagName -> addElement(parent, tagName), texts -> addTextNode(parent, texts));
+        translator.translate(nameEntry, tagName -> addElement(parent, tagName), texts -> addTextNode(parent, texts), isSingleParam);
     }
 
     private void translateOrderBy(Element parent, OrderBy orderBy) {
@@ -637,7 +638,7 @@ public class MySqlTranslator extends Translator {
     @FunctionalInterface
     interface ByTranslator {
 
-        void translate(NameEntry nameEntry, Function<String, Element> addElement, AddTextNode addTextNode);
+        void translate(NameEntry nameEntry, Function<String, Element> addElement, AddTextNode addTextNode, boolean isSingleParam);
 
     }
 

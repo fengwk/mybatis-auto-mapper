@@ -48,4 +48,6 @@ public interface ExampleMapper extends BaseMapper<ExampleDO> {
 
     List<ExampleDO> findByIdInAndIsDeleted(@Param("id") Collection<Long> ids, int isDeleted);
 
+    int countByIdIn(List<Long> ids);
+
 }
