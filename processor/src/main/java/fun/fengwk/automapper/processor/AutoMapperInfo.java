@@ -5,6 +5,11 @@ import fun.fengwk.automapper.annotation.DBType;
 import fun.fengwk.automapper.annotation.NamingStyle;
 import fun.fengwk.automapper.processor.mapper.GlobalConfig;
 
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.ExecutableElement;
+import java.util.Map;
+
 /**
  *
  * @see AutoMapper
@@ -12,43 +17,60 @@ import fun.fengwk.automapper.processor.mapper.GlobalConfig;
  */
 public class AutoMapperInfo {
 
-    private DBType dbType;
-    private String mapperSuffix;
-    private NamingStyle tableNamingStyle;
-    private NamingStyle fieldNamingStyle;
-    private String tableName;
+    private final DBType dbType;
+    private final String mapperSuffix;
+    private final NamingStyle tableNamingStyle;
+    private final NamingStyle fieldNamingStyle;
+    private final String tableName;
 
-    public AutoMapperInfo(AutoMapper autoMapper) {
-        this.dbType = autoMapper.dbType();
-        this.mapperSuffix = autoMapper.mapperSuffix();
-        this.tableNamingStyle = autoMapper.tableNamingStyle();
-        this.fieldNamingStyle = autoMapper.fieldNamingStyle();
-        this.tableName = autoMapper.tableName();
+    private AutoMapperInfo(DBType dbType, String mapperSuffix, NamingStyle tableNamingStyle,
+                          NamingStyle fieldNamingStyle, String tableName) {
+        this.dbType = dbType;
+        this.mapperSuffix = mapperSuffix;
+        this.tableNamingStyle = tableNamingStyle;
+        this.fieldNamingStyle = fieldNamingStyle;
+        this.tableName = tableName;
     }
 
-    /**
-     * 优先使用全局配置。
-     *
-     * @param globalConfig
-     */
-    public void preferGlobalConfig(GlobalConfig globalConfig) {
-        DBType dbType = globalConfig.getDBType();
-        String mapperSuffix = globalConfig.getMapperSuffix();
-        NamingStyle tableNamingStyle = globalConfig.getTableNamingStyle();
-        NamingStyle fieldNamingStyle = globalConfig.getFieldNamingStyle();
+    public static AutoMapperInfo parse(AutoMapper autoMapper, AnnotationMirror autoMapperMirror, GlobalConfig globalConfig) {
+        // 规则：用户注解明确设置 > 全局配置 > 默认设置
 
-        if (dbType != null) {
-            this.dbType = dbType;
+        DBType dbType = autoMapper.dbType();
+        String mapperSuffix = autoMapper.mapperSuffix();
+        NamingStyle tableNamingStyle = autoMapper.tableNamingStyle();
+        NamingStyle fieldNamingStyle = autoMapper.fieldNamingStyle();
+        String tableName = autoMapper.tableName();
+
+        DBType globalDbType = globalConfig.getDBType();
+        String globalMapperSuffix = globalConfig.getMapperSuffix();
+        NamingStyle globalTableNamingStyle = globalConfig.getTableNamingStyle();
+        NamingStyle globalFieldNamingStyle = globalConfig.getFieldNamingStyle();
+
+        if (globalDbType != null && !isExplicit(autoMapperMirror, "dbType")) {
+            dbType = globalDbType;
         }
-        if (mapperSuffix != null) {
-            this.mapperSuffix = mapperSuffix;
+        if (globalMapperSuffix != null && !isExplicit(autoMapperMirror, "mapperSuffix")) {
+            mapperSuffix = globalMapperSuffix;
         }
-        if (tableNamingStyle != null) {
-            this.tableNamingStyle = tableNamingStyle;
+        if (globalTableNamingStyle != null && !isExplicit(autoMapperMirror, "tableNamingStyle")) {
+            tableNamingStyle = globalTableNamingStyle;
         }
-        if (fieldNamingStyle != null) {
-            this.fieldNamingStyle = fieldNamingStyle;
+        if (globalFieldNamingStyle != null && !isExplicit(autoMapperMirror, "fieldNamingStyle")) {
+            fieldNamingStyle = globalFieldNamingStyle;
         }
+
+        return new AutoMapperInfo(dbType, mapperSuffix, tableNamingStyle, fieldNamingStyle, tableName);
+    }
+
+    // 检查注解方法是否被用户明确设置了
+    private static boolean isExplicit(AnnotationMirror autoMapperMirror, String methodName) {
+        Map<? extends ExecutableElement, ? extends AnnotationValue> elementValues = autoMapperMirror.getElementValues();
+        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> e : elementValues.entrySet()) {
+            if (methodName.equals(e.getKey().getSimpleName().toString())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public DBType getDbType() {

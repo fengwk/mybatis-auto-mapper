@@ -1,11 +1,7 @@
 package fun.fengwk.automapper.processor.translator.mysql;
 
 import fun.fengwk.automapper.processor.naming.LowerUnderScoreCaseConverter;
-import fun.fengwk.automapper.processor.translator.BeanField;
-import fun.fengwk.automapper.processor.translator.MethodInfo;
-import fun.fengwk.automapper.processor.translator.Param;
-import fun.fengwk.automapper.processor.translator.Return;
-import fun.fengwk.automapper.processor.translator.TranslateContext;
+import fun.fengwk.automapper.processor.translator.*;
 import fun.fengwk.automapper.processor.util.DOMUtils;
 import org.junit.Test;
 

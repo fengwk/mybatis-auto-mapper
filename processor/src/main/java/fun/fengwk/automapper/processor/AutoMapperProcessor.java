@@ -14,12 +14,9 @@ import fun.fengwk.automapper.processor.translator.TranslatorFactory;
 import fun.fengwk.automapper.processor.util.DOMUtils;
 import fun.fengwk.automapper.processor.util.StringUtils;
 
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
@@ -32,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
@@ -78,7 +76,8 @@ public class AutoMapperProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for (Element annotatedElement : roundEnv.getElementsAnnotatedWith(AutoMapper.class)) {
             if (annotatedElement.getKind() != ElementKind.INTERFACE) {
-                error(annotatedElement, "Only interface can be annotated with @%s", AutoMapper.class.getSimpleName());
+                error(annotatedElement, "Only interface can be annotated with @%s, but '%s' is not.",
+                        AutoMapper.class.getSimpleName(), annotatedElement.getSimpleName().toString());
                 break;
             }
 
@@ -86,7 +85,8 @@ public class AutoMapperProcessor extends AbstractProcessor {
             try {
                 doProcess(mapperElement);
             } catch (Throwable e) {
-                error(mapperElement, e.toString());
+                error(mapperElement, "Error occurred when process '%s', cause: %s.",
+                        annotatedElement.getSimpleName().toString(), e.toString());
             }
         }
 
@@ -94,9 +94,8 @@ public class AutoMapperProcessor extends AbstractProcessor {
     }
 
     private void doProcess(TypeElement mapperElement) {
-        AutoMapper autoMapper = mapperElement.getAnnotation(AutoMapper.class);
-        AutoMapperInfo autoMapperInfo = new AutoMapperInfo(autoMapper);
-        autoMapperInfo.preferGlobalConfig(getGlobalConfig());
+        AutoMapperInfo autoMapperInfo = AutoMapperInfo.parse(mapperElement.getAnnotation(AutoMapper.class),
+                findAnnotationMirror(mapperElement, AutoMapper.class), getGlobalConfig());
 
         DBType dbType = autoMapperInfo.getDbType();
         String mapperSuffix = autoMapperInfo.getMapperSuffix();
@@ -140,6 +139,16 @@ public class AutoMapperProcessor extends AbstractProcessor {
             mapperMethodParser = new MapperMethodParser(types, elements);
         }
         return mapperMethodParser;
+    }
+
+    private <A extends Annotation> AnnotationMirror findAnnotationMirror(Element element, Class<A> annotationClass) {
+        List<? extends AnnotationMirror> annoMirrors = element.getAnnotationMirrors();
+        for (AnnotationMirror annoMirror : annoMirrors) {
+            if (annotationClass.getName().equals(annoMirror.getAnnotationType().asElement().getSimpleName().toString())) {
+                return annoMirror;
+            }
+        }
+        return null;
     }
 
     // 获取全局配置
@@ -228,11 +237,11 @@ public class AutoMapperProcessor extends AbstractProcessor {
     }
 
     private void log(String msg, Object... args) {
-        messager.printMessage(Diagnostic.Kind.NOTE, String.format(String.valueOf(msg), args));
+        messager.printMessage(Diagnostic.Kind.NOTE, String.format(msg, args));
     }
 
     private void error(Element e, String msg, Object... args) {
-        messager.printMessage(Diagnostic.Kind.ERROR, String.format(String.valueOf(msg), args), e);
+        messager.printMessage(Diagnostic.Kind.ERROR, String.format(msg, args), e);
     }
 
 }

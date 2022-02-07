@@ -1,8 +1,6 @@
 package fun.fengwk.automapper.processor.util;
 
-import fun.fengwk.automapper.processor.util.LocalEntityResolver;
 import org.junit.Test;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;

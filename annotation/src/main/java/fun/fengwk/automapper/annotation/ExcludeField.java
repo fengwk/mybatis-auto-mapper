@@ -1,10 +1,6 @@
 package fun.fengwk.automapper.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * 排除字段，该注解用于insert或update方法，被该注解指定的字段将在insert或update表达式生成xml时被忽略。

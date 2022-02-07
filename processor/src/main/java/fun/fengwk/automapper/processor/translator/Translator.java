@@ -9,14 +9,7 @@ import fun.fengwk.automapper.processor.parser.TokenIterator;
 import fun.fengwk.automapper.processor.parser.ast.ASTNode;
 import fun.fengwk.automapper.processor.parser.ast.Selective;
 import fun.fengwk.automapper.processor.util.LocalEntityResolver;
-import org.w3c.dom.Comment;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentType;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
