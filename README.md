@@ -1,6 +1,14 @@
 # AutoMapper
 
-AutoMapper是一款适用于Mybatis的SQL生成框架，提供了JPA风格的SQL语句生成能力，用户仅需依赖一个编译期jar包就能在编译期根据Mapper接口中的方法定义生成相应的XML文件和SQL语句。就像流行的Lombok一样，一切发生在编译期间，因此不会对软件性能造成任何影响，并且用户可以直接在编译完成的target目录或jar中看到生成的SQL语句。
+AutoMapper是一款适用于Mybatis的SQL生成插件，提供了JPA风格的SQL语句生成能力，用户仅需依赖一个编译期jar包，就能在编译期根据Mapper接口中的方法定义生成相应的XML文件和SQL语句。就像流行的Lombok一样，一切发生在编译期间，因此不会对软件性能造成任何影响，并且用户可以直接在编译完成的target目录或jar中看到生成的SQL语句。
+
+# 效果展示
+
+下方动图演示了在idea上插件在编译时动态生成SQL的效果，您可以通过Build -> ReBuild Project达到一样的效果。
+
+![idea.gif](./doc/idea.gif)
+
+无论您使用的是什么开发环境，只要编译器是按照标准实现的，都能生成成功。另外在打包发布时，这个过程是无感的，因为在打包编译的过程中AutoMapper会自动生效。
 
 # 开始使用
 
