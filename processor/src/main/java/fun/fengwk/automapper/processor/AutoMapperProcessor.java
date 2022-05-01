@@ -80,7 +80,7 @@ public class AutoMapperProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for (Element annotatedElement : roundEnv.getElementsAnnotatedWith(AutoMapper.class)) {
             if (annotatedElement.getKind() != ElementKind.INTERFACE) {
-                error(annotatedElement, "Only interface can be annotated with @%s, but '%s' is not.",
+                error(annotatedElement, "[AutoMapper] Only interface can be annotated with @%s, but '%s' is not.",
                         AutoMapper.class.getSimpleName(), annotatedElement.getSimpleName().toString());
                 break;
             }
@@ -89,7 +89,7 @@ public class AutoMapperProcessor extends AbstractProcessor {
             try {
                 doProcess(mapperElement);
             } catch (Throwable e) {
-                error(mapperElement, "Error occurred when process '%s', cause: %s.",
+                error(mapperElement, "[AutoMapper] Error occurred when process '%s', cause: '%s'.",
                         annotatedElement.getSimpleName().toString(), e.toString());
             }
         }
@@ -135,7 +135,7 @@ public class AutoMapperProcessor extends AbstractProcessor {
         InputStream xmlInput = openResource(xmlResourceFile);
         try {
             translator = TranslatorFactory.getInstance(dbType, new TranslateContext(namespace, tableName, fieldNamingConverter, xmlInput));
-            translateAll(translator, methodInfoList);
+            translateAll(translator, methodInfoList, mapperElement.getSimpleName().toString());
         } finally {
             close(xmlInput);
         }
@@ -217,7 +217,7 @@ public class AutoMapperProcessor extends AbstractProcessor {
     private void writeResource(String resourceFile, String context) {
         try {
             FileObject fileObject = filer.createResource(StandardLocation.CLASS_OUTPUT, "", resourceFile);
-            log("write resource %s", resourceFile);
+            log("[AutoMapper] Mapping result written to '%s'.", resourceFile);
             try (Writer writer = new OutputStreamWriter(fileObject.openOutputStream(), StandardCharsets.UTF_8)) {
                 writer.write(context);
             }
@@ -226,12 +226,12 @@ public class AutoMapperProcessor extends AbstractProcessor {
         }
     }
 
-    private void translateAll(Translator translator, List<MethodInfo> methodInfoList) {
+    private void translateAll(Translator translator, List<MethodInfo> methodInfoList, String mapperName) {
         for (MethodInfo methodInfo : methodInfoList) {
             try {
                 translator.translate(methodInfo);
             } catch (AutoMapperException e) {
-                log(e.toString());
+                log("[AutoMapper] Error mapping '%s#%s' method, cause: '%s'.", mapperName, methodInfo.getMethodName(), e.toString());
             }
         }
     }
