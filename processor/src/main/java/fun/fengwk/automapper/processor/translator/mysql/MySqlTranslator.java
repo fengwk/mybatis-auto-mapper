@@ -1,6 +1,6 @@
 package fun.fengwk.automapper.processor.translator.mysql;
 
-import fun.fengwk.automapper.annotation.mysql.Ignore;
+import fun.fengwk.automapper.annotation.mysql.InsertIgnore;
 import fun.fengwk.automapper.annotation.mysql.Replace;
 import fun.fengwk.automapper.processor.lexer.Keyword;
 import fun.fengwk.automapper.processor.lexer.Token;
@@ -302,7 +302,7 @@ public class MySqlTranslator extends Translator {
     private String insertMode(List<Anno> annos) {
         if (annos != null) {
             for (Anno anno : annos) {
-                if (Objects.equals(anno.getType(), Ignore.class.getName())) {
+                if (Objects.equals(anno.getType(), InsertIgnore.class.getName())) {
                     return "insert ignore into ";
                 } else if (Objects.equals(anno.getType(), Replace.class.getName())) {
                     return "replace into ";

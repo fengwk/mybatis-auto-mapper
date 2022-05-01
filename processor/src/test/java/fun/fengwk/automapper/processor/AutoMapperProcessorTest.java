@@ -32,14 +32,14 @@ public class AutoMapperProcessorTest {
                 .javac()
                 .withProcessors(new AutoMapperProcessor())
                 .compile(
-//                        JavaFileObjects.forResource("fun/fengwk/automapper/example/mapper/BaseMapper.java"),
-//                        JavaFileObjects.forResource("fun/fengwk/automapper/example/mapper/EmptyMapper.java"),
+                        JavaFileObjects.forResource("fun/fengwk/automapper/example/mapper/BaseMapper.java"),
+                        JavaFileObjects.forResource("fun/fengwk/automapper/example/mapper/EmptyMapper.java"),
                         JavaFileObjects.forResource("fun/fengwk/automapper/example/mapper/ExampleMapper.java"),
-//                        JavaFileObjects.forResource("fun/fengwk/automapper/example/mapper/SimpleExampleMapper.java"),
-//                        JavaFileObjects.forResource("fun/fengwk/automapper/example/model/BaseDO.java"),
-//                        JavaFileObjects.forResource("fun/fengwk/automapper/example/model/EmptyDO.java"),
-                        JavaFileObjects.forResource("fun/fengwk/automapper/example/model/ExampleDO.java")
-//                        JavaFileObjects.forResource("fun/fengwk/automapper/example/model/SimpleExampleDO.java")
+                        JavaFileObjects.forResource("fun/fengwk/automapper/example/mapper/SimpleExampleMapper.java"),
+                        JavaFileObjects.forResource("fun/fengwk/automapper/example/model/BaseDO.java"),
+                        JavaFileObjects.forResource("fun/fengwk/automapper/example/model/EmptyDO.java"),
+                        JavaFileObjects.forResource("fun/fengwk/automapper/example/model/ExampleDO.java"),
+                        JavaFileObjects.forResource("fun/fengwk/automapper/example/model/SimpleExampleDO.java")
                 );
     }
 
