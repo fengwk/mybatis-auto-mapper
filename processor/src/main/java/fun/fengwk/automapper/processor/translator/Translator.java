@@ -77,13 +77,19 @@ public abstract class Translator {
     }
 
     /**
-     * 将方法信息翻译为 mybatis xml，无法翻译的情况将抛出{@link TranslateException}。
+     * 将方法信息翻译为 mybatis xml，如果方法已存在无需翻译返回false，无法翻译的情况将抛出{@link TranslateException}。
      *
      * @param methodInfo
+     * @return
      */
-    public void translate(MethodInfo methodInfo) {
+    public boolean translate(MethodInfo methodInfo) {
+        if (existsStmtElement(methodInfo.getMethodName())) {
+            return false;
+        }
+
         ASTNode node = parse(methodInfo.getMethodName());
         doTranslate(node, methodInfo);
+        return true;
     }
 
     /**
@@ -161,22 +167,18 @@ public abstract class Translator {
         if (existingIdsCache == null) {
             existingIdsCache = new HashSet<>();
             NodeList childNodes = mapperElement.getChildNodes();
-            if (childNodes != null) {
-                for (int i = 0; i < childNodes.getLength(); i++) {
-                    Node node = childNodes.item(i);
-                    String tagName;
-                    if (node != null && (
-                            TAG_INSERT.equals(tagName = node.getNodeName())
-                                    || TAG_DELETE.equals(tagName)
-                                    || TAG_UPDATE.equals(tagName)
-                                    || TAG_SELECT.equals(tagName))) {
-                        NamedNodeMap attributes = node.getAttributes();
-                        if (attributes != null) {
-                            Node idAttr = attributes.getNamedItem("id");
-                            if (idAttr != null) {
-                                existingIdsCache.add(idAttr.getNodeValue());
-                            }
-                        }
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node node = childNodes.item(i);
+                String tagName;
+                if (node != null && (
+                        TAG_INSERT.equals(tagName = node.getNodeName())
+                                || TAG_DELETE.equals(tagName)
+                                || TAG_UPDATE.equals(tagName)
+                                || TAG_SELECT.equals(tagName))) {
+                    NamedNodeMap attributes = node.getAttributes();
+                    Node idAttr = attributes.getNamedItem("id");
+                    if (idAttr != null) {
+                        existingIdsCache.add(idAttr.getNodeValue());
                     }
                 }
             }

@@ -19,7 +19,7 @@ AutoMapper是一款适用于Mybatis的SQL生成插件，提供了JPA风格的SQL
     <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>auto-mapper-processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.22</version>
+    <version>0.0.23</version>
 </dependency>
 ```
 
@@ -113,6 +113,14 @@ fun.fengwk.automapper.annotation.AutoMapper.tableNamingStyle=LOWER_UNDER_SCORE_C
 fun.fengwk.automapper.annotation.AutoMapper.fieldNamingStyle=LOWER_UNDER_SCORE_CASE
 fun.fengwk.automapper.annotation.AutoMapper.tableNamePrefix=test_
 ```
+
+# 编译信息
+
+AutoMapper在编译期会打印这以下几种常见信息：
+
+- 映射完成写入目标xml文件。
+- 用户已经编写过要映射的方法的sql片段，AutoMapper将跳过这一方法的处理。
+- 用户没有编写过要映射的方法并且自动映射失败，此时会报告错误并中断编译，此时用户需要确认是否需要使用AutoMapper映射此方法，如果需要则需修正方法语法，否则可以自行在xml文件中定义相应方法对应的sql片段。
 
 # MySQL特性
 

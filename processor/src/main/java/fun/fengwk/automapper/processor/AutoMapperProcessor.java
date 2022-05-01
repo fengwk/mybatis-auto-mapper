@@ -135,7 +135,7 @@ public class AutoMapperProcessor extends AbstractProcessor {
         InputStream xmlInput = openResource(xmlResourceFile);
         try {
             translator = TranslatorFactory.getInstance(dbType, new TranslateContext(namespace, tableName, fieldNamingConverter, xmlInput));
-            translateAll(translator, methodInfoList, mapperElement.getSimpleName().toString());
+            translateAll(translator, methodInfoList, mapperElement);
         } finally {
             close(xmlInput);
         }
@@ -226,12 +226,16 @@ public class AutoMapperProcessor extends AbstractProcessor {
         }
     }
 
-    private void translateAll(Translator translator, List<MethodInfo> methodInfoList, String mapperName) {
+    private void translateAll(Translator translator, List<MethodInfo> methodInfoList, TypeElement mapperElement) {
         for (MethodInfo methodInfo : methodInfoList) {
             try {
-                translator.translate(methodInfo);
+                if (!translator.translate(methodInfo)) {
+                    log("[AutoMapper] Skip '%s#%s' method, because the mapping already exists.",
+                            mapperElement.getSimpleName().toString(), methodInfo.getMethodName());
+                }
             } catch (AutoMapperException e) {
-                log("[AutoMapper] Error mapping '%s#%s' method, cause: '%s'.", mapperName, methodInfo.getMethodName(), e.toString());
+                error(mapperElement, "[AutoMapper] Error mapping '%s#%s' method, cause: '%s'.",
+                        mapperElement.getQualifiedName().toString(), methodInfo.getMethodName(), e.toString());
             }
         }
     }
