@@ -1,11 +1,6 @@
-package fun.fengwk.automapper.processor.translator.mysql;
+package fun.fengwk.automapper.processor.translator;
 
 import fun.fengwk.automapper.processor.naming.LowerUnderScoreCaseConverter;
-import fun.fengwk.automapper.processor.translator.BeanField;
-import fun.fengwk.automapper.processor.translator.MethodInfo;
-import fun.fengwk.automapper.processor.translator.Param;
-import fun.fengwk.automapper.processor.translator.Return;
-import fun.fengwk.automapper.processor.translator.TranslateContext;
 import fun.fengwk.automapper.processor.util.DOMUtils;
 import org.junit.Test;
 
@@ -14,7 +9,7 @@ import java.util.Arrays;
 /**
  * @author fengwk
  */
-public class MySqlTranslatorTest {
+public class Sql92TranslatorTest {
 
     @Test
     public void testInsert() {
@@ -26,7 +21,7 @@ public class MySqlTranslatorTest {
 
         Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -53,7 +48,7 @@ public class MySqlTranslatorTest {
 
         Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -88,7 +83,7 @@ public class MySqlTranslatorTest {
 
         Param param = new Param("demoDO", null, null, true, true, Arrays.asList(bf1, bf2, bf3), false);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -117,7 +112,7 @@ public class MySqlTranslatorTest {
 
         Param param = new Param("demoDO", null, null, true, true, Arrays.asList(bf1, bf2, bf3), false);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -148,7 +143,7 @@ public class MySqlTranslatorTest {
     public void testDeleteAll() {
         String methodName = "deleteAll";
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, null, null));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -171,7 +166,7 @@ public class MySqlTranslatorTest {
         Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
         Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), null));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -198,7 +193,7 @@ public class MySqlTranslatorTest {
         Param p1 = new Param("java.lang.String", "username", "username", false, false, null, true);
         Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, true);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), null));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -232,7 +227,7 @@ public class MySqlTranslatorTest {
 
         Param p = new Param("DemoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p), null));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -262,7 +257,7 @@ public class MySqlTranslatorTest {
 
         Param p = new Param("DemoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p), null));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -297,7 +292,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, null, ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -324,7 +319,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, null, ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -355,7 +350,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -389,7 +384,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -417,7 +412,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("int", false, null);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, null, ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -443,7 +438,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("int", false, null);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -473,7 +468,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("int", false, null);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -503,7 +498,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("int", false, null);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -533,7 +528,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("int", false, null);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -563,7 +558,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("int", false, null);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -594,7 +589,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("int", false, null);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -624,7 +619,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("int", false, null);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -654,7 +649,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("int", false, null);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -668,7 +663,7 @@ public class MySqlTranslatorTest {
                         "    from demo\n" +
                         "    <where>\n" +
                         "        username not like #{username}\n" +
-                        "        and user_address like concat(#{userAddress}, '%')\n" +
+                        "        and user_address like '${userAddress}%'\n" +
                         "    </where>\n" +
                         "</select>\n" +
                         "</mapper>"
@@ -684,7 +679,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("int", false, null);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -697,8 +692,8 @@ public class MySqlTranslatorTest {
                         "    select count(*)\n" +
                         "    from demo\n" +
                         "    <where>\n" +
-                        "        username like concat('%', #{username})\n" +
-                        "        and user_address like concat('%', #{userAddress}, '%')\n" +
+                        "        username like '%${username}'\n" +
+                        "        and user_address like '%${userAddress}%'\n" +
                         "    </where>\n" +
                         "</select>\n" +
                         "</mapper>"
@@ -714,7 +709,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("int", false, null);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -747,7 +742,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("int", false, null);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -783,7 +778,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("int", false, null);
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -827,7 +822,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -857,7 +852,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -888,7 +883,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -922,7 +917,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2, p3, p4), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
@@ -959,7 +954,7 @@ public class MySqlTranslatorTest {
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
-        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2, p3, p4), ret));
 
         assert DOMUtils.toString(translator.getDocument()).equals(

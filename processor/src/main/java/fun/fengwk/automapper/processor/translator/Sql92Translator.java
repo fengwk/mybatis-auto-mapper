@@ -19,6 +19,7 @@ import fun.fengwk.automapper.processor.util.StringUtils;
 import org.w3c.dom.Element;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -32,60 +33,66 @@ import java.util.stream.Collectors;
  */
 public class Sql92Translator extends Translator {
 
-    private static final Map<Keyword, ByTranslator> BY_TRANSLATOR_MAP;
-    private static final Map<Keyword, BiConsumer<String, AddTextNode>> ORDER_BY_TRANSLATOR_MAP;
-
-    static {
-        Map<Keyword, ByTranslator> byTranslatorMap = new HashMap<>();
-        byTranslatorMap.put(Keyword.IS, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.EQUALS, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.LESS_THAN, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s<#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.LESS_THAN_EQUALS, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s<=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.GREATER_THAN, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s>#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.GREATER_THAN_EQUALS, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s>=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.AFTER, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s>#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.BEFORE, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s<#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.IS_NULL, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s is null", nameEntry.getFieldName())));
-        byTranslatorMap.put(Keyword.IS_NOT_NULL, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s is not null", nameEntry.getFieldName())));
-        byTranslatorMap.put(Keyword.NOT_NULL, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s is not null", nameEntry.getFieldName())));
-        byTranslatorMap.put(Keyword.LIKE, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s like #{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.NOT_LIKE, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s not like #{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.STARTING_WITH, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s like '${%s}%%'", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.ENDING_WITH, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s like '%%${%s}'", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.CONTAINING, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s like '%%${%s}%%'", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.NOT, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s != #{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.IN, (nameEntry, addElement, addTextNode, isSingleParam) -> {
-            addTextNode.accept(nameEntry.getFieldName(), " in", LF, INDENT);
-            String itemName = "item".equals(nameEntry.getName()) ? "item0" : "item";
-            Element foreachElement = addElement.apply("foreach");
-            foreachElement.setAttribute("collection", isSingleParam ? "collection" : nameEntry.getName());
-            foreachElement.setAttribute("item", itemName);
-            foreachElement.setAttribute("separator", ",");
-            foreachElement.setAttribute("open", "(");
-            foreachElement.setAttribute("close", ")");
-            foreachElement.setTextContent(String.format("%s%s%s#{%s}%s%s", LF, INDENT, INDENT, itemName, LF, INDENT));
-        });
-        byTranslatorMap.put(Keyword.NOT_IN, (nameEntry, addElement, addTextNode, isSingleParam) -> {
-            addTextNode.accept(nameEntry.getFieldName(), " not in", LF, INDENT);
-            String itemName = "item".equals(nameEntry.getName()) ? "item0" : "item";
-            Element foreachElement = addElement.apply("foreach");
-            foreachElement.setAttribute("collection", isSingleParam ? "collection" : nameEntry.getName());
-            foreachElement.setAttribute("item", itemName);
-            foreachElement.setAttribute("separator", ",");
-            foreachElement.setAttribute("open", "(");
-            foreachElement.setAttribute("close", ")");
-            foreachElement.setTextContent(String.format("%s%s%s#{%s}%s%s", LF, INDENT, INDENT, itemName, LF, INDENT));
-        });
-        BY_TRANSLATOR_MAP = byTranslatorMap;
-
-        Map<Keyword, BiConsumer<String, AddTextNode>> orderByTranslatorMap = new HashMap<>();
-        orderByTranslatorMap.put(Keyword.ASC, (fieldName, addTextNode) -> addTextNode.accept(String.format("%s", fieldName)));
-        orderByTranslatorMap.put(Keyword.DESC, (fieldName, addTextNode) -> addTextNode.accept(String.format("%s desc", fieldName)));
-        ORDER_BY_TRANSLATOR_MAP = orderByTranslatorMap;
-    }
+    protected final Map<Keyword, ByTranslator> byTranslatorMap;
+    protected final Map<Keyword, BiConsumer<String, AddTextNode>> orderByTranslatorMap;
 
     public Sql92Translator(TranslateContext translateContext) {
         super(translateContext);
+
+        this.byTranslatorMap = buildByTranslatorMap();
+        this.orderByTranslatorMap = buildOrderByTranslatorMap();
+    }
+
+    protected Map<Keyword, ByTranslator> buildByTranslatorMap() {
+        Map<Keyword, ByTranslator> byTranslatorMap = new HashMap<>();
+        byTranslatorMap.put(Keyword.IS, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.EQUALS, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.LESS_THAN, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s<#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.LESS_THAN_EQUALS, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s<=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.GREATER_THAN, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s>#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.GREATER_THAN_EQUALS, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s>=#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.AFTER, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s>#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.BEFORE, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s<#{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.IS_NULL, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s is null", nameEntry.getFieldName())));
+        byTranslatorMap.put(Keyword.IS_NOT_NULL, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s is not null", nameEntry.getFieldName())));
+        byTranslatorMap.put(Keyword.NOT_NULL, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s is not null", nameEntry.getFieldName())));
+        byTranslatorMap.put(Keyword.LIKE, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s like #{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.NOT_LIKE, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s not like #{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.STARTING_WITH, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s like '${%s}%%'", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.ENDING_WITH, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s like '%%${%s}'", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.CONTAINING, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s like '%%${%s}%%'", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.NOT, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> addTextNode.accept(String.format("%s != #{%s}", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.IN, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> {
+            addTextNode.accept(nameEntry.getFieldName(), " in", LF, indent(indent));
+            String itemName = "item".equals(nameEntry.getName()) ? "item0" : "item";
+            Element foreachElement = addElement.apply("foreach");
+            foreachElement.setAttribute("collection", isSingleParam ? "collection" : nameEntry.getName());
+            foreachElement.setAttribute("item", itemName);
+            foreachElement.setAttribute("separator", ",");
+            foreachElement.setAttribute("open", "(");
+            foreachElement.setAttribute("close", ")");
+            foreachElement.setTextContent(String.format("%s%s#{%s}%s%s", LF, indent(indent + 1), itemName, LF, indent(indent)));
+        });
+        byTranslatorMap.put(Keyword.NOT_IN, (nameEntry, addElement, addTextNode, isSingleParam, indent) -> {
+            addTextNode.accept(nameEntry.getFieldName(), " not in", LF, indent(indent));
+            String itemName = "item".equals(nameEntry.getName()) ? "item0" : "item";
+            Element foreachElement = addElement.apply("foreach");
+            foreachElement.setAttribute("collection", isSingleParam ? "collection" : nameEntry.getName());
+            foreachElement.setAttribute("item", itemName);
+            foreachElement.setAttribute("separator", ",");
+            foreachElement.setAttribute("open", "(");
+            foreachElement.setAttribute("close", ")");
+            foreachElement.setTextContent(String.format("%s%s#{%s}%s%s", LF, indent(indent + 1), itemName, LF, indent(indent)));
+        });
+
+        return byTranslatorMap;
+    }
+
+    protected Map<Keyword, BiConsumer<String, AddTextNode>> buildOrderByTranslatorMap() {
+        Map<Keyword, BiConsumer<String, AddTextNode>> orderByTranslatorMap = new HashMap<>();
+        orderByTranslatorMap.put(Keyword.ASC, (fieldName, addTextNode) -> addTextNode.accept(String.format("%s", fieldName)));
+        orderByTranslatorMap.put(Keyword.DESC, (fieldName, addTextNode) -> addTextNode.accept(String.format("%s desc", fieldName)));
+        return orderByTranslatorMap;
     }
 
     @Override
@@ -129,20 +136,20 @@ public class Sql92Translator extends Translator {
                 && (child = insert.getChild(0)) != null
                 && child.getLexeme().isKeyword(Keyword.ALL)) {
             if (isSelective(insert)) {
-                translateInsertAllSelective(methodName, param);
+                translateInsertAllSelective(insert, methodName, param);
             } else {
-                translateInsertAll(methodName, param);
+                translateInsertAll(insert, methodName, param);
             }
         } else {
             if (isSelective(insert)) {
-                translateInsertOneSelective(methodName, param);
+                translateInsertOneSelective(insert, methodName, param);
             } else {
-                translateInsertOne(methodName, param);
+                translateInsertOne(insert, methodName, param);
             }
         }
     }
 
-    private void translateInsertAll(String methodName, Param param) {
+    private void translateInsertAll(Insert insert, String methodName, Param param) {
         if (!param.isIterable()) {
             throw new TranslateException("%s should have iterable param", methodName);
         }
@@ -164,7 +171,7 @@ public class Sql92Translator extends Translator {
         addTextNode(insertElement,
                 LF,
                 INDENT,
-                "insert into ",
+                translateInsertInstruction(insert), BLANK,
                 tableName,
                 " (",
                 param.getBeanFields().stream()
@@ -189,7 +196,7 @@ public class Sql92Translator extends Translator {
         insertStmtElement.append();
     }
 
-    private void translateInsertAllSelective(String methodName, Param param) {
+    private void translateInsertAllSelective(Insert insert, String methodName, Param param) {
         if (!param.isIterable()) {
             throw new TranslateException("%s should have iterable param", methodName);
         }
@@ -205,7 +212,7 @@ public class Sql92Translator extends Translator {
         foreachElement.setAttribute("collection", "collection");
         foreachElement.setAttribute("item", "item");
         foreachElement.setAttribute("separator", ";");
-        addTextNode(foreachElement, LF, INDENT, INDENT, "insert into ", tableName, LF, INDENT, INDENT);
+        addTextNode(foreachElement, LF, INDENT, INDENT, translateInsertInstruction(insert), BLANK, tableName, LF, INDENT, INDENT);
         Element trimElement = addElement(foreachElement, "trim");
         trimElement.setAttribute("prefix", "(");
         trimElement.setAttribute("suffix", ")");
@@ -239,7 +246,7 @@ public class Sql92Translator extends Translator {
         insertStmtElement.append();
     }
 
-    private void translateInsertOne(String methodName, Param param) {
+    private void translateInsertOne(Insert insert, String methodName, Param param) {
         if (!param.isJavaBean()) {
             throw new TranslateException("% should have java bean param", methodName);
         }
@@ -252,7 +259,7 @@ public class Sql92Translator extends Translator {
         StmtElement insertStmtElement = addInsertElement(methodName, param.getType(), param.findUseGeneratedKeysField());
         Element insertElement = insertStmtElement.getElement();
 
-        addTextNode(insertElement, LF, INDENT, "insert into ", tableName, " (",
+        addTextNode(insertElement, LF, INDENT, translateInsertInstruction(insert), BLANK, tableName, " (",
                 param.getBeanFields().stream()
                         .filter(bf -> !bf.isUseGeneratedKeys())
                         .map(BeanField::getFieldName)
@@ -267,7 +274,7 @@ public class Sql92Translator extends Translator {
         insertStmtElement.append();
     }
 
-    private void translateInsertOneSelective(String methodName, Param param) {
+    private void translateInsertOneSelective(Insert insert, String methodName, Param param) {
         if (!param.isJavaBean()) {
             throw new TranslateException("% should have java bean param", methodName);
         }
@@ -275,7 +282,7 @@ public class Sql92Translator extends Translator {
         StmtElement insertStmtElement = addInsertElement(methodName, param.getType(), param.findUseGeneratedKeysField());
         Element insertElement = insertStmtElement.getElement();
 
-        addTextNode(insertElement, LF, INDENT, "insert into ", tableName, LF, INDENT);
+        addTextNode(insertElement, LF, INDENT, translateInsertInstruction(insert), BLANK, tableName, LF, INDENT);
         Element trimElement = addElement(insertElement, "trim");
         trimElement.setAttribute("prefix", "(");
         trimElement.setAttribute("suffix", ")");
@@ -306,6 +313,16 @@ public class Sql92Translator extends Translator {
         addTextNode(insertElement, LF);
 
         insertStmtElement.append();
+    }
+
+    /**
+     * 翻译insert指令。
+     *
+     * @param insert
+     * @return
+     */
+    protected String translateInsertInstruction(Insert insert) {
+        return "insert into";
     }
 
     private void translateDelete(Delete delete, String methodName, List<Param> params) {
@@ -495,9 +512,9 @@ public class Sql92Translator extends Translator {
             throw new TranslateException("%s should have java bean return", methodName);
         }
 
-        Map<String, NameEntry> nameMap = asNameMap(params);
-        NameEntry offset = nameMap.get(OFFSET);
-        NameEntry limit = nameMap.get(LIMIT);
+        Map<String, SelectiveNameEntry> nameMap = asNameMap(params);
+        SelectiveNameEntry offset = nameMap.get(OFFSET);
+        SelectiveNameEntry limit = nameMap.get(LIMIT);
         if (limit == null) {
             throw new TranslateException("%s should have limit params", methodName);
         }
@@ -552,41 +569,44 @@ public class Sql92Translator extends Translator {
                 || "java.lang.Long".equals(type);
     }
 
-    private Map<String, NameEntry> asNameMap(List<? extends NameEntry> list) {
-        Map<String, NameEntry> map = new HashMap<>();
-        for (NameEntry nameEntry : list) {
+    private Map<String, SelectiveNameEntry> asNameMap(List<? extends SelectiveNameEntry> list) {
+        Map<String, SelectiveNameEntry> map = new HashMap<>();
+        for (SelectiveNameEntry nameEntry : list) {
             map.put(StringUtils.upperCamelToLowerCamel(nameEntry.getName()), nameEntry);
         }
         return map;
     }
 
-    private void translateBy(Element parent, By by, Map<String, NameEntry> nameMap) {
-        addTextNode(parent, "where", BLANK);
-        doTranslateBy(parent, by.getChild(0), nameMap);
+    private void translateBy(Element parent, By by, Map<String, SelectiveNameEntry> nameMap) {
+//        addTextNode(parent, "where", BLANK);
+        Element whereElement = addElement(parent, "where");
+        doTranslateBy(whereElement, by.getChild(0), nameMap, new LinkedList<>());
+        addTextNode(whereElement, LF, INDENT);
     }
 
-    private void doTranslateBy(Element parent, ASTNode node, Map<String, NameEntry> nameMap) {
+    private void doTranslateBy(Element parent, ASTNode node, Map<String, SelectiveNameEntry> nameMap, LinkedList<String> connStack) {
         if (node instanceof ConnectOp) {
-            doTranslateBy(parent, node.getChild(0), nameMap);
-            addTextNode(parent, LF, INDENT, node.getLexeme().getValue().toLowerCase(), BLANK);
-            doTranslateBy(parent, node.getChild(1), nameMap);
+            doTranslateBy(parent, node.getChild(0), nameMap, connStack);
+//            addTextNode(parent, LF, INDENT, node.getLexeme().getValue().toLowerCase(), BLANK);
+            connStack.push(node.getLexeme().getValue().toLowerCase());
+            doTranslateBy(parent, node.getChild(1), nameMap, connStack);
         } else if (node instanceof ByOp) {
-            translateByOp(parent, (ByOp) node, nameMap);
+            translateByOp(parent, (ByOp) node, nameMap, connStack);
         } else {
             throw new TranslateException("Translate error, %s", node);
         }
     }
 
-    private void translateByOp(Element parent, ByOp byOp, Map<String, NameEntry> nameMap) {
+    private void translateByOp(Element parent, ByOp byOp, Map<String, SelectiveNameEntry> nameMap, LinkedList<String> connStack) {
         Token lexeme = byOp.getLexeme();
         Keyword kw = Keyword.of(lexeme.getValue());
-        ByTranslator translator = BY_TRANSLATOR_MAP.get(kw);
+        ByTranslator translator = byTranslatorMap.get(kw);
         if (translator == null) {
             throw new TranslateException("Translate error, %s", byOp);
         }
 
         Variable variable = (Variable) byOp.getChild(0);
-        NameEntry nameEntry = nameMap.get(StringUtils.upperCamelToLowerCamel(variable.getLexeme().getValue()));
+        SelectiveNameEntry nameEntry = nameMap.get(StringUtils.upperCamelToLowerCamel(variable.getLexeme().getValue()));
         boolean isSingleParam = nameMap.size() == 1;
         if (nameEntry == null) {
             if (isSingleParam) {
@@ -597,7 +617,23 @@ public class Sql92Translator extends Translator {
             }
         }
 
-        translator.translate(nameEntry, tagName -> addElement(parent, tagName), texts -> addTextNode(parent, texts), isSingleParam);
+        if (nameEntry.isSelective()) {
+            addTextNode(parent, LF, INDENT, INDENT);
+            Element ifElement = addElement(parent, "if");
+            ifElement.setAttribute("test", String.format("%s != null", nameEntry.getName()));
+            addTextNode(ifElement, LF, INDENT, INDENT, INDENT);
+            if (!connStack.isEmpty()) {
+                addTextNode(ifElement, connStack.pop(), BLANK);
+            }
+            translator.translate(nameEntry, tagName -> addElement(ifElement, tagName), texts -> addTextNode(ifElement, texts), isSingleParam, 3);
+            addTextNode(ifElement, LF, INDENT, INDENT);
+        } else {
+            addTextNode(parent, LF, INDENT, INDENT);
+            if (!connStack.isEmpty()) {
+                addTextNode(parent, connStack.pop(), BLANK);
+            }
+            translator.translate(nameEntry, tagName -> addElement(parent, tagName), texts -> addTextNode(parent, texts), isSingleParam, 2);
+        }
     }
 
     private void translateOrderBy(Element parent, OrderBy orderBy) {
@@ -620,7 +656,7 @@ public class Sql92Translator extends Translator {
     private void translateOrderByOp(Element parent, OrderByOp orderByOp) {
         Token lexeme = orderByOp.getLexeme();
         Keyword kw = Keyword.of(lexeme.getValue());
-        BiConsumer<String, AddTextNode> translator = ORDER_BY_TRANSLATOR_MAP.get(kw);
+        BiConsumer<String, AddTextNode> translator = orderByTranslatorMap.get(kw);
         if (translator == null) {
             throw new TranslateException("Translate error, %s", orderByOp);
         }
@@ -630,14 +666,14 @@ public class Sql92Translator extends Translator {
     }
 
     @FunctionalInterface
-    interface ByTranslator {
+    public interface ByTranslator {
 
-        void translate(NameEntry nameEntry, Function<String, Element> addElement, AddTextNode addTextNode, boolean isSingleParam);
+        void translate(SelectiveNameEntry nameEntry, Function<String, Element> addElement, AddTextNode addTextNode, boolean isSingleParam, int indent);
 
     }
 
     @FunctionalInterface
-    interface AddTextNode {
+    public interface AddTextNode {
 
         void accept(CharSequence... texts);
 

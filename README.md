@@ -19,7 +19,7 @@ AutoMapper是一款适用于Mybatis的SQL生成插件，提供了JPA风格的SQL
     <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>auto-mapper-processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.20</version>
+    <version>0.0.21</version>
 </dependency>
 ```
 
@@ -99,6 +99,8 @@ public interface ExampleMapper {
 使用`@ExcludeField`可以忽略insert或update方法中的指定字段。
 
 使用`@IncludeField`可以只指定insert或update方法中的指定字段。
+
+使用`@Selective`可以指明where查询字段是否为可选的。
 
 # 全局配置
 

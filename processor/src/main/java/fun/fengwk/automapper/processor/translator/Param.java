@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author fengwk
  */
-public class Param implements NameEntry {
+public class Param implements SelectiveNameEntry {
 
     /**
      * 类型。
@@ -37,13 +37,19 @@ public class Param implements NameEntry {
      */
     private final List<BeanField> beanFields;
 
-    public Param(String type, String name, String fieldName, boolean isIterable, boolean isJavaBean, List<BeanField> beanFields) {
+    /**
+     * 当前字段是否是可选的。
+     */
+    private final boolean isSelective;
+
+    public Param(String type, String name, String fieldName, boolean isIterable, boolean isJavaBean, List<BeanField> beanFields, boolean isSelective) {
         this.type = type;
         this.name = name;
         this.fieldName = fieldName;
         this.isIterable = isIterable;
         this.isJavaBean = isJavaBean;
         this.beanFields = beanFields;
+        this.isSelective = isSelective;
     }
 
     public String getType() {
@@ -75,5 +81,9 @@ public class Param implements NameEntry {
                 .filter(BeanField::isUseGeneratedKeys)
                 .findFirst()
                 .orElse(null);
+    }
+
+    public boolean isSelective() {
+        return isSelective;
     }
 }

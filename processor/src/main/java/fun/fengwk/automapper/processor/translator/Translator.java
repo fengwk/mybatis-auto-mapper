@@ -247,6 +247,14 @@ public abstract class Translator {
         });
     }
 
+    protected String indent(int indentCount) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < indentCount; i++) {
+            sb.append(INDENT);
+        }
+        return sb.toString();
+    }
+
     protected class StmtElement {
 
         private final Element element;

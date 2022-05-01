@@ -3,6 +3,7 @@ package fun.fengwk.automapper.processor.mapper;
 import fun.fengwk.automapper.annotation.ExcludeField;
 import fun.fengwk.automapper.annotation.FieldName;
 import fun.fengwk.automapper.annotation.IncludeField;
+import fun.fengwk.automapper.annotation.Selective;
 import fun.fengwk.automapper.annotation.UseGeneratedKeys;
 import fun.fengwk.automapper.processor.naming.NamingConverter;
 import fun.fengwk.automapper.processor.translator.BeanField;
@@ -132,11 +133,14 @@ public class MapperMethodParser {
                     if (paramAnnotation != null) {
                         name = paramAnnotation.value();
                     }
+
                     FieldName fieldNameAnnotation = methodParameter.getAnnotation(FieldName.class);
                     String fieldName = fieldNameAnnotation != null ? fieldNameAnnotation.value()
                             : fieldNamingConverter.convert(StringUtils.upperCamelToLowerCamel(name));
-//                    params.add(new Param(desc.type, name, fieldName, desc.isIterable, desc.isJavaBean, desc.beanFields));
-                    params.add(new Param(desc.type, name, fieldName, desc.isIterable, desc.isJavaBean, getAndFilterBeanFields(desc, includeFieldNames, excludeFieldNames)));
+
+                    params.add(new Param(desc.type, name, fieldName, desc.isIterable, desc.isJavaBean,
+                            getAndFilterBeanFields(desc, includeFieldNames, excludeFieldNames),
+                            methodParameter.getAnnotation(Selective.class) != null));
                 }
             }
         }
@@ -403,7 +407,8 @@ public class MapperMethodParser {
                                         : fieldNamingConverter.convert(StringUtils.upperCamelToLowerCamel(name));
                                 UseGeneratedKeys useGeneratedKeysAnnotation = fieldElement.getAnnotation(UseGeneratedKeys.class);
                                 boolean useGeneratedKeys = useGeneratedKeysAnnotation != null;
-                                beanFieldMap.put(name, new BeanField(name, fieldName, useGeneratedKeys));
+                                beanFieldMap.put(name, new BeanField(name, fieldName, useGeneratedKeys,
+                                        fieldElement.getAnnotation(Selective.class) != null));
                             }
                         }
                     }

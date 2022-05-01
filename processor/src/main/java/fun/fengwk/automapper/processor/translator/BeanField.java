@@ -3,7 +3,7 @@ package fun.fengwk.automapper.processor.translator;
 /**
  * @author fengwk
  */
-public class BeanField implements NameEntry {
+public class BeanField implements SelectiveNameEntry {
 
     /**
      * java程序中的名称。
@@ -20,10 +20,16 @@ public class BeanField implements NameEntry {
      */
     private boolean useGeneratedKeys;
 
-    public BeanField(String name, String fieldName, boolean useGeneratedKeys) {
+    /**
+     * 当前字段是否是可选的。
+     */
+    private final boolean isSelective;
+
+    public BeanField(String name, String fieldName, boolean useGeneratedKeys, boolean isSelective) {
         this.name = name;
         this.fieldName = fieldName;
         this.useGeneratedKeys = useGeneratedKeys;
+        this.isSelective = isSelective;
     }
 
     public String getName() {
@@ -38,4 +44,7 @@ public class BeanField implements NameEntry {
         return useGeneratedKeys;
     }
 
+    public boolean isSelective() {
+        return isSelective;
+    }
 }

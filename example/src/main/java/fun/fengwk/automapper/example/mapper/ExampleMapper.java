@@ -3,6 +3,7 @@ package fun.fengwk.automapper.example.mapper;
 import fun.fengwk.automapper.annotation.AutoMapper;
 import fun.fengwk.automapper.annotation.ExcludeField;
 import fun.fengwk.automapper.annotation.IncludeField;
+import fun.fengwk.automapper.annotation.Selective;
 import fun.fengwk.automapper.example.model.ExampleDO;
 import org.apache.ibatis.annotations.Param;
 
@@ -43,6 +44,8 @@ public interface ExampleMapper extends BaseMapper<ExampleDO> {
     int updateByIdSelective(ExampleDO exampleDO);
 
     ExampleDO findById(long id);
+
+    List<ExampleDO> findByName(@Selective String name);
 
     List<ExampleDO> findByNameStartingWith(String name);
 
