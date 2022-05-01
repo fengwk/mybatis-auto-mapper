@@ -9,7 +9,14 @@ import fun.fengwk.automapper.processor.parser.TokenIterator;
 import fun.fengwk.automapper.processor.parser.ast.ASTNode;
 import fun.fengwk.automapper.processor.parser.ast.Selective;
 import fun.fengwk.automapper.processor.util.LocalEntityResolver;
-import org.w3c.dom.*;
+import org.w3c.dom.Comment;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -46,7 +53,7 @@ public abstract class Translator {
 
     private Set<String> existingIdsCache;
 
-    private Lexer lexer = new Lexer();
+    private Lexer lexer = newLexer();
     private Parser parser = new Parser();
 
     public Translator(TranslateContext translateContext) {
@@ -61,12 +68,20 @@ public abstract class Translator {
     }
 
     /**
+     * 构建词法分析器。
+     *
+     * @return
+     */
+    protected Lexer newLexer() {
+        return new Lexer.Builder().build();
+    }
+
+    /**
      * 将方法信息翻译为 mybatis xml，无法翻译的情况将抛出{@link TranslateException}。
      *
      * @param methodInfo
      */
     public void translate(MethodInfo methodInfo) {
-
         ASTNode node = parse(methodInfo.getMethodName());
         doTranslate(node, methodInfo);
     }

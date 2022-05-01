@@ -3,8 +3,6 @@ package fun.fengwk.automapper.example.mapper;
 import fun.fengwk.automapper.annotation.AutoMapper;
 import fun.fengwk.automapper.annotation.ExcludeField;
 import fun.fengwk.automapper.annotation.IncludeField;
-import fun.fengwk.automapper.annotation.mysql.InsertIgnore;
-import fun.fengwk.automapper.annotation.mysql.Replace;
 import fun.fengwk.automapper.example.model.ExampleDO;
 import org.apache.ibatis.annotations.Param;
 
@@ -18,15 +16,17 @@ import java.util.List;
 @AutoMapper
 public interface ExampleMapper extends BaseMapper<ExampleDO> {
 
-    @InsertIgnore
     @ExcludeField("f1")
     int insert(ExampleDO exampleDO);
 
-    @Replace
     @IncludeField("f1")
     @IncludeField("f2")
     @ExcludeField("f1")
     int insertSelective(ExampleDO exampleDO);
+
+    int insertIgnore(ExampleDO exampleDO);
+
+    int replace(ExampleDO exampleDO);
 
     @ExcludeField.List({
             @ExcludeField("f1"),

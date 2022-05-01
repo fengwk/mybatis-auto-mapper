@@ -19,7 +19,7 @@ AutoMapper是一款适用于Mybatis的SQL生成插件，提供了JPA风格的SQL
     <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>auto-mapper-processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.19</version>
+    <version>0.0.20</version>
 </dependency>
 ```
 
@@ -114,10 +114,10 @@ fun.fengwk.automapper.annotation.AutoMapper.tableNamePrefix=test_
 
 # MySQL特性
 
-当前版本的AutoMapper对MySQL提供了一些特殊的语法支持：
+当在`@AutoMapper`注解或全局配置中指定了dbType为MYSQL时可以使用一些特有的语法：
 
-- 对于添加了`@Ignore`注解的insert方法，将使用`insert ignore into`语法。
-- 对于添加了`@Replace`注解的insert方法，将使用`replace into`语法。
+- 使用`insertIgnore`代替`insert`可使用`insert ignore into`语法。
+- 使用`replace`代替`insert`可使用`replace into`语法。
 - 对于like语句，将使用concat拼接防止SQL注入。
 
 # 应用示例

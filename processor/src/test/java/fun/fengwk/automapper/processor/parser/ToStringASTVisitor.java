@@ -1,6 +1,20 @@
 package fun.fengwk.automapper.processor.parser;
 
-import fun.fengwk.automapper.processor.parser.ast.*;
+import fun.fengwk.automapper.processor.parser.ast.ASTVisitor;
+import fun.fengwk.automapper.processor.parser.ast.All;
+import fun.fengwk.automapper.processor.parser.ast.By;
+import fun.fengwk.automapper.processor.parser.ast.ByOp;
+import fun.fengwk.automapper.processor.parser.ast.ConnectOp;
+import fun.fengwk.automapper.processor.parser.ast.Count;
+import fun.fengwk.automapper.processor.parser.ast.Delete;
+import fun.fengwk.automapper.processor.parser.ast.Find;
+import fun.fengwk.automapper.processor.parser.ast.Insert;
+import fun.fengwk.automapper.processor.parser.ast.OrderBy;
+import fun.fengwk.automapper.processor.parser.ast.OrderByOp;
+import fun.fengwk.automapper.processor.parser.ast.Page;
+import fun.fengwk.automapper.processor.parser.ast.Selective;
+import fun.fengwk.automapper.processor.parser.ast.Update;
+import fun.fengwk.automapper.processor.parser.ast.Variable;
 
 import java.util.LinkedList;
 

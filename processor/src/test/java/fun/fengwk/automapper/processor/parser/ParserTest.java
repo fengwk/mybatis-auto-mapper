@@ -15,7 +15,7 @@ public class ParserTest {
     @Test
     public void test1() {
         String expr = "insert";
-        Lexer lexer = new Lexer();
+        Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse(expr);
         TokenIterator tokenIterator = new TokenIterator(tokens.iterator());
         Parser parser = new Parser();
@@ -28,7 +28,7 @@ public class ParserTest {
     @Test
     public void test2() {
         String expr = "insertAll";
-        Lexer lexer = new Lexer();
+        Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse(expr);
         TokenIterator tokenIterator = new TokenIterator(tokens.iterator());
         Parser parser = new Parser();
@@ -41,7 +41,7 @@ public class ParserTest {
     @Test
     public void test3() {
         String expr = "deleteByUserTypeAndUserName";
-        Lexer lexer = new Lexer();
+        Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse(expr);
         TokenIterator tokenIterator = new TokenIterator(tokens.iterator());
         Parser parser = new Parser();
@@ -54,7 +54,7 @@ public class ParserTest {
     @Test
     public void test4() {
         String expr = "deleteAll";
-        Lexer lexer = new Lexer();
+        Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse(expr);
         TokenIterator tokenIterator = new TokenIterator(tokens.iterator());
         Parser parser = new Parser();
@@ -67,7 +67,7 @@ public class ParserTest {
     @Test
     public void test5() {
         String expr = "deleteByIdOrderByName";
-        Lexer lexer = new Lexer();
+        Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse(expr);
         TokenIterator tokenIterator = new TokenIterator(tokens.iterator());
         Parser parser = new Parser();
@@ -80,7 +80,7 @@ public class ParserTest {
     @Test
     public void test6() {
         String expr = "updateByUserTypeAndUserName";
-        Lexer lexer = new Lexer();
+        Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse(expr);
         TokenIterator tokenIterator = new TokenIterator(tokens.iterator());
         Parser parser = new Parser();
@@ -93,7 +93,7 @@ public class ParserTest {
     @Test
     public void test7() {
         String expr = "findByUsernameAndPasswordOrderByCreatedTimeDesc";
-        Lexer lexer = new Lexer();
+        Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse(expr);
         TokenIterator tokenIterator = new TokenIterator(tokens.iterator());
         Parser parser = new Parser();
@@ -106,7 +106,7 @@ public class ParserTest {
     @Test
     public void test8() {
         String expr = "findByAfter";
-        Lexer lexer = new Lexer();
+        Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse(expr);
         TokenIterator tokenIterator = new TokenIterator(tokens.iterator());
         Parser parser = new Parser();
@@ -119,7 +119,7 @@ public class ParserTest {
     @Test
     public void test9() {
         String expr = "findByUsernameAndPasswordOrderByCreatedTime";
-        Lexer lexer = new Lexer();
+        Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse(expr);
         TokenIterator tokenIterator = new TokenIterator(tokens.iterator());
         Parser parser = new Parser();
@@ -132,7 +132,7 @@ public class ParserTest {
     @Test
     public void test10() {
         String expr = "findByUsernameAndPasswordAndUserTypeBeforeOrderByCreatedTime";
-        Lexer lexer = new Lexer();
+        Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse(expr);
         TokenIterator tokenIterator = new TokenIterator(tokens.iterator());
         Parser parser = new Parser();
@@ -145,7 +145,7 @@ public class ParserTest {
     @Test
     public void test11() {
         String expr = "insertAllSelective";
-        Lexer lexer = new Lexer();
+        Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse(expr);
         TokenIterator tokenIterator = new TokenIterator(tokens.iterator());
         Parser parser = new Parser();
@@ -158,7 +158,7 @@ public class ParserTest {
     @Test
     public void test12() {
         String expr = "insertSelective";
-        Lexer lexer = new Lexer();
+        Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse(expr);
         TokenIterator tokenIterator = new TokenIterator(tokens.iterator());
         Parser parser = new Parser();
@@ -171,7 +171,7 @@ public class ParserTest {
     @Test
     public void test13() {
         String expr = "updateByIdSelective";
-        Lexer lexer = new Lexer();
+        Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse(expr);
         TokenIterator tokenIterator = new TokenIterator(tokens.iterator());
         Parser parser = new Parser();
@@ -184,7 +184,7 @@ public class ParserTest {
     @Test
     public void test14() {
         String expr = "updateByIdAndNameBeforeSelective";
-        Lexer lexer = new Lexer();
+        Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse(expr);
         TokenIterator tokenIterator = new TokenIterator(tokens.iterator());
         Parser parser = new Parser();

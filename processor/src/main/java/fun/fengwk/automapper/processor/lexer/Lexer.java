@@ -5,7 +5,9 @@ import fun.fengwk.automapper.processor.util.StringCharSequenceView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,9 +33,27 @@ public class Lexer {
     private static final Keyword[] BY_KEYWORDS = sortByValueLengthDesc(Keyword.getByOps());
     private static final Keyword[] ORDER_BY_KEYWORDS = sortByValueLengthDesc(Keyword.getOrderByOps());
 
+    /* derivedValues必须要先从长到短排序 */
+    private final String[] insertDerivedValues;
+    private final String[] deleteDerivedValues;
+    private final String[] updateDerivedValues;
+    private final String[] findDerivedValues;
+    private final String[] countDerivedValues;
+    private final String[] pageDerivedValues;
+
     private String expression;
     private int offset;
     private List<Token> tokens;
+
+    private Lexer(String[] insertDerivedValues, String[] deleteDerivedValues, String[] updateDerivedValues,
+                 String[] findDerivedValues, String[] countDerivedValues, String[] pageDerivedValues) {
+        this.insertDerivedValues = insertDerivedValues;
+        this.deleteDerivedValues = deleteDerivedValues;
+        this.updateDerivedValues = updateDerivedValues;
+        this.findDerivedValues = findDerivedValues;
+        this.countDerivedValues = countDerivedValues;
+        this.pageDerivedValues = pageDerivedValues;
+    }
 
     // 从长到短排序是为了防止歧义
     private static Keyword[] sortByValueLengthDesc(Keyword[] keywords) {
@@ -59,35 +79,34 @@ public class Lexer {
     private List<Token> doAnalyse() {
         int state = 0;
         while (offset < expression.length()) {
-            Keyword eaten;
             switch (state) {
                 case 0:
-                    if (tryEatKeyword(Keyword.INSERT)) {
+                    if (tryEatDerivedKeyword(Keyword.INSERT, insertDerivedValues)) {
                         state = 1;
                         break;
                     }
 
-                    if (tryEatKeyword(Keyword.DELETE)) {
+                    if (tryEatDerivedKeyword(Keyword.DELETE, deleteDerivedValues)) {
                         state = 2;
                         break;
                     }
 
-                    if (tryEatKeyword(Keyword.UPDATE)) {
+                    if (tryEatDerivedKeyword(Keyword.UPDATE, updateDerivedValues)) {
                         state = 3;
                         break;
                     }
 
-                    if (tryEatKeyword(Keyword.FIND)) {
+                    if (tryEatDerivedKeyword(Keyword.FIND, findDerivedValues)) {
                         state = 4;
                         break;
                     }
 
-                    if (tryEatKeyword(Keyword.COUNT)) {
+                    if (tryEatDerivedKeyword(Keyword.COUNT, countDerivedValues)) {
                         state = 2;
                         break;
                     }
 
-                    if (tryEatKeyword(Keyword.PAGE)) {
+                    if (tryEatDerivedKeyword(Keyword.PAGE, pageDerivedValues)) {
                         state = 4;
                         break;
                     }
@@ -273,6 +292,24 @@ public class Lexer {
     }
 
     /**
+     * 尝试吃掉一个支持派生的关键码，成功返回true，失败返回false
+     *
+     * @param kw
+     * @return
+     */
+    private boolean tryEatDerivedKeyword(Keyword kw, String[] derivedValues) {
+        for (String derivedValue : derivedValues) {
+            if (expression.startsWith(derivedValue, offset)) {
+                offset += derivedValue.length();
+                tokens.add(new DerivedToken(TokenType.KEYWORD, kw.getValue(), derivedValue));
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * 尝试吃掉一个指定的关键码，成功返回true，失败返回false
      *
      * @param kw
@@ -410,6 +447,72 @@ public class Lexer {
             }
         }
         tokens.add(new Token(TokenType.VARIABLE, term));
+    }
+
+    public static class Builder {
+
+        private final Set<String> insertDerivedValues = new HashSet<>();
+        private final Set<String> deleteDerivedValues = new HashSet<>();
+        private final Set<String> updateDerivedValues = new HashSet<>();
+        private final Set<String> findDerivedValues = new HashSet<>();
+        private final Set<String> countDerivedValues = new HashSet<>();
+        private final Set<String> pageDerivedValues = new HashSet<>();
+
+        public Builder() {
+            deriveInsert(Keyword.INSERT.getValue());
+            deriveDelete(Keyword.DELETE.getValue());
+            deriveUpdate(Keyword.UPDATE.getValue());
+            deriveFind(Keyword.FIND.getValue());
+            deriveCount(Keyword.COUNT.getValue());
+            derivePage(Keyword.PAGE.getValue());
+        }
+
+        public Builder deriveInsert(String derivedValue) {
+            insertDerivedValues.add(derivedValue);
+            return this;
+        }
+
+        public Builder deriveDelete(String derivedValue) {
+            deleteDerivedValues.add(derivedValue);
+            return this;
+        }
+
+        public Builder deriveUpdate(String derivedValue) {
+            updateDerivedValues.add(derivedValue);
+            return this;
+        }
+
+        public Builder deriveFind(String derivedValue) {
+            findDerivedValues.add(derivedValue);
+            return this;
+        }
+
+        public Builder deriveCount(String derivedValue) {
+            countDerivedValues.add(derivedValue);
+            return this;
+        }
+
+        public Builder derivePage(String derivedValue) {
+            pageDerivedValues.add(derivedValue);
+            return this;
+        }
+
+        public Lexer build() {
+            return new Lexer(
+                    sortByLengthDesc(insertDerivedValues),
+                    sortByLengthDesc(deleteDerivedValues),
+                    sortByLengthDesc(updateDerivedValues),
+                    sortByLengthDesc(findDerivedValues),
+                    sortByLengthDesc(countDerivedValues),
+                    sortByLengthDesc(pageDerivedValues));
+        }
+
+        private String[] sortByLengthDesc(Set<String> set) {
+            String[] strs = set.toArray(new String[0]);
+            Arrays.sort(strs, Comparator.comparing(String::length).reversed());
+            return strs;
+        }
+
     }
 
 }

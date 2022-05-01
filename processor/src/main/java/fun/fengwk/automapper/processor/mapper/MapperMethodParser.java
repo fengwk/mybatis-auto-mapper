@@ -5,7 +5,6 @@ import fun.fengwk.automapper.annotation.FieldName;
 import fun.fengwk.automapper.annotation.IncludeField;
 import fun.fengwk.automapper.annotation.UseGeneratedKeys;
 import fun.fengwk.automapper.processor.naming.NamingConverter;
-import fun.fengwk.automapper.processor.translator.Anno;
 import fun.fengwk.automapper.processor.translator.BeanField;
 import fun.fengwk.automapper.processor.translator.MethodInfo;
 import fun.fengwk.automapper.processor.translator.Param;
@@ -16,7 +15,6 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -122,7 +120,7 @@ public class MapperMethodParser {
         String methodName = methodElement.getSimpleName().toString();
         Set<String> includeFieldNames = getIncludeFieldNames(methodElement);
         Set<String> excludeFieldNames = getExcludeFieldNames(methodElement);
-        List<Anno> annos = parseAnnotations(methodElement);
+//        List<Anno> annos = parseAnnotations(methodElement);
         List<Param> params = new ArrayList<>();
         List<? extends VariableElement> methodParameters = methodElement.getParameters();
         if (methodParameters != null) {
@@ -153,7 +151,7 @@ public class MapperMethodParser {
             return null;
         }
 
-        return new MethodInfo(methodName, params, ret, annos);
+        return new MethodInfo(methodName, params, ret);
     }
 
     private Set<String> getIncludeFieldNames(ExecutableElement methodElement) {
@@ -204,16 +202,16 @@ public class MapperMethodParser {
         return excludeFieldNames;
     }
 
-    private List<Anno> parseAnnotations(ExecutableElement methodElement) {
-        List<Anno> annos = new ArrayList<>();
-        List<? extends AnnotationMirror> annotationMirrors = methodElement.getAnnotationMirrors();
-        if (annotationMirrors != null) {
-            for (AnnotationMirror annotationMirror : annotationMirrors) {
-                annos.add(new Anno(annotationMirror.getAnnotationType().toString()));
-            }
-        }
-        return annos;
-    }
+//    private List<Anno> parseAnnotations(ExecutableElement methodElement) {
+//        List<Anno> annos = new ArrayList<>();
+//        List<? extends AnnotationMirror> annotationMirrors = methodElement.getAnnotationMirrors();
+//        if (annotationMirrors != null) {
+//            for (AnnotationMirror annotationMirror : annotationMirrors) {
+//                annos.add(new Anno(annotationMirror.getAnnotationType().toString()));
+//            }
+//        }
+//        return annos;
+//    }
 
     private List<BeanField> getAndFilterBeanFields(TypeDescriptor desc, Set<String> includeFieldNames, Set<String> excludeFieldNames) {
         if (!desc.isJavaBean) {
