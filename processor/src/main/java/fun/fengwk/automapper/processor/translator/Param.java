@@ -10,32 +10,32 @@ public class Param implements NameEntry {
     /**
      * 类型。
      */
-    private String type;
+    private final String type;
 
     /**
      * 参数变量名称，即@Param("name")中指定的名称。
      */
-    private String name;
+    private final String name;
 
     /**
      * 字段在数据库的名称，如果该参数是javaBean，那么该参数为null。
      */
-    private String fieldName;
+    private final String fieldName;
 
     /**
      * 是否是可迭代的。
      */
-    private boolean isIterable;
+    private final boolean isIterable;
 
     /**
      * 是否为javaBean。
      */
-    private boolean isJavaBean;
+    private final boolean isJavaBean;
 
     /**
      * 如果当前参数是javaBean，如果当前对象是集合则判断其泛型对象是否为javaBean，那么该参数有值，否则为null。
      */
-    private List<BeanField> beanFields;
+    private final List<BeanField> beanFields;
 
     public Param(String type, String name, String fieldName, boolean isIterable, boolean isJavaBean, List<BeanField> beanFields) {
         this.type = type;

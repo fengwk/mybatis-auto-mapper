@@ -10,7 +10,7 @@ AutoMapper是一款适用于Mybatis的SQL生成插件，提供了JPA风格的SQL
 
 无论您使用的是什么开发环境，只要编译器是按照标准实现的，都能生成成功。另外在打包发布时，这个过程是无感的，因为在打包编译的过程中AutoMapper会自动生效。
 
-# 开始使用
+# 快速开始
 
 首先需要在项目的编译阶段依赖AutoMapper，如果您正在使用maven管理项目，那么添加如下依赖即可：
 
@@ -19,7 +19,7 @@ AutoMapper是一款适用于Mybatis的SQL生成插件，提供了JPA风格的SQL
     <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>auto-mapper-processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.17</version>
+    <version>0.0.18</version>
 </dependency>
 ```
 
@@ -44,6 +44,8 @@ public interface ExampleMapper {
     where id=#{id}
 </select>
 ```
+
+# 语法约定
 
 为了实现SQL生成，必须遵循一定规则来定义Mapper接口的方法，如果您曾使用过JPA，那么这些规则会非常容易理解，因为这些规则几乎完全遵循了JPA的约定。
 
@@ -88,13 +90,19 @@ public interface ExampleMapper {
 | In                 | findByIdIn(Collection)                 | ... where x.id in (...)                      |
 | NotIn              | findByIdNotIn(Collection)              | ... where x.id not in (...)                  |
 
-注意：由于要防止SQL注入问题，当前的StartingWith、EndingWith、Containing关键字均使用的Mysql函数concat，这也意味着这3个关键字仅支持Mysql数据源。
+# 注解支持
 
 支持自定义字段名：可以在入参或字段上添加`@FieldName`注解支持自定义数据库字段名称。
 
 支持useGeneratedKeys：可以在字段上添加`@UseGeneratedKeys`注解支持Mybatis的useGeneratedKeys功能。
 
-全局配置：尽管我们可以在`@AutoMapper`注解中修改当前类的配置，但如果需要进行全局配置，可以在resource根目录下定义`auto-mapper.config`文件作为全局配置，优先级为：用户明确指定的注解配置 > 全局配置 > 默认配置。
+使用`@ExcludeField`可以忽略insert或update方法中的指定字段。
+
+使用`@IncludeField`可以只指定insert或update方法中的指定字段。
+
+# 全局配置
+
+尽管我们可以在`@AutoMapper`注解中修改当前类的配置，但如果需要进行全局配置，可以在resource根目录下定义`auto-mapper.config`文件作为全局配置，优先级为：用户明确指定的注解配置 > 全局配置 > 默认配置。
 
 ```properties
 fun.fengwk.automapper.annotation.AutoMapper.dbType=MYSQL
@@ -104,7 +112,13 @@ fun.fengwk.automapper.annotation.AutoMapper.fieldNamingStyle=LOWER_UNDER_SCORE_C
 fun.fengwk.automapper.annotation.AutoMapper.tableNamePrefix=test_
 ```
 
-编译：由于AutoMapper作用与编译期，要生成SQL片段必须重新编译项目，使用IDEA的Build -> Rebuild project或者执行`mvn clean install`命令均可执行编译。
+# MySQL特性
+
+当前版本的AutoMapper对MySQL提供了一些特殊的语法支持：
+
+- 对于添加了`@Ignore`注解的insert方法，将使用`insert ignore into`语法。
+- 对于添加了`@Replace`注解的insert方法，将使用`replace into`语法。
+- 对于like语句，将使用concat拼接防止SQL注入。
 
 # 应用示例
 

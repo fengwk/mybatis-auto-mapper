@@ -11,11 +11,13 @@ public class MethodInfo {
     private final String methodName;
     private final List<Param> params;
     private final Return ret;
+    private final List<Anno> annos;
 
-    public MethodInfo(String methodName, List<Param> params, Return ret) {
+    public MethodInfo(String methodName, List<Param> params, Return ret, List<Anno> annos) {
         this.methodName = methodName;
         this.params = params != null ? params : Collections.emptyList();
         this.ret = ret;
+        this.annos = annos != null ? annos : Collections.emptyList();
     }
 
     public String getMethodName() {
@@ -28,5 +30,9 @@ public class MethodInfo {
 
     public Return getRet() {
         return ret;
+    }
+
+    public List<Anno> getAnnos() {
+        return annos;
     }
 }

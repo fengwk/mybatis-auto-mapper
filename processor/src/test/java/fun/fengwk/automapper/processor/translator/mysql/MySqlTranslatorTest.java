@@ -6,6 +6,7 @@ import fun.fengwk.automapper.processor.util.DOMUtils;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * @author fengwk
@@ -23,7 +24,7 @@ public class MySqlTranslatorTest {
         Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3));
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(param), null, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -50,7 +51,7 @@ public class MySqlTranslatorTest {
         Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3));
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(param), null, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -85,7 +86,7 @@ public class MySqlTranslatorTest {
         Param param = new Param("demoDO", null, null, true, true, Arrays.asList(bf1, bf2, bf3));
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(param), null, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -114,7 +115,7 @@ public class MySqlTranslatorTest {
         Param param = new Param("demoDO", null, null, true, true, Arrays.asList(bf1, bf2, bf3));
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(param), null, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -145,7 +146,7 @@ public class MySqlTranslatorTest {
         String methodName = "deleteAll";
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, null, null));
+        translator.translate(new MethodInfo(methodName, null, null, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -168,7 +169,7 @@ public class MySqlTranslatorTest {
         Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), null));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), null, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -196,7 +197,7 @@ public class MySqlTranslatorTest {
         Param p = new Param("DemoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3));
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p), null));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p), null, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -224,7 +225,7 @@ public class MySqlTranslatorTest {
         Param p = new Param("DemoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3));
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p), null));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p), null, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -257,7 +258,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, null, ret));
+        translator.translate(new MethodInfo(methodName, null, ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -284,7 +285,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, null, ret));
+        translator.translate(new MethodInfo(methodName, null, ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -315,7 +316,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -347,7 +348,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -373,7 +374,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("int", false, null);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, null, ret));
+        translator.translate(new MethodInfo(methodName, null, ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -399,7 +400,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("int", false, null);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -427,7 +428,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("int", false, null);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -455,7 +456,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("int", false, null);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -483,7 +484,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("int", false, null);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -511,7 +512,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("int", false, null);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -540,7 +541,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("int", false, null);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -568,7 +569,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("int", false, null);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -596,7 +597,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("int", false, null);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -624,7 +625,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("int", false, null);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -652,7 +653,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("int", false, null);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -683,7 +684,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("int", false, null);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -721,7 +722,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -751,7 +752,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -782,7 +783,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -816,7 +817,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2, p3, p4), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2, p3, p4), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
@@ -851,7 +852,7 @@ public class MySqlTranslatorTest {
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
-        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2, p3, p4), ret));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2, p3, p4), ret, Collections.emptyList()));
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +

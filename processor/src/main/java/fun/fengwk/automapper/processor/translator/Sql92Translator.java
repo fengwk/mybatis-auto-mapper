@@ -1,26 +1,36 @@
-package fun.fengwk.automapper.processor.translator.mysql;
+package fun.fengwk.automapper.processor.translator;
 
-import fun.fengwk.automapper.annotation.mysql.Ignore;
-import fun.fengwk.automapper.annotation.mysql.Replace;
 import fun.fengwk.automapper.processor.lexer.Keyword;
 import fun.fengwk.automapper.processor.lexer.Token;
-import fun.fengwk.automapper.processor.parser.ast.*;
-import fun.fengwk.automapper.processor.translator.*;
+import fun.fengwk.automapper.processor.parser.ast.ASTNode;
+import fun.fengwk.automapper.processor.parser.ast.By;
+import fun.fengwk.automapper.processor.parser.ast.ByOp;
+import fun.fengwk.automapper.processor.parser.ast.ConnectOp;
+import fun.fengwk.automapper.processor.parser.ast.Count;
+import fun.fengwk.automapper.processor.parser.ast.Delete;
+import fun.fengwk.automapper.processor.parser.ast.Find;
+import fun.fengwk.automapper.processor.parser.ast.Insert;
+import fun.fengwk.automapper.processor.parser.ast.OrderBy;
+import fun.fengwk.automapper.processor.parser.ast.OrderByOp;
+import fun.fengwk.automapper.processor.parser.ast.Page;
+import fun.fengwk.automapper.processor.parser.ast.Update;
+import fun.fengwk.automapper.processor.parser.ast.Variable;
 import fun.fengwk.automapper.processor.util.StringUtils;
 import org.w3c.dom.Element;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
+ * 通用标准的的sql翻译器。
+ *
  * @author fengwk
  */
-public class MySqlTranslator extends Translator {
+public class Sql92Translator extends Translator {
 
     private static final Map<Keyword, ByTranslator> BY_TRANSLATOR_MAP;
     private static final Map<Keyword, BiConsumer<String, AddTextNode>> ORDER_BY_TRANSLATOR_MAP;
@@ -40,9 +50,9 @@ public class MySqlTranslator extends Translator {
         byTranslatorMap.put(Keyword.NOT_NULL, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s is not null", nameEntry.getFieldName())));
         byTranslatorMap.put(Keyword.LIKE, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s like #{%s}", nameEntry.getFieldName(), nameEntry.getName())));
         byTranslatorMap.put(Keyword.NOT_LIKE, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s not like #{%s}", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.STARTING_WITH, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s like concat(#{%s}, '%%')", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.ENDING_WITH, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s like concat('%%', #{%s})", nameEntry.getFieldName(), nameEntry.getName())));
-        byTranslatorMap.put(Keyword.CONTAINING, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s like concat('%%', #{%s}, '%%')", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.STARTING_WITH, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s like '${%s}%%'", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.ENDING_WITH, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s like '%%${%s}'", nameEntry.getFieldName(), nameEntry.getName())));
+        byTranslatorMap.put(Keyword.CONTAINING, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s like '%%${%s}%%'", nameEntry.getFieldName(), nameEntry.getName())));
         byTranslatorMap.put(Keyword.NOT, (nameEntry, addElement, addTextNode, isSingleParam) -> addTextNode.accept(String.format("%s != #{%s}", nameEntry.getFieldName(), nameEntry.getName())));
         byTranslatorMap.put(Keyword.IN, (nameEntry, addElement, addTextNode, isSingleParam) -> {
             addTextNode.accept(nameEntry.getFieldName(), " in", LF, INDENT);
@@ -74,7 +84,7 @@ public class MySqlTranslator extends Translator {
         ORDER_BY_TRANSLATOR_MAP = orderByTranslatorMap;
     }
 
-    public MySqlTranslator(TranslateContext translateContext) {
+    public Sql92Translator(TranslateContext translateContext) {
         super(translateContext);
     }
 
@@ -83,12 +93,11 @@ public class MySqlTranslator extends Translator {
         String methodName = methodInfo.getMethodName();
         List<Param> params = methodInfo.getParams();
         Return ret = methodInfo.getRet();
-        List<Anno> annos = methodInfo.getAnnos();
 
         if (existsStmtElement(methodName)) {
             throw new TranslateException("%s is exists", methodName);
         } if (node instanceof Insert) {
-            translateInsert((Insert) node, methodName, params, annos);
+            translateInsert((Insert) node, methodName, params);
         } else if (node instanceof Delete) {
             translateDelete((Delete) node, methodName, params);
         } else if (node instanceof Update) {
@@ -108,7 +117,7 @@ public class MySqlTranslator extends Translator {
         }
     }
 
-    private void translateInsert(Insert insert, String methodName, List<Param> params, List<Anno> annos) {
+    private void translateInsert(Insert insert, String methodName, List<Param> params) {
         // insert语句应当只有一个参数，是JavaBean或Iterable<JavaBean>
         if (params.size() != 1) {
             throw new TranslateException("%s should have only one param", methodName);
@@ -120,20 +129,20 @@ public class MySqlTranslator extends Translator {
                 && (child = insert.getChild(0)) != null
                 && child.getLexeme().isKeyword(Keyword.ALL)) {
             if (isSelective(insert)) {
-                translateInsertAllSelective(methodName, param, annos);
+                translateInsertAllSelective(methodName, param);
             } else {
-                translateInsertAll(methodName, param, annos);
+                translateInsertAll(methodName, param);
             }
         } else {
             if (isSelective(insert)) {
-                translateInsertOneSelective(methodName, param, annos);
+                translateInsertOneSelective(methodName, param);
             } else {
-                translateInsertOne(methodName, param, annos);
+                translateInsertOne(methodName, param);
             }
         }
     }
 
-    private void translateInsertAll(String methodName, Param param, List<Anno> annos) {
+    private void translateInsertAll(String methodName, Param param) {
         if (!param.isIterable()) {
             throw new TranslateException("%s should have iterable param", methodName);
         }
@@ -155,7 +164,7 @@ public class MySqlTranslator extends Translator {
         addTextNode(insertElement,
                 LF,
                 INDENT,
-                insertMode(annos),
+                "insert into ",
                 tableName,
                 " (",
                 param.getBeanFields().stream()
@@ -180,7 +189,7 @@ public class MySqlTranslator extends Translator {
         insertStmtElement.append();
     }
 
-    private void translateInsertAllSelective(String methodName, Param param, List<Anno> annos) {
+    private void translateInsertAllSelective(String methodName, Param param) {
         if (!param.isIterable()) {
             throw new TranslateException("%s should have iterable param", methodName);
         }
@@ -196,7 +205,7 @@ public class MySqlTranslator extends Translator {
         foreachElement.setAttribute("collection", "collection");
         foreachElement.setAttribute("item", "item");
         foreachElement.setAttribute("separator", ";");
-        addTextNode(foreachElement, LF, INDENT, INDENT, insertMode(annos), tableName, LF, INDENT, INDENT);
+        addTextNode(foreachElement, LF, INDENT, INDENT, "insert into ", tableName, LF, INDENT, INDENT);
         Element trimElement = addElement(foreachElement, "trim");
         trimElement.setAttribute("prefix", "(");
         trimElement.setAttribute("suffix", ")");
@@ -230,7 +239,7 @@ public class MySqlTranslator extends Translator {
         insertStmtElement.append();
     }
 
-    private void translateInsertOne(String methodName, Param param, List<Anno> annos) {
+    private void translateInsertOne(String methodName, Param param) {
         if (!param.isJavaBean()) {
             throw new TranslateException("% should have java bean param", methodName);
         }
@@ -243,7 +252,7 @@ public class MySqlTranslator extends Translator {
         StmtElement insertStmtElement = addInsertElement(methodName, param.getType(), param.findUseGeneratedKeysField());
         Element insertElement = insertStmtElement.getElement();
 
-        addTextNode(insertElement, LF, INDENT, insertMode(annos), tableName, " (",
+        addTextNode(insertElement, LF, INDENT, "insert into ", tableName, " (",
                 param.getBeanFields().stream()
                         .filter(bf -> !bf.isUseGeneratedKeys())
                         .map(BeanField::getFieldName)
@@ -258,7 +267,7 @@ public class MySqlTranslator extends Translator {
         insertStmtElement.append();
     }
 
-    private void translateInsertOneSelective(String methodName, Param param, List<Anno> annos) {
+    private void translateInsertOneSelective(String methodName, Param param) {
         if (!param.isJavaBean()) {
             throw new TranslateException("% should have java bean param", methodName);
         }
@@ -266,7 +275,7 @@ public class MySqlTranslator extends Translator {
         StmtElement insertStmtElement = addInsertElement(methodName, param.getType(), param.findUseGeneratedKeysField());
         Element insertElement = insertStmtElement.getElement();
 
-        addTextNode(insertElement, LF, INDENT, insertMode(annos), tableName, LF, INDENT);
+        addTextNode(insertElement, LF, INDENT, "insert into ", tableName, LF, INDENT);
         Element trimElement = addElement(insertElement, "trim");
         trimElement.setAttribute("prefix", "(");
         trimElement.setAttribute("suffix", ")");
@@ -297,19 +306,6 @@ public class MySqlTranslator extends Translator {
         addTextNode(insertElement, LF);
 
         insertStmtElement.append();
-    }
-
-    private String insertMode(List<Anno> annos) {
-        if (annos != null) {
-            for (Anno anno : annos) {
-                if (Objects.equals(anno.getType(), Ignore.class.getName())) {
-                    return "insert ignore into ";
-                } else if (Objects.equals(anno.getType(), Replace.class.getName())) {
-                    return "replace into ";
-                }
-            }
-        }
-        return "insert into ";
     }
 
     private void translateDelete(Delete delete, String methodName, List<Param> params) {

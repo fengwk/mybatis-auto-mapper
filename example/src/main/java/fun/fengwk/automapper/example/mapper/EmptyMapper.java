@@ -1,6 +1,7 @@
 package fun.fengwk.automapper.example.mapper;
 
 import fun.fengwk.automapper.annotation.AutoMapper;
+import fun.fengwk.automapper.annotation.DBType;
 import fun.fengwk.automapper.example.model.EmptyDO;
 
 /**
