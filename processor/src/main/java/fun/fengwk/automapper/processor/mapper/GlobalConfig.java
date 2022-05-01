@@ -21,6 +21,7 @@ public class GlobalConfig {
     private static final String MAPPER_SUFFIX = AutoMapper.class.getName() + ".mapperSuffix";
     private static final String TABLE_NAMING_STYLE = AutoMapper.class.getName() + ".tableNamingStyle";
     private static final String FIELD_NAMING_STYLE = AutoMapper.class.getName() + ".fieldNamingStyle";
+    private static final String TABLE_NAME_PREFIX = AutoMapper.class.getName() + ".tableNamePrefix";
 
     private final Properties config = new Properties();
 
@@ -60,6 +61,10 @@ public class GlobalConfig {
             } catch (IllegalArgumentException ignore) {}
         }
         return null;
+    }
+
+    public String getTableNamePrefix() {
+        return config.getProperty(TABLE_NAME_PREFIX);
     }
 
 }

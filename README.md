@@ -19,7 +19,7 @@ AutoMapper是一款适用于Mybatis的SQL生成插件，提供了JPA风格的SQL
     <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>auto-mapper-processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.16</version>
+    <version>0.0.17</version>
 </dependency>
 ```
 
@@ -101,6 +101,7 @@ fun.fengwk.automapper.annotation.AutoMapper.dbType=MYSQL
 fun.fengwk.automapper.annotation.AutoMapper.mapperSuffix=Mapper
 fun.fengwk.automapper.annotation.AutoMapper.tableNamingStyle=LOWER_UNDER_SCORE_CASE
 fun.fengwk.automapper.annotation.AutoMapper.fieldNamingStyle=LOWER_UNDER_SCORE_CASE
+fun.fengwk.automapper.annotation.AutoMapper.tableNamePrefix=test_
 ```
 
 编译：由于AutoMapper作用与编译期，要生成SQL片段必须重新编译项目，使用IDEA的Build -> Rebuild project或者执行`mvn clean install`命令均可执行编译。

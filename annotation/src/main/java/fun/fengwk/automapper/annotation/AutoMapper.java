@@ -52,4 +52,11 @@ public @interface AutoMapper {
      */
     String tableName() default "";
 
+    /**
+     * 指定表名前缀，通常用于从逻辑上区分表的命名空间。
+     *
+     * @return
+     */
+    String tableNamePrefix() default "";
+
 }

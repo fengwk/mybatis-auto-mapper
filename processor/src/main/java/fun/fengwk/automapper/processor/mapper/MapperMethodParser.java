@@ -110,7 +110,7 @@ public class MapperMethodParser {
         Set<String> excludeFieldNames = getExcludeFieldNames(methodElement);
         List<Param> params = new ArrayList<>();
         List<? extends VariableElement> methodParameters = methodElement.getParameters();
-        if (methodParameters != null) { 
+        if (methodParameters != null) {
             for (VariableElement methodParameter : methodParameters) {
                 TypeDescriptor desc = new TypeDescriptor();
                 if (desc.init(mapperElement, methodParameter.asType(), fieldNamingConverter, 0)) {

@@ -6,7 +6,7 @@ import fun.fengwk.automapper.example.model.EmptyDO;
 /**
  * @author fengwk
  */
-@AutoMapper
+@AutoMapper(tableNamePrefix = "emm_")
 public interface EmptyMapper {
 
     int insert(EmptyDO emptyDO);

@@ -102,6 +102,7 @@ public class AutoMapperProcessor extends AbstractProcessor {
         NamingStyle tableNamingStyle = autoMapperInfo.getTableNamingStyle();
         NamingStyle fieldNamingStyle = autoMapperInfo.getFieldNamingStyle();
         String tableName = autoMapperInfo.getTableName();
+        String tableNamePrefix = autoMapperInfo.getTableNamePrefix();
 
         NamingConverter tableNamingConverter = NamingConverterFactory.getInstance(tableNamingStyle);
         NamingConverter fieldNamingConverter = NamingConverterFactory.getInstance(fieldNamingStyle);
@@ -113,6 +114,11 @@ public class AutoMapperProcessor extends AbstractProcessor {
         if (tableName == null || tableName.isEmpty()) {
             String mapperName = mapperElement.getSimpleName().toString();
             tableName = mapperNameToTableName(mapperName, mapperSuffix, tableNamingConverter);
+        }
+
+        // 添加前缀
+        if (tableNamePrefix != null && !tableNamePrefix.isEmpty()) {
+            tableName = tableNamePrefix + tableName;
         }
 
         // 解析Mapper方法列表
@@ -144,7 +150,7 @@ public class AutoMapperProcessor extends AbstractProcessor {
     private <A extends Annotation> AnnotationMirror findAnnotationMirror(Element element, Class<A> annotationClass) {
         List<? extends AnnotationMirror> annoMirrors = element.getAnnotationMirrors();
         for (AnnotationMirror annoMirror : annoMirrors) {
-            if (annotationClass.getName().equals(annoMirror.getAnnotationType().asElement().getSimpleName().toString())) {
+            if (annotationClass.getName().equals(annoMirror.getAnnotationType().toString())) {
                 return annoMirror;
             }
         }

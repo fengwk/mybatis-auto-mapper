@@ -22,14 +22,16 @@ public class AutoMapperInfo {
     private final NamingStyle tableNamingStyle;
     private final NamingStyle fieldNamingStyle;
     private final String tableName;
+    private final String tableNamePrefix;
 
     private AutoMapperInfo(DBType dbType, String mapperSuffix, NamingStyle tableNamingStyle,
-                          NamingStyle fieldNamingStyle, String tableName) {
+                          NamingStyle fieldNamingStyle, String tableName, String tableNamePrefix) {
         this.dbType = dbType;
         this.mapperSuffix = mapperSuffix;
         this.tableNamingStyle = tableNamingStyle;
         this.fieldNamingStyle = fieldNamingStyle;
         this.tableName = tableName;
+        this.tableNamePrefix = tableNamePrefix;
     }
 
     public static AutoMapperInfo parse(AutoMapper autoMapper, AnnotationMirror autoMapperMirror, GlobalConfig globalConfig) {
@@ -40,11 +42,13 @@ public class AutoMapperInfo {
         NamingStyle tableNamingStyle = autoMapper.tableNamingStyle();
         NamingStyle fieldNamingStyle = autoMapper.fieldNamingStyle();
         String tableName = autoMapper.tableName();
+        String tableNamePrefix = autoMapper.tableNamePrefix();
 
         DBType globalDbType = globalConfig.getDBType();
         String globalMapperSuffix = globalConfig.getMapperSuffix();
         NamingStyle globalTableNamingStyle = globalConfig.getTableNamingStyle();
         NamingStyle globalFieldNamingStyle = globalConfig.getFieldNamingStyle();
+        String globalTableNamePrefix = globalConfig.getTableNamePrefix();
 
         if (globalDbType != null && !isExplicit(autoMapperMirror, "dbType")) {
             dbType = globalDbType;
@@ -58,12 +62,16 @@ public class AutoMapperInfo {
         if (globalFieldNamingStyle != null && !isExplicit(autoMapperMirror, "fieldNamingStyle")) {
             fieldNamingStyle = globalFieldNamingStyle;
         }
+        if (globalTableNamePrefix != null && !isExplicit(autoMapperMirror, "tableNamePrefix")) {
+            tableNamePrefix = globalTableNamePrefix;
+        }
 
-        return new AutoMapperInfo(dbType, mapperSuffix, tableNamingStyle, fieldNamingStyle, tableName);
+        return new AutoMapperInfo(dbType, mapperSuffix, tableNamingStyle, fieldNamingStyle, tableName, tableNamePrefix);
     }
 
     // 检查注解方法是否被用户明确设置了
     private static boolean isExplicit(AnnotationMirror autoMapperMirror, String methodName) {
+        System.out.println(autoMapperMirror + " " + methodName);
         Map<? extends ExecutableElement, ? extends AnnotationValue> elementValues = autoMapperMirror.getElementValues();
         for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> e : elementValues.entrySet()) {
             if (methodName.equals(e.getKey().getSimpleName().toString())) {
@@ -91,5 +99,9 @@ public class AutoMapperInfo {
 
     public String getTableName() {
         return tableName;
+    }
+
+    public String getTableNamePrefix() {
+        return tableNamePrefix;
     }
 }
