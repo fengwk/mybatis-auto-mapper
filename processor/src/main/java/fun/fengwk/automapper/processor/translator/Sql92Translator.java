@@ -171,7 +171,7 @@ public class Sql92Translator extends Translator {
         addTextNode(insertElement,
                 LF,
                 INDENT,
-                translateInsertInstruction(insert), BLANK,
+                "insert into ",
                 tableName,
                 " (",
                 param.getBeanFields().stream()
@@ -193,6 +193,9 @@ public class Sql92Translator extends Translator {
                 .collect(Collectors.joining(", ")) + ")" + LF + INDENT;
         addTextNode(foreachElement, foreachText);
 
+        // for subclass
+        postProcessInsert(insert, insertElement);
+
         insertStmtElement.append();
     }
 
@@ -212,7 +215,7 @@ public class Sql92Translator extends Translator {
         foreachElement.setAttribute("collection", "collection");
         foreachElement.setAttribute("item", "item");
         foreachElement.setAttribute("separator", ";");
-        addTextNode(foreachElement, LF, INDENT, INDENT, translateInsertInstruction(insert), BLANK, tableName, LF, INDENT, INDENT);
+        addTextNode(foreachElement, LF, INDENT, INDENT, "insert into ", tableName, LF, INDENT, INDENT);
         Element trimElement = addElement(foreachElement, "trim");
         trimElement.setAttribute("prefix", "(");
         trimElement.setAttribute("suffix", ")");
@@ -243,6 +246,9 @@ public class Sql92Translator extends Translator {
         addTextNode(trimElement, LF, INDENT, INDENT);
         addTextNode(foreachElement, LF, INDENT);
 
+        // for subclass
+        postProcessInsert(insert, insertElement);
+
         insertStmtElement.append();
     }
 
@@ -259,7 +265,7 @@ public class Sql92Translator extends Translator {
         StmtElement insertStmtElement = addInsertElement(methodName, param.getType(), param.findUseGeneratedKeysField());
         Element insertElement = insertStmtElement.getElement();
 
-        addTextNode(insertElement, LF, INDENT, translateInsertInstruction(insert), BLANK, tableName, " (",
+        addTextNode(insertElement, LF, INDENT, "insert into ", tableName, " (",
                 param.getBeanFields().stream()
                         .filter(bf -> !bf.isUseGeneratedKeys())
                         .map(BeanField::getFieldName)
@@ -270,6 +276,9 @@ public class Sql92Translator extends Translator {
                         .map(bf -> String.format("#{%s}", bf.getName()))
                         .collect(Collectors.joining(", ")),
                 ")", LF);
+
+        // for subclass
+        postProcessInsert(insert, insertElement);
 
         insertStmtElement.append();
     }
@@ -282,7 +291,7 @@ public class Sql92Translator extends Translator {
         StmtElement insertStmtElement = addInsertElement(methodName, param.getType(), param.findUseGeneratedKeysField());
         Element insertElement = insertStmtElement.getElement();
 
-        addTextNode(insertElement, LF, INDENT, translateInsertInstruction(insert), BLANK, tableName, LF, INDENT);
+        addTextNode(insertElement, LF, INDENT, "insert into ", tableName, LF, INDENT);
         Element trimElement = addElement(insertElement, "trim");
         trimElement.setAttribute("prefix", "(");
         trimElement.setAttribute("suffix", ")");
@@ -312,17 +321,10 @@ public class Sql92Translator extends Translator {
         addTextNode(trimElement, LF, INDENT);
         addTextNode(insertElement, LF);
 
-        insertStmtElement.append();
-    }
+        // for subclass
+        postProcessInsert(insert, insertElement);
 
-    /**
-     * 翻译insert指令。
-     *
-     * @param insert
-     * @return
-     */
-    protected String translateInsertInstruction(Insert insert) {
-        return "insert into";
+        insertStmtElement.append();
     }
 
     private void translateDelete(Delete delete, String methodName, List<Param> params) {
@@ -333,13 +335,13 @@ public class Sql92Translator extends Translator {
             if (params != null && !params.isEmpty()) {
                 throw new TranslateException("%s should have should have no params", methodName);
             }
-            translateDeleteAll(methodName);
+            translateDeleteAll(delete, methodName);
         } else {
             translateDeleteBy(delete, methodName, params);
         }
     }
 
-    private void translateDeleteAll(String methodName) {
+    private void translateDeleteAll(Delete delete, String methodName) {
         /*
          * <delete id="deleteAll">
          *     delete from {table}
@@ -349,6 +351,9 @@ public class Sql92Translator extends Translator {
         Element deleteElement = deleteStmtElement.getElement();
 
         addTextNode(deleteElement, LF, INDENT, "delete from ", tableName, LF);
+
+        // for subclass
+        postProcessDelete(delete, deleteElement);
 
         deleteStmtElement.append();
     }
@@ -366,6 +371,9 @@ public class Sql92Translator extends Translator {
         addTextNode(deleteElement, LF, INDENT, "delete from ", tableName, LF, INDENT);
         translateBy(deleteElement, (By) delete.getChild(0), asNameMap(params));
         addTextNode(deleteElement, LF);
+
+        // for subclass
+        postProcessDelete(delete, deleteElement);
 
         deleteStmtElement.append();
     }
@@ -400,6 +408,9 @@ public class Sql92Translator extends Translator {
                 );
         translateBy(updateElement, (By) update.getChild(0), asNameMap(param.getBeanFields()));
         addTextNode(updateElement, LF);
+
+        // for subclass
+        postProcessUpdate(update, updateElement);
 
         updateStmtElement.append();
     }
@@ -437,6 +448,9 @@ public class Sql92Translator extends Translator {
 
         translateBy(updateElement, (By) update.getChild(0), asNameMap(param.getBeanFields()));
         addTextNode(updateElement, LF);
+
+        // for subclass
+        postProcessUpdate(update, updateElement);
 
         updateStmtElement.append();
     }
@@ -478,6 +492,9 @@ public class Sql92Translator extends Translator {
             addTextNode(selectElement, LF);
         }
 
+        // for subclass
+        postProcessFind(find, selectElement);
+
         selectStmtElement.append();
     }
 
@@ -503,6 +520,9 @@ public class Sql92Translator extends Translator {
             translateBy(selectElement, (By) child, asNameMap(params));
             addTextNode(selectElement, LF);
         }
+
+        // for subclass
+        postProcessCount(count, selectElement);
 
         selectStmtElement.append();
     }
@@ -558,6 +578,9 @@ public class Sql92Translator extends Translator {
             addTextNode(selectElement, "#{offset},");
         }
         addTextNode(selectElement, "#{limit}", LF);
+
+        // for subclass
+        postProcessPage(page, selectElement);
 
         selectStmtElement.append();
     }
@@ -677,6 +700,30 @@ public class Sql92Translator extends Translator {
 
         void accept(CharSequence... texts);
 
+    }
+
+    protected void postProcessInsert(Insert insert, Element insertElement) {
+        // subclass extension point
+    }
+
+    protected void postProcessDelete(Delete delete, Element deleteElement) {
+        // subclass extension point
+    }
+
+    protected void postProcessUpdate(Update update, Element updateElement) {
+        // subclass extension point
+    }
+
+    protected void postProcessFind(Find find, Element selectElement) {
+        // subclass extension point
+    }
+
+    protected void postProcessCount(Count count, Element countElement) {
+        // subclass extension point
+    }
+
+    protected void postProcessPage(Page page, Element pageElement) {
+        // subclass extension point
     }
 
 }

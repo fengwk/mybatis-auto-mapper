@@ -79,6 +79,76 @@ public class MySqlTranslatorTest {
     }
 
     @Test
+    public void testInsertIgnoreSelective() {
+        String methodName = "insertIgnoreSelective";
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false);
+
+        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                        "<mapper namespace=\"demo\">\n" +
+                        "\n" +
+                        "<!--auto mapper generate-->\n" +
+                        "<insert id=\"insertIgnoreSelective\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
+                        "    insert ignore into demo\n" +
+                        "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                        "        <if test=\"username != null\">username,</if>\n" +
+                        "        <if test=\"userAddress != null\">user_address,</if>\n" +
+                        "    </trim>\n" +
+                        "    values\n" +
+                        "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                        "        <if test=\"username != null\">#{username},</if>\n" +
+                        "        <if test=\"userAddress != null\">#{userAddress},</if>\n" +
+                        "    </trim>\n" +
+                        "</insert>\n" +
+                        "</mapper>"
+        );
+    }
+
+    @Test
+    public void testReplaceSelective() {
+        String methodName = "replaceSelective";
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false);
+
+        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                        "<mapper namespace=\"demo\">\n" +
+                        "\n" +
+                        "<!--auto mapper generate-->\n" +
+                        "<insert id=\"replaceSelective\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
+                        "    replace into demo\n" +
+                        "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                        "        <if test=\"username != null\">username,</if>\n" +
+                        "        <if test=\"userAddress != null\">user_address,</if>\n" +
+                        "    </trim>\n" +
+                        "    values\n" +
+                        "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                        "        <if test=\"username != null\">#{username},</if>\n" +
+                        "        <if test=\"userAddress != null\">#{userAddress},</if>\n" +
+                        "    </trim>\n" +
+                        "</insert>\n" +
+                        "</mapper>"
+        );
+    }
+
+    @Test
     public void testInsertAll() {
         String methodName = "insertAll";
 
@@ -371,6 +441,76 @@ public class MySqlTranslatorTest {
                         "        username=#{username}\n" +
                         "        and user_address=#{userAddress}\n" +
                         "    </where>\n" +
+                        "</select>\n" +
+                        "</mapper>"
+        );
+    }
+
+    @Test
+    public void testFindLockInShareMode() {
+        String methodName = "findLockInShareModeByUsernameAndUserAddress";
+
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
+
+        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                        "<mapper namespace=\"demo\">\n" +
+                        "\n" +
+                        "<!--auto mapper generate-->\n" +
+                        "<select id=\"findLockInShareModeByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
+                        "    select id, username, user_address as userAddress\n" +
+                        "    from demo\n" +
+                        "    <where>\n" +
+                        "        username=#{username}\n" +
+                        "        and user_address=#{userAddress}\n" +
+                        "    </where>\n" +
+                        "    lock in share mode\n" +
+                        "</select>\n" +
+                        "</mapper>"
+        );
+    }
+
+    @Test
+    public void testFindForUpdate() {
+        String methodName = "findForUpdateByUsernameAndUserAddress";
+
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
+
+        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                        "<mapper namespace=\"demo\">\n" +
+                        "\n" +
+                        "<!--auto mapper generate-->\n" +
+                        "<select id=\"findForUpdateByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
+                        "    select id, username, user_address as userAddress\n" +
+                        "    from demo\n" +
+                        "    <where>\n" +
+                        "        username=#{username}\n" +
+                        "        and user_address=#{userAddress}\n" +
+                        "    </where>\n" +
+                        "    for update\n" +
                         "</select>\n" +
                         "</mapper>"
         );

@@ -7,6 +7,6 @@ import java.util.List;
  */
 public interface BaseMapper<T> {
 
-    List<T> pageAll();
+    List<T> pageAll(int limit);
 
 }
