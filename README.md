@@ -19,7 +19,7 @@ AutoMapper是一款适用于Mybatis的SQL生成插件，提供了JPA风格的SQL
     <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>auto-mapper-processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.24</version>
+    <version>0.0.25</version>
 </dependency>
 ```
 
@@ -64,6 +64,8 @@ public interface ExampleMapper {
 |      | countBy...              | 多入参数时必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                                        |
 | 分页 | pageAll[OrderBy...]     | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                   |
 |      | pageBy...[OrderBy...]   | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                   |
+|      | limitAll[OrderBy...]    | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                   |
+|      | limitBy...[OrderBy...]  | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                   |
 
 下表格展示了当前支持的所有关键字：
 
@@ -128,6 +130,7 @@ AutoMapper在编译期会打印这以下几种常见信息：
 
 - 使用`insertIgnore`代替`insert`可使用`insert ignore into`语法。
 - 使用`replace`代替`insert`可使用`replace into`语法。
+- 使用`insertOnDuplicateKeyUpdate`可使用`insert into ... on duplicate key update ...`语法。
 - 使用`findLockInShareMode`代替`find`可使用`select ... lock in share mode`语法。
 - 使用`findForUpdate`代替`find`可使用`select ... for update`语法。
 - 对于like语句，将使用concat拼接防止SQL注入。
