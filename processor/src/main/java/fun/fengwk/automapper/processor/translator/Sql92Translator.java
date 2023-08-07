@@ -194,7 +194,7 @@ public class Sql92Translator extends Translator {
         addTextNode(foreachElement, foreachText);
 
         // for subclass
-        postProcessInsert(insert, insertElement);
+        postProcessInsert(insert, insertElement, param);
 
         insertStmtElement.append();
     }
@@ -247,7 +247,7 @@ public class Sql92Translator extends Translator {
         addTextNode(foreachElement, LF, INDENT);
 
         // for subclass
-        postProcessInsert(insert, insertElement);
+        postProcessInsert(insert, insertElement, param);
 
         insertStmtElement.append();
     }
@@ -278,7 +278,7 @@ public class Sql92Translator extends Translator {
                 ")", LF);
 
         // for subclass
-        postProcessInsert(insert, insertElement);
+        postProcessInsert(insert, insertElement, param);
 
         insertStmtElement.append();
     }
@@ -322,7 +322,7 @@ public class Sql92Translator extends Translator {
         addTextNode(insertElement, LF);
 
         // for subclass
-        postProcessInsert(insert, insertElement);
+        postProcessInsert(insert, insertElement, param);
 
         insertStmtElement.append();
     }
@@ -702,7 +702,7 @@ public class Sql92Translator extends Translator {
 
     }
 
-    protected void postProcessInsert(Insert insert, Element insertElement) {
+    protected void postProcessInsert(Insert insert, Element insertElement, Param param) {
         // subclass extension point
     }
 

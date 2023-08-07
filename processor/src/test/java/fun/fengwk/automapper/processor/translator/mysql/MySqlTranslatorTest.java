@@ -31,15 +31,15 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<insert id=\"insert\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
-                        "    insert into demo (username, user_address) values\n" +
-                        "    (#{username}, #{userAddress})\n" +
-                        "</insert>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<insert id=\"insert\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
+                "    insert into demo (username, user_address) values\n" +
+                "    (#{username}, #{userAddress})\n" +
+                "</insert>\n" +
+                "</mapper>"
         );
     }
 
@@ -58,23 +58,23 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<insert id=\"insertSelective\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
-                        "    insert into demo\n" +
-                        "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
-                        "        <if test=\"username != null\">username,</if>\n" +
-                        "        <if test=\"userAddress != null\">user_address,</if>\n" +
-                        "    </trim>\n" +
-                        "    values\n" +
-                        "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
-                        "        <if test=\"username != null\">#{username},</if>\n" +
-                        "        <if test=\"userAddress != null\">#{userAddress},</if>\n" +
-                        "    </trim>\n" +
-                        "</insert>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<insert id=\"insertSelective\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
+                "    insert into demo\n" +
+                "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                "        <if test=\"username != null\">username,</if>\n" +
+                "        <if test=\"userAddress != null\">user_address,</if>\n" +
+                "    </trim>\n" +
+                "    values\n" +
+                "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                "        <if test=\"username != null\">#{username},</if>\n" +
+                "        <if test=\"userAddress != null\">#{userAddress},</if>\n" +
+                "    </trim>\n" +
+                "</insert>\n" +
+                "</mapper>"
         );
     }
 
@@ -93,23 +93,89 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<insert id=\"insertIgnoreSelective\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
-                        "    insert ignore into demo\n" +
-                        "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
-                        "        <if test=\"username != null\">username,</if>\n" +
-                        "        <if test=\"userAddress != null\">user_address,</if>\n" +
-                        "    </trim>\n" +
-                        "    values\n" +
-                        "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
-                        "        <if test=\"username != null\">#{username},</if>\n" +
-                        "        <if test=\"userAddress != null\">#{userAddress},</if>\n" +
-                        "    </trim>\n" +
-                        "</insert>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<insert id=\"insertIgnoreSelective\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
+                "    insert ignore into demo\n" +
+                "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                "        <if test=\"username != null\">username,</if>\n" +
+                "        <if test=\"userAddress != null\">user_address,</if>\n" +
+                "    </trim>\n" +
+                "    values\n" +
+                "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                "        <if test=\"username != null\">#{username},</if>\n" +
+                "        <if test=\"userAddress != null\">#{userAddress},</if>\n" +
+                "    </trim>\n" +
+                "</insert>\n" +
+                "</mapper>"
+        );
+    }
+
+    @Test
+    public void testInsertOnDuplicateKeyUpdate() {
+        String methodName = "insertOnDuplicateKeyUpdate";
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false);
+
+        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+            "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+            "<mapper namespace=\"demo\">\n" +
+            "\n" +
+            "<!--auto mapper generate-->\n" +
+            "<insert id=\"insertOnDuplicateKeyUpdate\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
+            "    insert into demo (username, user_address) values\n" +
+            "    (#{username}, #{userAddress})\n" +
+            "    on duplicate key update username=#{username}, user_address=#{userAddress}\n" +
+            "    </insert>\n" +
+            "</mapper>"
+        );
+    }
+
+    @Test
+    public void testInsertOnDuplicateKeyUpdateSelective() {
+        String methodName = "insertOnDuplicateKeyUpdateSelective";
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false);
+
+        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+            "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+            "<mapper namespace=\"demo\">\n" +
+            "\n" +
+            "<!--auto mapper generate-->\n" +
+            "<insert id=\"insertOnDuplicateKeyUpdateSelective\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
+            "    insert into demo\n" +
+            "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+            "        <if test=\"username != null\">username,</if>\n" +
+            "        <if test=\"userAddress != null\">user_address,</if>\n" +
+            "    </trim>\n" +
+            "    values\n" +
+            "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+            "        <if test=\"username != null\">#{username},</if>\n" +
+            "        <if test=\"userAddress != null\">#{userAddress},</if>\n" +
+            "    </trim>\n" +
+            "    <trim prefix=\"on duplicate key update \" suffixOverrides=\",\">\n" +
+            "        <if test=\"username != null\">username=#{username},</if>\n" +
+            "        <if test=\"userAddress != null\">user_address=#{userAddress},</if>\n" +
+            "    </trim>\n" +
+            "</insert>\n" +
+            "</mapper>"
         );
     }
 
@@ -128,23 +194,23 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<insert id=\"replaceSelective\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
-                        "    replace into demo\n" +
-                        "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
-                        "        <if test=\"username != null\">username,</if>\n" +
-                        "        <if test=\"userAddress != null\">user_address,</if>\n" +
-                        "    </trim>\n" +
-                        "    values\n" +
-                        "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
-                        "        <if test=\"username != null\">#{username},</if>\n" +
-                        "        <if test=\"userAddress != null\">#{userAddress},</if>\n" +
-                        "    </trim>\n" +
-                        "</insert>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<insert id=\"replaceSelective\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
+                "    replace into demo\n" +
+                "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                "        <if test=\"username != null\">username,</if>\n" +
+                "        <if test=\"userAddress != null\">user_address,</if>\n" +
+                "    </trim>\n" +
+                "    values\n" +
+                "    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                "        <if test=\"username != null\">#{username},</if>\n" +
+                "        <if test=\"userAddress != null\">#{userAddress},</if>\n" +
+                "    </trim>\n" +
+                "</insert>\n" +
+                "</mapper>"
         );
     }
 
@@ -163,17 +229,17 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<insert id=\"insertAll\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
-                        "    insert into demo (username, user_address) values\n" +
-                        "    <foreach collection=\"collection\" item=\"item\" separator=\",\">\n" +
-                        "        (#{item.username}, #{item.userAddress})\n" +
-                        "    </foreach>\n" +
-                        "</insert>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<insert id=\"insertAll\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
+                "    insert into demo (username, user_address) values\n" +
+                "    <foreach collection=\"collection\" item=\"item\" separator=\",\">\n" +
+                "        (#{item.username}, #{item.userAddress})\n" +
+                "    </foreach>\n" +
+                "</insert>\n" +
+                "</mapper>"
         );
     }
 
@@ -192,25 +258,25 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<insert id=\"insertAllSelective\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
-                        "    <foreach collection=\"collection\" item=\"item\" separator=\";\">\n" +
-                        "        insert into demo\n" +
-                        "        <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
-                        "            <if test=\"item.username != null\">username,</if>\n" +
-                        "            <if test=\"item.userAddress != null\">user_address,</if>\n" +
-                        "        </trim>\n" +
-                        "        values\n" +
-                        "        <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
-                        "            <if test=\"item.username != null\">#{item.username},</if>\n" +
-                        "            <if test=\"item.userAddress != null\">#{item.userAddress},</if>\n" +
-                        "        </trim>\n" +
-                        "    </foreach>\n" +
-                        "</insert>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<insert id=\"insertAllSelective\" keyProperty=\"id\" parameterType=\"demoDO\" useGeneratedKeys=\"true\">\n" +
+                "    <foreach collection=\"collection\" item=\"item\" separator=\";\">\n" +
+                "        insert into demo\n" +
+                "        <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                "            <if test=\"item.username != null\">username,</if>\n" +
+                "            <if test=\"item.userAddress != null\">user_address,</if>\n" +
+                "        </trim>\n" +
+                "        values\n" +
+                "        <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +
+                "            <if test=\"item.username != null\">#{item.username},</if>\n" +
+                "            <if test=\"item.userAddress != null\">#{item.userAddress},</if>\n" +
+                "        </trim>\n" +
+                "    </foreach>\n" +
+                "</insert>\n" +
+                "</mapper>"
         );
     }
 
@@ -223,14 +289,14 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<delete id=\"deleteAll\">\n" +
-                        "    delete from demo\n" +
-                        "</delete>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<delete id=\"deleteAll\">\n" +
+                "    delete from demo\n" +
+                "</delete>\n" +
+                "</mapper>"
         );
     }
 
@@ -246,18 +312,18 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<delete id=\"deleteByUsernameAndUserAddress\">\n" +
-                        "    delete from demo\n" +
-                        "    <where>\n" +
-                        "        username=#{username}\n" +
-                        "        and user_address=#{userAddress}\n" +
-                        "    </where>\n" +
-                        "</delete>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<delete id=\"deleteByUsernameAndUserAddress\">\n" +
+                "    delete from demo\n" +
+                "    <where>\n" +
+                "        username=#{username}\n" +
+                "        and user_address=#{userAddress}\n" +
+                "    </where>\n" +
+                "</delete>\n" +
+                "</mapper>"
         );
     }
 
@@ -273,22 +339,22 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<delete id=\"deleteByUsernameAndUserAddress\">\n" +
-                        "    delete from demo\n" +
-                        "    <where>\n" +
-                        "        <if test=\"username != null\">\n" +
-                        "            username=#{username}\n" +
-                        "        </if>\n" +
-                        "        <if test=\"userAddress != null\">\n" +
-                        "            and user_address=#{userAddress}\n" +
-                        "        </if>\n" +
-                        "    </where>\n" +
-                        "</delete>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<delete id=\"deleteByUsernameAndUserAddress\">\n" +
+                "    delete from demo\n" +
+                "    <where>\n" +
+                "        <if test=\"username != null\">\n" +
+                "            username=#{username}\n" +
+                "        </if>\n" +
+                "        <if test=\"userAddress != null\">\n" +
+                "            and user_address=#{userAddress}\n" +
+                "        </if>\n" +
+                "    </where>\n" +
+                "</delete>\n" +
+                "</mapper>"
         );
     }
 
@@ -307,18 +373,18 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<update id=\"updateByUsernameAndUserAddress\" parameterType=\"DemoDO\">\n" +
-                        "    update demo set id=#{id}, username=#{username}, user_address=#{userAddress}\n" +
-                        "    <where>\n" +
-                        "        username=#{username}\n" +
-                        "        and user_address=#{userAddress}\n" +
-                        "    </where>\n" +
-                        "</update>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<update id=\"updateByUsernameAndUserAddress\" parameterType=\"DemoDO\">\n" +
+                "    update demo set id=#{id}, username=#{username}, user_address=#{userAddress}\n" +
+                "    <where>\n" +
+                "        username=#{username}\n" +
+                "        and user_address=#{userAddress}\n" +
+                "    </where>\n" +
+                "</update>\n" +
+                "</mapper>"
         );
     }
 
@@ -337,23 +403,23 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<update id=\"updateByUsernameAndUserAddressSelective\" parameterType=\"DemoDO\">\n" +
-                        "    update demo set \n" +
-                        "    <trim suffixOverrides=\",\">\n" +
-                        "        <if test=\"id != null\">id=#{id},</if>\n" +
-                        "        <if test=\"username != null\">username=#{username},</if>\n" +
-                        "        <if test=\"userAddress != null\">user_address=#{userAddress},</if>\n" +
-                        "    </trim>\n" +
-                        "    <where>\n" +
-                        "        username=#{username}\n" +
-                        "        and user_address=#{userAddress}\n" +
-                        "    </where>\n" +
-                        "</update>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<update id=\"updateByUsernameAndUserAddressSelective\" parameterType=\"DemoDO\">\n" +
+                "    update demo set \n" +
+                "    <trim suffixOverrides=\",\">\n" +
+                "        <if test=\"id != null\">id=#{id},</if>\n" +
+                "        <if test=\"username != null\">username=#{username},</if>\n" +
+                "        <if test=\"userAddress != null\">user_address=#{userAddress},</if>\n" +
+                "    </trim>\n" +
+                "    <where>\n" +
+                "        username=#{username}\n" +
+                "        and user_address=#{userAddress}\n" +
+                "    </where>\n" +
+                "</update>\n" +
+                "</mapper>"
         );
     }
 
@@ -372,15 +438,15 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"findAll\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
-                        "    from demo\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"findAll\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -399,16 +465,16 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"findAllOrderById\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
-                        "    from demo\n" +
-                        "    order by id\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"findAllOrderById\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    order by id\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -430,19 +496,19 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"findByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username=#{username}\n" +
-                        "        and user_address=#{userAddress}\n" +
-                        "    </where>\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"findByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username=#{username}\n" +
+                "        and user_address=#{userAddress}\n" +
+                "    </where>\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -464,20 +530,20 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"findLockInShareModeByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username=#{username}\n" +
-                        "        and user_address=#{userAddress}\n" +
-                        "    </where>\n" +
-                        "    lock in share mode\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"findLockInShareModeByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username=#{username}\n" +
+                "        and user_address=#{userAddress}\n" +
+                "    </where>\n" +
+                "    lock in share mode\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -499,20 +565,20 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"findForUpdateByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username=#{username}\n" +
-                        "        and user_address=#{userAddress}\n" +
-                        "    </where>\n" +
-                        "    for update\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"findForUpdateByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username=#{username}\n" +
+                "        and user_address=#{userAddress}\n" +
+                "    </where>\n" +
+                "    for update\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -534,20 +600,20 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"findByUsernameAndUserAddressOrderByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username=#{username}\n" +
-                        "        and user_address=#{userAddress}\n" +
-                        "    </where>\n" +
-                        "    order by username, user_address\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"findByUsernameAndUserAddressOrderByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username=#{username}\n" +
+                "        and user_address=#{userAddress}\n" +
+                "    </where>\n" +
+                "    order by username, user_address\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -562,15 +628,15 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"countAll\" resultType=\"int\">\n" +
-                        "    select count(*)\n" +
-                        "    from demo\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"countAll\" resultType=\"int\">\n" +
+                "    select count(*)\n" +
+                "    from demo\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -588,19 +654,19 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"countByUsernameAndUserAddress\" resultType=\"int\">\n" +
-                        "    select count(*)\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username=#{username}\n" +
-                        "        and user_address=#{userAddress}\n" +
-                        "    </where>\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"countByUsernameAndUserAddress\" resultType=\"int\">\n" +
+                "    select count(*)\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username=#{username}\n" +
+                "        and user_address=#{userAddress}\n" +
+                "    </where>\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -618,19 +684,19 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"countByUsernameIsAndUserAddressEquals\" resultType=\"int\">\n" +
-                        "    select count(*)\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username=#{username}\n" +
-                        "        and user_address=#{userAddress}\n" +
-                        "    </where>\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"countByUsernameIsAndUserAddressEquals\" resultType=\"int\">\n" +
+                "    select count(*)\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username=#{username}\n" +
+                "        and user_address=#{userAddress}\n" +
+                "    </where>\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -648,19 +714,19 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"countByUsernameLessThanAndUserAddressLessThanEquals\" resultType=\"int\">\n" +
-                        "    select count(*)\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username&lt;#{username}\n" +
-                        "        and user_address&lt;=#{userAddress}\n" +
-                        "    </where>\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"countByUsernameLessThanAndUserAddressLessThanEquals\" resultType=\"int\">\n" +
+                "    select count(*)\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username&lt;#{username}\n" +
+                "        and user_address&lt;=#{userAddress}\n" +
+                "    </where>\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -678,19 +744,19 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"countByUsernameGreaterThanAndUserAddressGreaterThanEquals\" resultType=\"int\">\n" +
-                        "    select count(*)\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username&gt;#{username}\n" +
-                        "        and user_address&gt;=#{userAddress}\n" +
-                        "    </where>\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"countByUsernameGreaterThanAndUserAddressGreaterThanEquals\" resultType=\"int\">\n" +
+                "    select count(*)\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username&gt;#{username}\n" +
+                "        and user_address&gt;=#{userAddress}\n" +
+                "    </where>\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -708,19 +774,19 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"countByUsernameAfterAndUserAddressBefore\" resultType=\"int\">\n" +
-                        "    select count(*)\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username&gt;#{username}\n" +
-                        "        and user_address&lt;#{userAddress}\n" +
-                        "    </where>\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"countByUsernameAfterAndUserAddressBefore\" resultType=\"int\">\n" +
+                "    select count(*)\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username&gt;#{username}\n" +
+                "        and user_address&lt;#{userAddress}\n" +
+                "    </where>\n" +
+                "</select>\n" +
+                "</mapper>"
         );
 
     }
@@ -739,19 +805,19 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"countByUsernameIsNullAndUserAddressIsNotNull\" resultType=\"int\">\n" +
-                        "    select count(*)\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username is null\n" +
-                        "        and user_address is not null\n" +
-                        "    </where>\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"countByUsernameIsNullAndUserAddressIsNotNull\" resultType=\"int\">\n" +
+                "    select count(*)\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username is null\n" +
+                "        and user_address is not null\n" +
+                "    </where>\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -769,19 +835,19 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"countByUsernameNotNullAndUserAddressLike\" resultType=\"int\">\n" +
-                        "    select count(*)\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username is not null\n" +
-                        "        and user_address like #{userAddress}\n" +
-                        "    </where>\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"countByUsernameNotNullAndUserAddressLike\" resultType=\"int\">\n" +
+                "    select count(*)\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username is not null\n" +
+                "        and user_address like #{userAddress}\n" +
+                "    </where>\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -799,19 +865,19 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"countByUsernameNotLikeAndUserAddressStartingWith\" resultType=\"int\">\n" +
-                        "    select count(*)\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username not like #{username}\n" +
-                        "        and user_address like concat(#{userAddress}, '%')\n" +
-                        "    </where>\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"countByUsernameNotLikeAndUserAddressStartingWith\" resultType=\"int\">\n" +
+                "    select count(*)\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username not like #{username}\n" +
+                "        and user_address like concat(#{userAddress}, '%')\n" +
+                "    </where>\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -829,19 +895,19 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"countByUsernameEndingWithAndUserAddressContaining\" resultType=\"int\">\n" +
-                        "    select count(*)\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username like concat('%', #{username})\n" +
-                        "        and user_address like concat('%', #{userAddress}, '%')\n" +
-                        "    </where>\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"countByUsernameEndingWithAndUserAddressContaining\" resultType=\"int\">\n" +
+                "    select count(*)\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username like concat('%', #{username})\n" +
+                "        and user_address like concat('%', #{userAddress}, '%')\n" +
+                "    </where>\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -859,22 +925,22 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"countByUsernameNotAndUserAddressIn\" resultType=\"int\">\n" +
-                        "    select count(*)\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username != #{username}\n" +
-                        "        and user_address in\n" +
-                        "        <foreach close=\")\" collection=\"userAddress\" item=\"item\" open=\"(\" separator=\",\">\n" +
-                        "            #{item}\n" +
-                        "        </foreach>\n" +
-                        "    </where>\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"countByUsernameNotAndUserAddressIn\" resultType=\"int\">\n" +
+                "    select count(*)\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username != #{username}\n" +
+                "        and user_address in\n" +
+                "        <foreach close=\")\" collection=\"userAddress\" item=\"item\" open=\"(\" separator=\",\">\n" +
+                "            #{item}\n" +
+                "        </foreach>\n" +
+                "    </where>\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -892,25 +958,25 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"countByUsernameInAndUserAddressNotIn\" resultType=\"int\">\n" +
-                        "    select count(*)\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username in\n" +
-                        "        <foreach close=\")\" collection=\"username\" item=\"item\" open=\"(\" separator=\",\">\n" +
-                        "            #{item}\n" +
-                        "        </foreach>\n" +
-                        "        and user_address not in\n" +
-                        "        <foreach close=\")\" collection=\"userAddress\" item=\"item\" open=\"(\" separator=\",\">\n" +
-                        "            #{item}\n" +
-                        "        </foreach>\n" +
-                        "    </where>\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"countByUsernameInAndUserAddressNotIn\" resultType=\"int\">\n" +
+                "    select count(*)\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username in\n" +
+                "        <foreach close=\")\" collection=\"username\" item=\"item\" open=\"(\" separator=\",\">\n" +
+                "            #{item}\n" +
+                "        </foreach>\n" +
+                "        and user_address not in\n" +
+                "        <foreach close=\")\" collection=\"userAddress\" item=\"item\" open=\"(\" separator=\",\">\n" +
+                "            #{item}\n" +
+                "        </foreach>\n" +
+                "    </where>\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -928,29 +994,29 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"countByUsernameInAndUserAddressNotIn\" resultType=\"int\">\n" +
-                        "    select count(*)\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        <if test=\"username != null\">\n" +
-                        "            username in\n" +
-                        "            <foreach close=\")\" collection=\"username\" item=\"item\" open=\"(\" separator=\",\">\n" +
-                        "                #{item}\n" +
-                        "            </foreach>\n" +
-                        "        </if>\n" +
-                        "        <if test=\"userAddress != null\">\n" +
-                        "            and user_address not in\n" +
-                        "            <foreach close=\")\" collection=\"userAddress\" item=\"item\" open=\"(\" separator=\",\">\n" +
-                        "                #{item}\n" +
-                        "            </foreach>\n" +
-                        "        </if>\n" +
-                        "    </where>\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"countByUsernameInAndUserAddressNotIn\" resultType=\"int\">\n" +
+                "    select count(*)\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        <if test=\"username != null\">\n" +
+                "            username in\n" +
+                "            <foreach close=\")\" collection=\"username\" item=\"item\" open=\"(\" separator=\",\">\n" +
+                "                #{item}\n" +
+                "            </foreach>\n" +
+                "        </if>\n" +
+                "        <if test=\"userAddress != null\">\n" +
+                "            and user_address not in\n" +
+                "            <foreach close=\")\" collection=\"userAddress\" item=\"item\" open=\"(\" separator=\",\">\n" +
+                "                #{item}\n" +
+                "            </foreach>\n" +
+                "        </if>\n" +
+                "    </where>\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -972,16 +1038,16 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"pageAll\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
-                        "    from demo\n" +
-                        "    limit #{offset},#{limit}\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"pageAll\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    limit #{offset},#{limit}\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -1002,16 +1068,16 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"pageAll\" parameterType=\"int\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
-                        "    from demo\n" +
-                        "    limit #{limit}\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"pageAll\" parameterType=\"int\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    limit #{limit}\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -1033,17 +1099,17 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"pageAllOrderById\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
-                        "    from demo\n" +
-                        "    order by id\n" +
-                        "    limit #{offset},#{limit}\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"pageAllOrderById\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    order by id\n" +
+                "    limit #{offset},#{limit}\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -1067,20 +1133,20 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"pageByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username=#{username}\n" +
-                        "        and user_address=#{userAddress}\n" +
-                        "    </where>\n" +
-                        "    limit #{offset},#{limit}\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"pageByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username=#{username}\n" +
+                "        and user_address=#{userAddress}\n" +
+                "    </where>\n" +
+                "    limit #{offset},#{limit}\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 
@@ -1104,21 +1170,21 @@ public class MySqlTranslatorTest {
 
         assert DOMUtils.toString(translator.getDocument()).equals(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                        "<mapper namespace=\"demo\">\n" +
-                        "\n" +
-                        "<!--auto mapper generate-->\n" +
-                        "<select id=\"pageByUsernameAndUserAddressOrderByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
-                        "    from demo\n" +
-                        "    <where>\n" +
-                        "        username=#{username}\n" +
-                        "        and user_address=#{userAddress}\n" +
-                        "    </where>\n" +
-                        "    order by username, user_address\n" +
-                        "    limit #{offset},#{limit}\n" +
-                        "</select>\n" +
-                        "</mapper>"
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"pageByUsernameAndUserAddressOrderByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username=#{username}\n" +
+                "        and user_address=#{userAddress}\n" +
+                "    </where>\n" +
+                "    order by username, user_address\n" +
+                "    limit #{offset},#{limit}\n" +
+                "</select>\n" +
+                "</mapper>"
         );
     }
 

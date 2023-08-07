@@ -977,4 +977,172 @@ public class Sql92TranslatorTest {
         );
     }
 
+    @Test
+    public void testLimitAll1() {
+        String methodName = "limitAll";
+
+        Param p1 = new Param("int", "offset", "offset", false, false, null, false);
+        Param p2 = new Param("int", "limit", "limit", false, false, null, false);
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
+
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"limitAll\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    limit #{offset},#{limit}\n" +
+                "</select>\n" +
+                "</mapper>"
+        );
+    }
+
+    @Test
+    public void testLimitAll2() {
+        String methodName = "limitAll";
+
+        Param p1 = new Param("int", "limit", "limit", false, false, null, false);
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
+
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1), ret));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"limitAll\" parameterType=\"int\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    limit #{limit}\n" +
+                "</select>\n" +
+                "</mapper>"
+        );
+    }
+
+    @Test
+    public void testLimitAllOrderBy() {
+        String methodName = "limitAllOrderById";
+
+        Param p1 = new Param("int", "offset", "offset", false, false, null, false);
+        Param p2 = new Param("int", "limit", "limit", false, false, null, false);
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
+
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"limitAllOrderById\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    order by id\n" +
+                "    limit #{offset},#{limit}\n" +
+                "</select>\n" +
+                "</mapper>"
+        );
+    }
+
+    @Test
+    public void testLimitBy1() {
+        String methodName = "limitByUsernameAndUserAddress";
+
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p3 = new Param("int", "offset", "offset", false, false, null, false);
+        Param p4 = new Param("int", "limit", "limit", false, false, null, false);
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
+
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2, p3, p4), ret));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"limitByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username=#{username}\n" +
+                "        and user_address=#{userAddress}\n" +
+                "    </where>\n" +
+                "    limit #{offset},#{limit}\n" +
+                "</select>\n" +
+                "</mapper>"
+        );
+    }
+
+    @Test
+    public void testLimitByOrderBy1() {
+        String methodName = "limitByUsernameAndUserAddressOrderByUsernameAndUserAddress";
+
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p3 = new Param("int", "offset", "offset", false, false, null, false);
+        Param p4 = new Param("int", "limit", "limit", false, false, null, false);
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
+
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2, p3, p4), ret));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"limitByUsernameAndUserAddressOrderByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    <where>\n" +
+                "        username=#{username}\n" +
+                "        and user_address=#{userAddress}\n" +
+                "    </where>\n" +
+                "    order by username, user_address\n" +
+                "    limit #{offset},#{limit}\n" +
+                "</select>\n" +
+                "</mapper>"
+        );
+    }
+
 }

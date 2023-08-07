@@ -27,6 +27,8 @@ public interface ExampleMapper extends BaseMapper<ExampleDO> {
 
     int insertIgnore(ExampleDO exampleDO);
 
+    int insertOnDuplicateKeyUpdateSelective(ExampleDO exampleDO);
+
     int replace(ExampleDO exampleDO);
 
     @ExcludeField.List({

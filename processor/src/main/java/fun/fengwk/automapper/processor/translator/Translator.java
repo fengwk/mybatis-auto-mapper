@@ -33,6 +33,8 @@ import java.util.Set;
  */
 public abstract class Translator {
 
+
+    protected static final String LIMIT_PAGE = "limit";
     protected static final String OFFSET = "offset";
     protected static final String LIMIT = "limit";
 
@@ -73,7 +75,9 @@ public abstract class Translator {
      * @return
      */
     protected Lexer newLexer() {
-        return new Lexer.Builder().build();
+        return new Lexer.Builder()
+            .derivePage(LIMIT_PAGE)
+            .build();
     }
 
     /**
