@@ -53,10 +53,11 @@ public abstract class Translator {
     protected final Element mapperElement;
     protected final NamingConverter fieldNamingConverter;
 
-    private Set<String> existingIdsCache;
+    protected Set<String> existingIdsCache;
+    protected Set<String> appendedIds = new HashSet<>();
 
-    private Lexer lexer = newLexer();
-    private Parser parser = new Parser();
+    protected Lexer lexer = newLexer();
+    protected Parser parser = new Parser();
 
     public Translator(TranslateContext translateContext) {
         this.tableName = translateContext.getTableName();
@@ -246,10 +247,14 @@ public abstract class Translator {
         Element element = document.createElement(tagName);
         element.setAttribute("id", id);
         return new StmtElement(element, () -> {
+            if (appendedIds.contains(id)) {
+                throw new TranslateException("'%s' id duplicated", id);
+            }
             mapperElement.appendChild(document.createTextNode(LF_LF));
             mapperElement.appendChild(comment);
             mapperElement.appendChild(document.createTextNode(LF));
             mapperElement.appendChild(element);
+            appendedIds.add(id);
         });
     }
 

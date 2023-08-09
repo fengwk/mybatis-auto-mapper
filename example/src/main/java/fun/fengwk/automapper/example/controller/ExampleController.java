@@ -118,7 +118,7 @@ public class ExampleController {
     // curl http://localhost:8080/findByNameStaringWith?name=New
     @GetMapping("/findByNameStaringWith")
     public String findByNameStaringWith(@RequestParam("name") String name) {
-        return Arrays.toString(exampleMapper.findByNameStartingWith(name).toArray());
+        return Arrays.toString(exampleMapper.findByNameStartingWith(name, "name asc").toArray());
     }
 
     // curl http://localhost:8080/findByNameStartingWithAndSortGreaterThanEqualsOrderBySortDesc?name=New&sort=10

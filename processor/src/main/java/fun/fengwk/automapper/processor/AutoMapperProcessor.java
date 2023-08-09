@@ -107,6 +107,7 @@ public class AutoMapperProcessor extends AbstractProcessor {
         NamingStyle fieldNamingStyle = autoMapperInfo.getFieldNamingStyle();
         String tableName = autoMapperInfo.getTableName();
         String tableNamePrefix = autoMapperInfo.getTableNamePrefix();
+        String tableNameSuffix = autoMapperInfo.getTableNameSuffix();
 
         NamingConverter tableNamingConverter = NamingConverterFactory.getInstance(tableNamingStyle);
         NamingConverter fieldNamingConverter = NamingConverterFactory.getInstance(fieldNamingStyle);
@@ -123,6 +124,10 @@ public class AutoMapperProcessor extends AbstractProcessor {
         // 添加前缀
         if (tableNamePrefix != null && !tableNamePrefix.isEmpty()) {
             tableName = tableNamePrefix + tableName;
+        }
+        // 添加后缀
+        if (tableNameSuffix != null && !tableNameSuffix.isEmpty()) {
+            tableName = tableName + tableNameSuffix;
         }
 
         // 解析Mapper方法列表

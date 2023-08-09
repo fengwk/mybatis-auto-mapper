@@ -19,7 +19,7 @@ AutoMapper是一款适用于Mybatis的SQL生成插件，提供了JPA风格的SQL
     <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>auto-mapper-processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.25</version>
+    <version>0.0.26</version>
 </dependency>
 ```
 
@@ -104,6 +104,8 @@ public interface ExampleMapper {
 
 使用`@Selective`可以指明where查询字段是否为可选的。
 
+使用`@DynamicOrderBy`可以指明动态排序字段。
+
 # 全局配置
 
 尽管我们可以在`@AutoMapper`注解中修改当前类的配置，但如果需要进行全局配置，可以在resource根目录下定义`auto-mapper.config`文件作为全局配置，优先级为：用户明确指定的注解配置 > 全局配置 > 默认配置。
@@ -114,6 +116,7 @@ fun.fengwk.automapper.annotation.AutoMapper.mapperSuffix=Mapper
 fun.fengwk.automapper.annotation.AutoMapper.tableNamingStyle=LOWER_UNDER_SCORE_CASE
 fun.fengwk.automapper.annotation.AutoMapper.fieldNamingStyle=LOWER_UNDER_SCORE_CASE
 fun.fengwk.automapper.annotation.AutoMapper.tableNamePrefix=test_
+fun.fengwk.automapper.annotation.AutoMapper.tableNameSuffix=_test
 ```
 
 # 编译信息

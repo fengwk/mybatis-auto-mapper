@@ -23,15 +23,17 @@ public class AutoMapperInfo {
     private final NamingStyle fieldNamingStyle;
     private final String tableName;
     private final String tableNamePrefix;
+    private final String tableNameSuffix;
 
     private AutoMapperInfo(DBType dbType, String mapperSuffix, NamingStyle tableNamingStyle,
-                          NamingStyle fieldNamingStyle, String tableName, String tableNamePrefix) {
+                          NamingStyle fieldNamingStyle, String tableName, String tableNamePrefix, String tableNameSuffix) {
         this.dbType = dbType;
         this.mapperSuffix = mapperSuffix;
         this.tableNamingStyle = tableNamingStyle;
         this.fieldNamingStyle = fieldNamingStyle;
         this.tableName = tableName;
         this.tableNamePrefix = tableNamePrefix;
+        this.tableNameSuffix = tableNameSuffix;
     }
 
     public static AutoMapperInfo parse(AutoMapper autoMapper, AnnotationMirror autoMapperMirror, GlobalConfig globalConfig) {
@@ -43,12 +45,14 @@ public class AutoMapperInfo {
         NamingStyle fieldNamingStyle = autoMapper.fieldNamingStyle();
         String tableName = autoMapper.tableName();
         String tableNamePrefix = autoMapper.tableNamePrefix();
+        String tableNameSuffix = autoMapper.tableNameSuffix();
 
         DBType globalDbType = globalConfig.getDBType();
         String globalMapperSuffix = globalConfig.getMapperSuffix();
         NamingStyle globalTableNamingStyle = globalConfig.getTableNamingStyle();
         NamingStyle globalFieldNamingStyle = globalConfig.getFieldNamingStyle();
         String globalTableNamePrefix = globalConfig.getTableNamePrefix();
+        String globalTableNameSuffix = globalConfig.getTableNameSuffix();
 
         if (globalDbType != null && !isExplicit(autoMapperMirror, "dbType")) {
             dbType = globalDbType;
@@ -65,8 +69,12 @@ public class AutoMapperInfo {
         if (globalTableNamePrefix != null && !isExplicit(autoMapperMirror, "tableNamePrefix")) {
             tableNamePrefix = globalTableNamePrefix;
         }
+        if (globalTableNameSuffix != null && !isExplicit(autoMapperMirror, "tableNameSuffix")) {
+            tableNameSuffix = globalTableNameSuffix;
+        }
 
-        return new AutoMapperInfo(dbType, mapperSuffix, tableNamingStyle, fieldNamingStyle, tableName, tableNamePrefix);
+        return new AutoMapperInfo(dbType, mapperSuffix, tableNamingStyle, fieldNamingStyle, tableName,
+            tableNamePrefix, tableNameSuffix);
     }
 
     // 检查注解方法是否被用户明确设置了
@@ -104,4 +112,9 @@ public class AutoMapperInfo {
     public String getTableNamePrefix() {
         return tableNamePrefix;
     }
+
+    public String getTableNameSuffix() {
+        return tableNameSuffix;
+    }
+
 }

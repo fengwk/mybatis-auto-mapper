@@ -1,5 +1,6 @@
 package fun.fengwk.automapper.processor.translator;
 
+import fun.fengwk.automapper.annotation.DynamicOrderBy;
 import fun.fengwk.automapper.processor.lexer.Keyword;
 import fun.fengwk.automapper.processor.lexer.Token;
 import fun.fengwk.automapper.processor.parser.ast.ASTNode;
@@ -490,6 +491,16 @@ public class Sql92Translator extends Translator {
             addTextNode(selectElement, INDENT);
             translateOrderBy(selectElement, (OrderBy) find.getChild(1));
             addTextNode(selectElement, LF);
+        } else {
+            List<Param> dynamicOrderByParams = params.stream()
+                .filter(Param::isDynamicOrderBy).collect(Collectors.toList());
+            if (dynamicOrderByParams.size() > 1) {
+                throw new TranslateException(
+                    "Only one param is allowed to use @%s", DynamicOrderBy.class.getSimpleName());
+            } else if (dynamicOrderByParams.size() == 1) {
+                Param dynamicOrderByParam = dynamicOrderByParams.get(0);
+                addTextNode(selectElement, INDENT, "order by ${", dynamicOrderByParam.getName(), "}", LF);
+            }
         }
 
         // for subclass
@@ -571,6 +582,16 @@ public class Sql92Translator extends Translator {
             addTextNode(selectElement, INDENT);
             translateOrderBy(selectElement, (OrderBy) page.getChild(1));
             addTextNode(selectElement, LF);
+        } else {
+            List<Param> dynamicOrderByParams = params.stream()
+                .filter(Param::isDynamicOrderBy).collect(Collectors.toList());
+            if (dynamicOrderByParams.size() > 1) {
+                throw new TranslateException(
+                    "Only one param is allowed to use @%s", DynamicOrderBy.class.getSimpleName());
+            } else if (dynamicOrderByParams.size() == 1) {
+                Param dynamicOrderByParam = dynamicOrderByParams.get(0);
+                addTextNode(selectElement, INDENT, "order by ${", dynamicOrderByParam.getName(), "}", LF);
+            }
         }
 
         addTextNode(selectElement, INDENT, "limit ");

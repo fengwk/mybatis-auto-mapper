@@ -42,7 +42,13 @@ public class Param implements SelectiveNameEntry {
      */
     private final boolean isSelective;
 
-    public Param(String type, String name, String fieldName, boolean isIterable, boolean isJavaBean, List<BeanField> beanFields, boolean isSelective) {
+    /**
+     * 当前字段是否为动态order by条件。
+     */
+    private final boolean isDynamicOrderBy;
+
+    public Param(String type, String name, String fieldName, boolean isIterable, boolean isJavaBean, List<BeanField> beanFields,
+                 boolean isSelective, boolean isDynamicOrderBy) {
         this.type = type;
         this.name = name;
         this.fieldName = fieldName;
@@ -50,6 +56,7 @@ public class Param implements SelectiveNameEntry {
         this.isJavaBean = isJavaBean;
         this.beanFields = beanFields;
         this.isSelective = isSelective;
+        this.isDynamicOrderBy = isDynamicOrderBy;
     }
 
     public String getType() {
@@ -86,4 +93,9 @@ public class Param implements SelectiveNameEntry {
     public boolean isSelective() {
         return isSelective;
     }
+
+    public boolean isDynamicOrderBy() {
+        return isDynamicOrderBy;
+    }
+
 }

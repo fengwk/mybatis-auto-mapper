@@ -1,5 +1,6 @@
 package fun.fengwk.automapper.processor.mapper;
 
+import fun.fengwk.automapper.annotation.DynamicOrderBy;
 import fun.fengwk.automapper.annotation.ExcludeField;
 import fun.fengwk.automapper.annotation.FieldName;
 import fun.fengwk.automapper.annotation.IncludeField;
@@ -140,7 +141,8 @@ public class MapperMethodParser {
 
                     params.add(new Param(desc.type, name, fieldName, desc.isIterable, desc.isJavaBean,
                             getAndFilterBeanFields(desc, includeFieldNames, excludeFieldNames),
-                            methodParameter.getAnnotation(Selective.class) != null));
+                            methodParameter.getAnnotation(Selective.class) != null,
+                            methodParameter.getAnnotation(DynamicOrderBy.class) != null));
                 }
             }
         }

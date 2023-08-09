@@ -1,6 +1,7 @@
 package fun.fengwk.automapper.example.mapper;
 
 import fun.fengwk.automapper.annotation.AutoMapper;
+import fun.fengwk.automapper.annotation.DynamicOrderBy;
 import fun.fengwk.automapper.annotation.ExcludeField;
 import fun.fengwk.automapper.annotation.IncludeField;
 import fun.fengwk.automapper.annotation.Selective;
@@ -49,7 +50,7 @@ public interface ExampleMapper extends BaseMapper<ExampleDO> {
 
     List<ExampleDO> findByName(@Selective String name);
 
-    List<ExampleDO> findByNameStartingWith(String name);
+    List<ExampleDO> findByNameStartingWith(@Param("name") String name, @DynamicOrderBy @Param("orderBy") String orderBy);
 
     List<ExampleDO> findByNameStartingWithAndSortGreaterThanEqualsOrderBySortDesc(@Param("name") String name, @Param("sort") int sort);
 

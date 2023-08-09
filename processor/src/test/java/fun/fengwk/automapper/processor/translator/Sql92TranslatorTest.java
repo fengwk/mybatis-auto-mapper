@@ -5,6 +5,7 @@ import fun.fengwk.automapper.processor.util.DOMUtils;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * @author fengwk
@@ -19,7 +20,7 @@ public class Sql92TranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false);
+        Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
@@ -46,7 +47,7 @@ public class Sql92TranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false);
+        Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
@@ -81,7 +82,7 @@ public class Sql92TranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param param = new Param("demoDO", null, null, true, true, Arrays.asList(bf1, bf2, bf3), false);
+        Param param = new Param("demoDO", null, null, true, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
@@ -110,7 +111,7 @@ public class Sql92TranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param param = new Param("demoDO", null, null, true, true, Arrays.asList(bf1, bf2, bf3), false);
+        Param param = new Param("demoDO", null, null, true, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
@@ -163,8 +164,8 @@ public class Sql92TranslatorTest {
     public void testDeleteBy1() {
         String methodName = "deleteByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
 
         Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), null));
@@ -190,8 +191,8 @@ public class Sql92TranslatorTest {
     public void testDeleteBy2() {
         String methodName = "deleteByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, true);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, true);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, true, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, true, false);
 
         Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), null));
@@ -225,7 +226,7 @@ public class Sql92TranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param p = new Param("DemoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false);
+        Param p = new Param("DemoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p), null));
@@ -255,7 +256,7 @@ public class Sql92TranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param p = new Param("DemoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false);
+        Param p = new Param("DemoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p), null));
@@ -341,8 +342,8 @@ public class Sql92TranslatorTest {
     public void testFindBy1() {
         String methodName = "findByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -375,8 +376,8 @@ public class Sql92TranslatorTest {
     public void testFindByOrderBy1() {
         String methodName = "findByUsernameAndUserAddressOrderByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -433,8 +434,8 @@ public class Sql92TranslatorTest {
     public void testCountBy1() {
         String methodName = "countByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -463,8 +464,8 @@ public class Sql92TranslatorTest {
     public void testCountBy2() {
         String methodName = "countByUsernameIsAndUserAddressEquals";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -493,8 +494,8 @@ public class Sql92TranslatorTest {
     public void testCountBy3() {
         String methodName = "countByUsernameLessThanAndUserAddressLessThanEquals";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -523,8 +524,8 @@ public class Sql92TranslatorTest {
     public void testCountBy4() {
         String methodName = "countByUsernameGreaterThanAndUserAddressGreaterThanEquals";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -553,8 +554,8 @@ public class Sql92TranslatorTest {
     public void testCountBy5() {
         String methodName = "countByUsernameAfterAndUserAddressBefore";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -584,8 +585,8 @@ public class Sql92TranslatorTest {
     public void testCountBy6() {
         String methodName = "countByUsernameIsNullAndUserAddressIsNotNull";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -614,8 +615,8 @@ public class Sql92TranslatorTest {
     public void testCountBy7() {
         String methodName = "countByUsernameNotNullAndUserAddressLike";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -644,8 +645,8 @@ public class Sql92TranslatorTest {
     public void testCountBy8() {
         String methodName = "countByUsernameNotLikeAndUserAddressStartingWith";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -674,8 +675,8 @@ public class Sql92TranslatorTest {
     public void testCountBy9() {
         String methodName = "countByUsernameEndingWithAndUserAddressContaining";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -704,8 +705,8 @@ public class Sql92TranslatorTest {
     public void testCountBy10() {
         String methodName = "countByUsernameNotAndUserAddressIn";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -737,8 +738,8 @@ public class Sql92TranslatorTest {
     public void testCountBy11() {
         String methodName = "countByUsernameInAndUserAddressNotIn";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -773,8 +774,8 @@ public class Sql92TranslatorTest {
     public void testCountBy12() {
         String methodName = "countByUsernameInAndUserAddressNotIn";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, true);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, true);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, true, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, true, false);
 
         Return ret = new Return("int", false, null);
 
@@ -813,8 +814,8 @@ public class Sql92TranslatorTest {
     public void testPageAll1() {
         String methodName = "pageAll";
 
-        Param p1 = new Param("int", "offset", "offset", false, false, null, false);
-        Param p2 = new Param("int", "limit", "limit", false, false, null, false);
+        Param p1 = new Param("int", "offset", "offset", false, false, null, false, false);
+        Param p2 = new Param("int", "limit", "limit", false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -844,7 +845,7 @@ public class Sql92TranslatorTest {
     public void testPageAll2() {
         String methodName = "pageAll";
 
-        Param p1 = new Param("int", "limit", "limit", false, false, null, false);
+        Param p1 = new Param("int", "limit", "limit", false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -874,8 +875,8 @@ public class Sql92TranslatorTest {
     public void testPageAllOrderBy() {
         String methodName = "pageAllOrderById";
 
-        Param p1 = new Param("int", "offset", "offset", false, false, null, false);
-        Param p2 = new Param("int", "limit", "limit", false, false, null, false);
+        Param p1 = new Param("int", "offset", "offset", false, false, null, false, false);
+        Param p2 = new Param("int", "limit", "limit", false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -906,10 +907,10 @@ public class Sql92TranslatorTest {
     public void testPageBy1() {
         String methodName = "pageByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
-        Param p3 = new Param("int", "offset", "offset", false, false, null, false);
-        Param p4 = new Param("int", "limit", "limit", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p3 = new Param("int", "offset", "offset", false, false, null, false, false);
+        Param p4 = new Param("int", "limit", "limit", false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -943,10 +944,10 @@ public class Sql92TranslatorTest {
     public void testPageByOrderBy1() {
         String methodName = "pageByUsernameAndUserAddressOrderByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
-        Param p3 = new Param("int", "offset", "offset", false, false, null, false);
-        Param p4 = new Param("int", "limit", "limit", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p3 = new Param("int", "offset", "offset", false, false, null, false, false);
+        Param p4 = new Param("int", "limit", "limit", false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -981,8 +982,8 @@ public class Sql92TranslatorTest {
     public void testLimitAll1() {
         String methodName = "limitAll";
 
-        Param p1 = new Param("int", "offset", "offset", false, false, null, false);
-        Param p2 = new Param("int", "limit", "limit", false, false, null, false);
+        Param p1 = new Param("int", "offset", "offset", false, false, null, false, false);
+        Param p2 = new Param("int", "limit", "limit", false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -1012,7 +1013,7 @@ public class Sql92TranslatorTest {
     public void testLimitAll2() {
         String methodName = "limitAll";
 
-        Param p1 = new Param("int", "limit", "limit", false, false, null, false);
+        Param p1 = new Param("int", "limit", "limit", false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -1042,8 +1043,8 @@ public class Sql92TranslatorTest {
     public void testLimitAllOrderBy() {
         String methodName = "limitAllOrderById";
 
-        Param p1 = new Param("int", "offset", "offset", false, false, null, false);
-        Param p2 = new Param("int", "limit", "limit", false, false, null, false);
+        Param p1 = new Param("int", "offset", "offset", false, false, null, false, false);
+        Param p2 = new Param("int", "limit", "limit", false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -1074,10 +1075,10 @@ public class Sql92TranslatorTest {
     public void testLimitBy1() {
         String methodName = "limitByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
-        Param p3 = new Param("int", "offset", "offset", false, false, null, false);
-        Param p4 = new Param("int", "limit", "limit", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p3 = new Param("int", "offset", "offset", false, false, null, false, false);
+        Param p4 = new Param("int", "limit", "limit", false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -1111,10 +1112,10 @@ public class Sql92TranslatorTest {
     public void testLimitByOrderBy1() {
         String methodName = "limitByUsernameAndUserAddressOrderByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false);
-        Param p3 = new Param("int", "offset", "offset", false, false, null, false);
-        Param p4 = new Param("int", "limit", "limit", false, false, null, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p3 = new Param("int", "offset", "offset", false, false, null, false, false);
+        Param p4 = new Param("int", "limit", "limit", false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -1140,6 +1141,101 @@ public class Sql92TranslatorTest {
                 "    </where>\n" +
                 "    order by username, user_address\n" +
                 "    limit #{offset},#{limit}\n" +
+                "</select>\n" +
+                "</mapper>"
+        );
+    }
+
+    @Test
+    public void testFindAllDynamicOrderBy() {
+        String methodName = "findAll";
+
+        Param dynamicOrderBy = new Param("java.lang.String", "orderBy", "orderBy", false, false, null, false, true);
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
+
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Collections.singletonList(dynamicOrderBy), ret));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"findAll\" parameterType=\"java.lang.String\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    order by ${orderBy}\n" +
+                "</select>\n" +
+                "</mapper>"
+        );
+    }
+
+    @Test
+    public void testPageAllDynamicOrderBy() {
+        String methodName = "pageAll";
+
+        Param p1 = new Param("int", "offset", "offset", false, false, null, false, false);
+        Param p2 = new Param("int", "limit", "limit", false, false, null, false, false);
+        Param dynamicOrderBy = new Param("java.lang.String", "orderBy", "orderBy", false, false, null, false, true);
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
+
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2, dynamicOrderBy), ret));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"pageAll\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    order by ${orderBy}\n" +
+                "    limit #{offset},#{limit}\n" +
+                "</select>\n" +
+                "</mapper>"
+        );
+    }
+
+    @Test
+    public void testLimitAllDynamicOrderBy() {
+        String methodName = "limitAll";
+
+        Param p1 = new Param("int", "limit", "limit", false, false, null, false, false);
+        Param dynamicOrderBy = new Param("java.lang.String", "orderBy", "orderBy", false, false, null, false, true);
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
+
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, dynamicOrderBy), ret));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"limitAll\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    order by ${orderBy}\n" +
+                "    limit #{limit}\n" +
                 "</select>\n" +
                 "</mapper>"
         );
