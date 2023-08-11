@@ -1241,4 +1241,105 @@ public class Sql92TranslatorTest {
         );
     }
 
+    @Test
+    public void testFindAllDynamicOrderBySelective() {
+        String methodName = "findAll";
+
+        Param dynamicOrderBy = new Param("java.lang.String", "orderBy", "orderBy", false, false, null, true, true);
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
+
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Collections.singletonList(dynamicOrderBy), ret));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"findAll\" parameterType=\"java.lang.String\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    <if test=\"orderBy != null\">\n" +
+                "        order by ${orderBy}\n" +
+                "    </if>\n" +
+                "</select>\n" +
+                "</mapper>"
+        );
+    }
+
+    @Test
+    public void testPageAllDynamicOrderBySelective() {
+        String methodName = "pageAll";
+
+        Param p1 = new Param("int", "offset", "offset", false, false, null, false, false);
+        Param p2 = new Param("int", "limit", "limit", false, false, null, false, false);
+        Param dynamicOrderBy = new Param("java.lang.String", "orderBy", "orderBy", false, false, null, true, true);
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
+
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2, dynamicOrderBy), ret));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"pageAll\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    <if test=\"orderBy != null\">\n" +
+                "        order by ${orderBy}\n" +
+                "    </if>\n" +
+                "    limit #{offset},#{limit}\n" +
+                "</select>\n" +
+                "</mapper>"
+        );
+    }
+
+    @Test
+    public void testLimitAllDynamicOrderBySelective() {
+        String methodName = "limitAll";
+
+        Param p1 = new Param("int", "limit", "limit", false, false, null, false, false);
+        Param dynamicOrderBy = new Param("java.lang.String", "orderBy", "orderBy", false, false, null, true, true);
+
+        BeanField bf1 = new BeanField("id", "id", true, false);
+        BeanField bf2 = new BeanField("username", "username", false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+
+        Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
+
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, dynamicOrderBy), ret));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"limitAll\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as userAddress\n" +
+                "    from demo\n" +
+                "    <if test=\"orderBy != null\">\n" +
+                "        order by ${orderBy}\n" +
+                "    </if>\n" +
+                "    limit #{limit}\n" +
+                "</select>\n" +
+                "</mapper>"
+        );
+    }
+
 }

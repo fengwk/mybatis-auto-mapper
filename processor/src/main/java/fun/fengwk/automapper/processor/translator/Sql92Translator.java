@@ -499,7 +499,15 @@ public class Sql92Translator extends Translator {
                     "Only one param is allowed to use @%s", DynamicOrderBy.class.getSimpleName());
             } else if (dynamicOrderByParams.size() == 1) {
                 Param dynamicOrderByParam = dynamicOrderByParams.get(0);
-                addTextNode(selectElement, INDENT, "order by ${", dynamicOrderByParam.getName(), "}", LF);
+                if (dynamicOrderByParam.isSelective()) {
+                    addTextNode(selectElement, INDENT);
+                    Element ifElement = addElement(selectElement, "if");
+                    ifElement.setAttribute("test", String.format("%s != null", dynamicOrderByParam.getName()));
+                    addTextNode(ifElement, LF, INDENT, INDENT, "order by ${", dynamicOrderByParam.getName(), "}", LF, INDENT);
+                    addTextNode(selectElement, LF);
+                } else {
+                    addTextNode(selectElement, INDENT, "order by ${", dynamicOrderByParam.getName(), "}", LF);
+                }
             }
         }
 
@@ -590,7 +598,15 @@ public class Sql92Translator extends Translator {
                     "Only one param is allowed to use @%s", DynamicOrderBy.class.getSimpleName());
             } else if (dynamicOrderByParams.size() == 1) {
                 Param dynamicOrderByParam = dynamicOrderByParams.get(0);
-                addTextNode(selectElement, INDENT, "order by ${", dynamicOrderByParam.getName(), "}", LF);
+                if (dynamicOrderByParam.isSelective()) {
+                    addTextNode(selectElement, INDENT);
+                    Element ifElement = addElement(selectElement, "if");
+                    ifElement.setAttribute("test", String.format("%s != null", dynamicOrderByParam.getName()));
+                    addTextNode(ifElement, LF, INDENT, INDENT, "order by ${", dynamicOrderByParam.getName(), "}", LF, INDENT);
+                    addTextNode(selectElement, LF);
+                } else {
+                    addTextNode(selectElement, INDENT, "order by ${", dynamicOrderByParam.getName(), "}", LF);
+                }
             }
         }
 
