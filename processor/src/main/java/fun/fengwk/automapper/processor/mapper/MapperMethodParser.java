@@ -126,20 +126,25 @@ public class MapperMethodParser {
         List<Param> params = new ArrayList<>();
         List<? extends VariableElement> methodParameters = methodElement.getParameters();
         if (methodParameters != null) {
-            for (VariableElement methodParameter : methodParameters) {
+            for (int i = 0; i < methodParameters.size(); i++) {
+                VariableElement methodParameter = methodParameters.get(i);
                 TypeDescriptor desc = new TypeDescriptor();
                 if (desc.init(mapperElement, methodParameter.asType(), fieldNamingConverter, 0)) {
                     String name = methodParameter.getSimpleName().toString();
+                    boolean inferredName = true;
                     org.apache.ibatis.annotations.Param paramAnnotation = methodParameter.getAnnotation(org.apache.ibatis.annotations.Param.class);
                     if (paramAnnotation != null) {
                         name = paramAnnotation.value();
+                        inferredName = false;
                     }
 
                     FieldName fieldNameAnnotation = methodParameter.getAnnotation(FieldName.class);
                     String fieldName = fieldNameAnnotation != null ? fieldNameAnnotation.value()
                             : fieldNamingConverter.convert(StringUtils.upperCamelToLowerCamel(name));
+                    boolean inferredFieldName = fieldNameAnnotation == null && inferredName;
 
-                    params.add(new Param(desc.type, name, fieldName, desc.isIterable, desc.isJavaBean,
+                    params.add(new Param(desc.type, name, fieldName, inferredName, inferredFieldName,
+                        desc.isIterable, desc.isJavaBean,
                             getAndFilterBeanFields(desc, includeFieldNames, excludeFieldNames),
                             methodParameter.getAnnotation(Selective.class) != null,
                             methodParameter.getAnnotation(DynamicOrderBy.class) != null));
@@ -299,7 +304,7 @@ public class MapperMethodParser {
                         if (types.isSameType(types.asElement(sup).asType(), variableEnclosingType)) {
                             List<? extends TypeMirror> supTypeArguments = ((DeclaredType) sup).getTypeArguments();
                             List<? extends TypeMirror> typeArguments = ((DeclaredType) variableEnclosingType).getTypeArguments();
-                            for (int i = 0; i < typeArguments.size(); i++) {
+                            for (int i = 0; i < typeArguments.size() && i < supTypeArguments.size(); i++) {
                                 if (types.isSameType(typeArguments.get(i), typeVariable)) {
                                     TypeMirror type = supTypeArguments.get(i);
                                     return init(mapperElement, type, fieldNamingConverter, depth);

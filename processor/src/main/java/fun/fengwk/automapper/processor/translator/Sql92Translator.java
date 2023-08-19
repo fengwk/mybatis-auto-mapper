@@ -676,6 +676,17 @@ public class Sql92Translator extends Translator {
                 throw new TranslateException("Can not found name entry %s", variable.getLexeme().getValue());
             }
         }
+        // 如果name和fieldName是推断的，使用LexemeValue替换
+        if (nameEntry.isInferredName()) {
+            nameEntry = new ImmutableSelectiveNameEntry(
+                StringUtils.upperCamelToLowerCamel(variable.getLexeme().getValue()), nameEntry.getFieldName(),
+                nameEntry.isInferredName(), nameEntry.isInferredFieldName(), nameEntry.isSelective());
+        }
+        if (nameEntry.isInferredFieldName()) {
+            nameEntry = new ImmutableSelectiveNameEntry(
+                nameEntry.getName(), fieldNamingConverter.convert(StringUtils.upperCamelToLowerCamel(nameEntry.getName())),
+                nameEntry.isInferredName(), nameEntry.isInferredFieldName(), nameEntry.isSelective());
+        }
 
         if (nameEntry.isSelective()) {
             addTextNode(parent, LF, INDENT, INDENT);

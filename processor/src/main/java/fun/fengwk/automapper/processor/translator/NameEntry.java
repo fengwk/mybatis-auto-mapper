@@ -19,4 +19,8 @@ public interface NameEntry {
      */
     String getFieldName();
 
+    boolean isInferredName();
+
+    boolean isInferredFieldName();
+
 }

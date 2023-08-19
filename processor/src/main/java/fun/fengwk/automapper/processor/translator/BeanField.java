@@ -40,6 +40,16 @@ public class BeanField implements SelectiveNameEntry {
         return fieldName;
     }
 
+    @Override
+    public boolean isInferredName() {
+        return false;
+    }
+
+    @Override
+    public boolean isInferredFieldName() {
+        return false;
+    }
+
     public boolean isUseGeneratedKeys() {
         return useGeneratedKeys;
     }

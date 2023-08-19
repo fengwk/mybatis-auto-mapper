@@ -18,9 +18,19 @@ public class Param implements SelectiveNameEntry {
     private final String name;
 
     /**
+     * 是否是推断出来的变量名称。
+     */
+    private final boolean inferredName;
+
+    /**
      * 字段在数据库的名称，如果该参数是javaBean，那么该参数为null。
      */
     private final String fieldName;
+
+    /**
+     * 是否是推断出来的字段名称。
+     */
+    private final boolean inferredFieldName;
 
     /**
      * 是否是可迭代的。
@@ -47,11 +57,14 @@ public class Param implements SelectiveNameEntry {
      */
     private final boolean isDynamicOrderBy;
 
-    public Param(String type, String name, String fieldName, boolean isIterable, boolean isJavaBean, List<BeanField> beanFields,
+    public Param(String type, String name, String fieldName, boolean inferredName, boolean inferredFieldName,
+                 boolean isIterable, boolean isJavaBean, List<BeanField> beanFields,
                  boolean isSelective, boolean isDynamicOrderBy) {
         this.type = type;
         this.name = name;
+        this.inferredName = inferredName;
         this.fieldName = fieldName;
+        this.inferredFieldName = inferredFieldName;
         this.isIterable = isIterable;
         this.isJavaBean = isJavaBean;
         this.beanFields = beanFields;
@@ -69,6 +82,16 @@ public class Param implements SelectiveNameEntry {
 
     public String getFieldName() {
         return fieldName;
+    }
+
+    @Override
+    public boolean isInferredName() {
+        return inferredName;
+    }
+
+    @Override
+    public boolean isInferredFieldName() {
+        return inferredFieldName;
     }
 
     public boolean isIterable() {

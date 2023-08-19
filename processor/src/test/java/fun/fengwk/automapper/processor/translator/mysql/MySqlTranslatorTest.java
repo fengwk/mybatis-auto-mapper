@@ -24,7 +24,7 @@ public class MySqlTranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
+        Param param = new Param("demoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
@@ -51,7 +51,7 @@ public class MySqlTranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
+        Param param = new Param("demoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
@@ -86,7 +86,7 @@ public class MySqlTranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
+        Param param = new Param("demoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
@@ -121,7 +121,7 @@ public class MySqlTranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
+        Param param = new Param("demoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
@@ -148,7 +148,7 @@ public class MySqlTranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
+        Param param = new Param("demoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
@@ -187,7 +187,7 @@ public class MySqlTranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param param = new Param("demoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
+        Param param = new Param("demoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
@@ -222,7 +222,7 @@ public class MySqlTranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param param = new Param("demoDO", null, null, true, true, Arrays.asList(bf1, bf2, bf3), false, false);
+        Param param = new Param("demoDO", null, null, false, false, true, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
@@ -251,7 +251,7 @@ public class MySqlTranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param param = new Param("demoDO", null, null, true, true, Arrays.asList(bf1, bf2, bf3), false, false);
+        Param param = new Param("demoDO", null, null, false, false, true, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(param), null));
@@ -304,8 +304,8 @@ public class MySqlTranslatorTest {
     public void testDeleteBy1() {
         String methodName = "deleteByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), null));
@@ -331,8 +331,8 @@ public class MySqlTranslatorTest {
     public void testDeleteBy2() {
         String methodName = "deleteByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, true, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, true, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, true, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, true, false);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), null));
@@ -366,7 +366,7 @@ public class MySqlTranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param p = new Param("DemoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
+        Param p = new Param("DemoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p), null));
@@ -396,7 +396,7 @@ public class MySqlTranslatorTest {
         BeanField bf2 = new BeanField("username", "username", false, false);
         BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
 
-        Param p = new Param("DemoDO", null, null, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
+        Param p = new Param("DemoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
         MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
         translator.translate(new MethodInfo(methodName, Arrays.asList(p), null));
@@ -482,8 +482,8 @@ public class MySqlTranslatorTest {
     public void testFindBy1() {
         String methodName = "findByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -516,8 +516,8 @@ public class MySqlTranslatorTest {
     public void testFindLockInShareMode() {
         String methodName = "findLockInShareModeByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -551,8 +551,8 @@ public class MySqlTranslatorTest {
     public void testFindForUpdate() {
         String methodName = "findForUpdateByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -586,8 +586,8 @@ public class MySqlTranslatorTest {
     public void testFindByOrderBy1() {
         String methodName = "findByUsernameAndUserAddressOrderByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -644,8 +644,8 @@ public class MySqlTranslatorTest {
     public void testCountBy1() {
         String methodName = "countByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -674,8 +674,8 @@ public class MySqlTranslatorTest {
     public void testCountBy2() {
         String methodName = "countByUsernameIsAndUserAddressEquals";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -704,8 +704,8 @@ public class MySqlTranslatorTest {
     public void testCountBy3() {
         String methodName = "countByUsernameLessThanAndUserAddressLessThanEquals";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -734,8 +734,8 @@ public class MySqlTranslatorTest {
     public void testCountBy4() {
         String methodName = "countByUsernameGreaterThanAndUserAddressGreaterThanEquals";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -764,8 +764,8 @@ public class MySqlTranslatorTest {
     public void testCountBy5() {
         String methodName = "countByUsernameAfterAndUserAddressBefore";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -795,8 +795,8 @@ public class MySqlTranslatorTest {
     public void testCountBy6() {
         String methodName = "countByUsernameIsNullAndUserAddressIsNotNull";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -825,8 +825,8 @@ public class MySqlTranslatorTest {
     public void testCountBy7() {
         String methodName = "countByUsernameNotNullAndUserAddressLike";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -855,8 +855,8 @@ public class MySqlTranslatorTest {
     public void testCountBy8() {
         String methodName = "countByUsernameNotLikeAndUserAddressStartingWith";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -885,8 +885,8 @@ public class MySqlTranslatorTest {
     public void testCountBy9() {
         String methodName = "countByUsernameEndingWithAndUserAddressContaining";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -915,8 +915,8 @@ public class MySqlTranslatorTest {
     public void testCountBy10() {
         String methodName = "countByUsernameNotAndUserAddressIn";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -948,8 +948,8 @@ public class MySqlTranslatorTest {
     public void testCountBy11() {
         String methodName = "countByUsernameInAndUserAddressNotIn";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
         Return ret = new Return("int", false, null);
 
@@ -984,8 +984,8 @@ public class MySqlTranslatorTest {
     public void testCountBy12() {
         String methodName = "countByUsernameInAndUserAddressNotIn";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, true, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, true, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, true, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, true, false);
 
         Return ret = new Return("int", false, null);
 
@@ -1024,8 +1024,8 @@ public class MySqlTranslatorTest {
     public void testPageAll1() {
         String methodName = "pageAll";
 
-        Param p1 = new Param("int", "offset", "offset", false, false, null, false, false);
-        Param p2 = new Param("int", "limit", "limit", false, false, null, false, false);
+        Param p1 = new Param("int", "offset", "offset", false, false, false, false, null, false, false);
+        Param p2 = new Param("int", "limit", "limit", false, false, false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -1055,7 +1055,7 @@ public class MySqlTranslatorTest {
     public void testPageAll2() {
         String methodName = "pageAll";
 
-        Param p1 = new Param("int", "limit", "limit", false, false, null, false, false);
+        Param p1 = new Param("int", "limit", "limit", false, false, false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -1085,8 +1085,8 @@ public class MySqlTranslatorTest {
     public void testPageAllOrderBy() {
         String methodName = "pageAllOrderById";
 
-        Param p1 = new Param("int", "offset", "offset", false, false, null, false, false);
-        Param p2 = new Param("int", "limit", "limit", false, false, null, false, false);
+        Param p1 = new Param("int", "offset", "offset", false, false, false, false, null, false, false);
+        Param p2 = new Param("int", "limit", "limit", false, false, false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -1117,10 +1117,10 @@ public class MySqlTranslatorTest {
     public void testPageBy1() {
         String methodName = "pageByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
-        Param p3 = new Param("int", "offset", "offset", false, false, null, false, false);
-        Param p4 = new Param("int", "limit", "limit", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
+        Param p3 = new Param("int", "offset", "offset", false, false, false, false, null, false, false);
+        Param p4 = new Param("int", "limit", "limit", false, false, false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
@@ -1154,10 +1154,10 @@ public class MySqlTranslatorTest {
     public void testPageByOrderBy1() {
         String methodName = "pageByUsernameAndUserAddressOrderByUsernameAndUserAddress";
 
-        Param p1 = new Param("java.lang.String", "username", "username", false, false, null, false, false);
-        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, null, false, false);
-        Param p3 = new Param("int", "offset", "offset", false, false, null, false, false);
-        Param p4 = new Param("int", "limit", "limit", false, false, null, false, false);
+        Param p1 = new Param("java.lang.String", "username", "username", false, false, false, false, null, false, false);
+        Param p2 = new Param("java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
+        Param p3 = new Param("int", "offset", "offset", false, false, false, false, null, false, false);
+        Param p4 = new Param("int", "limit", "limit", false, false, false, false, null, false, false);
 
         BeanField bf1 = new BeanField("id", "id", true, false);
         BeanField bf2 = new BeanField("username", "username", false, false);
