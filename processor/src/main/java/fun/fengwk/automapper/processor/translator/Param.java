@@ -8,6 +8,11 @@ import java.util.List;
 public class Param implements SelectiveNameEntry {
 
     /**
+     * 类型全写。
+     */
+    private final String fullType;
+
+    /**
      * 类型。
      */
     private final String type;
@@ -57,9 +62,10 @@ public class Param implements SelectiveNameEntry {
      */
     private final boolean isDynamicOrderBy;
 
-    public Param(String type, String name, String fieldName, boolean inferredName, boolean inferredFieldName,
+    public Param(String fullType, String type, String name, String fieldName, boolean inferredName, boolean inferredFieldName,
                  boolean isIterable, boolean isJavaBean, List<BeanField> beanFields,
                  boolean isSelective, boolean isDynamicOrderBy) {
+        this.fullType = fullType;
         this.type = type;
         this.name = name;
         this.inferredName = inferredName;
@@ -70,6 +76,10 @@ public class Param implements SelectiveNameEntry {
         this.beanFields = beanFields;
         this.isSelective = isSelective;
         this.isDynamicOrderBy = isDynamicOrderBy;
+    }
+
+    public String getFullType() {
+        return fullType;
     }
 
     public String getType() {

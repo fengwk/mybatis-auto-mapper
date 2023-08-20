@@ -27,6 +27,22 @@ public class AutoMapperProcessorTest {
     }
 
     @Test
+    public void testUser() {
+        Compilation compilation = Compiler
+            .javac()
+            .withProcessors(new AutoMapperProcessor())
+            .compile(
+                JavaFileObjects.forResource("fun/fengwk/automapper/processor/user/CacheRepository.java"),
+                JavaFileObjects.forResource("fun/fengwk/automapper/processor/user/GsonCacheRepository.java"),
+                JavaFileObjects.forResource("fun/fengwk/automapper/processor/user/SimpleIdCacheRepository.java"),
+                JavaFileObjects.forResource("fun/fengwk/automapper/processor/user/GsonLongIdCacheRepository.java"),
+                JavaFileObjects.forResource("fun/fengwk/automapper/processor/user/UserDO.java"),
+                JavaFileObjects.forResource("fun/fengwk/automapper/processor/user/UserMapper.java")
+            );
+        assertThat(compilation).generatedFile(StandardLocation.CLASS_OUTPUT, "fun/fengwk/automapper/processor/user/UserMapper.xml");
+    }
+
+    @Test
     public void testExample() {
         Compilation compilation = Compiler
                 .javac()

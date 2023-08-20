@@ -11,11 +11,13 @@ public class MethodInfo {
     private final String methodName;
     private final List<Param> params;
     private final Return ret;
+    private final boolean isDefault;
 
-    public MethodInfo(String methodName, List<Param> params, Return ret) {
+    public MethodInfo(String methodName, List<Param> params, Return ret, boolean isDefault) {
         this.methodName = methodName;
         this.params = params != null ? params : Collections.emptyList();
         this.ret = ret;
+        this.isDefault = isDefault;
     }
 
     public String getMethodName() {
@@ -28,6 +30,10 @@ public class MethodInfo {
 
     public Return getRet() {
         return ret;
+    }
+
+    public boolean isDefault() {
+        return isDefault;
     }
 
 }

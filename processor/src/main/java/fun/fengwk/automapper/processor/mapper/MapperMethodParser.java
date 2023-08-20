@@ -17,28 +17,14 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -54,7 +40,6 @@ public class MapperMethodParser {
     private static final List<Predicate<ExecutableElement>> METHOD_FILTERS = Arrays.asList(
             methodElement -> !methodElement.getModifiers().contains(Modifier.NATIVE),
             methodElement -> !methodElement.getModifiers().contains(Modifier.STATIC),
-            methodElement -> !methodElement.isDefault(),
             methodElement -> !isObjectMethod(methodElement)
     );
 
@@ -72,20 +57,62 @@ public class MapperMethodParser {
     }
 
     public List<MethodInfo> parse(TypeElement mapperElement, NamingConverter fieldNamingConverter) {
-        return collectMethodElements(mapperElement).stream()
-                .filter(this::filterMethodElement)
-                .map(methodElement -> convert(methodElement, mapperElement, fieldNamingConverter))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        List<MethodInfo> methodInfos = collectMethodElements(mapperElement).stream()
+            .filter(this::filterMethodElement)
+            .map(methodElement -> convert(methodElement, mapperElement, fieldNamingConverter))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+        return filterInheritedMethod(methodInfos);
     }
 
-    private Set<ExecutableElement> collectMethodElements(TypeElement mapperElement) {
-        Set<ExecutableElement> methodElementCollector = new LinkedHashSet<>();
+    private List<MethodInfo> filterInheritedMethod(List<MethodInfo> methodInfos) {
+        LinkedHashMap<String, MethodInfo> methodInfoMap = new LinkedHashMap<>();
+        for (int i = methodInfos.size() - 1; i >= 0; i--) {
+            MethodInfo methodInfo = methodInfos.get(i);
+            StringBuilder sb = new StringBuilder(methodInfo.getMethodName()).append("(");
+            for (int j = 0; j < methodInfo.getParams().size(); j++) {
+                Param param = methodInfo.getParams().get(j);
+                String type = typeErasure(param.getFullType());
+                if (j > 0) {
+                    sb.append(", ");
+                }
+                sb.append(type);
+            }
+            sb.append(")");
+            String signature = sb.toString();
+            if (!methodInfoMap.containsKey(signature)) {
+                methodInfoMap.put(signature, methodInfo);
+            }
+        }
+        return methodInfoMap.values().stream()
+            .filter(m -> !m.isDefault())
+            .collect(Collectors.toList());
+    }
+
+    private String typeErasure(String fullType) {
+        int begin = -1;
+        int end = -1;
+        for (int i = 0; i < fullType.length(); i++) {
+            char c = fullType.charAt(i);
+            if (begin == -1 && c == '<') {
+                begin = i;
+            } else if (c == '>') {
+                end = i;
+            }
+        }
+        if (begin >= 0 && end >= 0) {
+            return fullType.substring(0, begin) + fullType.substring(end + 1);
+        }
+        return fullType;
+    }
+
+    private List<ExecutableElement> collectMethodElements(TypeElement mapperElement) {
+        List<ExecutableElement> methodElementCollector = new ArrayList<>();
         doCollectMethodElements(mapperElement, methodElementCollector);
         return methodElementCollector;
     }
 
-    private void doCollectMethodElements(TypeElement mapperElement, Set<ExecutableElement> methodElementCollector) {
+    private void doCollectMethodElements(TypeElement mapperElement, List<ExecutableElement> methodElementCollector) {
         List<? extends TypeMirror> interfaces = mapperElement.getInterfaces();
         for (TypeMirror typeMirror : interfaces) {
             Element superMapperElement = types.asElement(typeMirror);
@@ -143,7 +170,7 @@ public class MapperMethodParser {
                             : fieldNamingConverter.convert(StringUtils.upperCamelToLowerCamel(name));
                     boolean inferredFieldName = fieldNameAnnotation == null && inferredName;
 
-                    params.add(new Param(desc.type, name, fieldName, inferredName, inferredFieldName,
+                    params.add(new Param(desc.fullType, desc.type, name, fieldName, inferredName, inferredFieldName,
                         desc.isIterable, desc.isJavaBean,
                             getAndFilterBeanFields(desc, includeFieldNames, excludeFieldNames),
                             methodParameter.getAnnotation(Selective.class) != null,
@@ -162,7 +189,7 @@ public class MapperMethodParser {
             return null;
         }
 
-        return new MethodInfo(methodName, params, ret);
+        return new MethodInfo(methodName, params, ret, methodElement.isDefault());
     }
 
     private Set<String> getIncludeFieldNames(ExecutableElement methodElement) {
@@ -248,6 +275,7 @@ public class MapperMethodParser {
 
     class TypeDescriptor {
 
+        String fullType;
         String type;
         boolean isIterable;
         boolean isJavaBean;
@@ -258,6 +286,7 @@ public class MapperMethodParser {
             if (depth > 1) {
                 return false;
             }
+            boolean initRes;
             switch (typeMirror.getKind()) {
                 case BOOLEAN:
                 case BYTE:
@@ -269,27 +298,39 @@ public class MapperMethodParser {
                 case DOUBLE:
                 case VOID:
                     type = typeMirror.toString();
+                    fullType = type;
                     return true;
                 case ARRAY:
                     ArrayType arrayType = (ArrayType) typeMirror;
                     TypeMirror componentTypeMirror = arrayType.getComponentType();
-                    return init(mapperElement, componentTypeMirror, fieldNamingConverter, depth + 1);
+                    initRes = init(mapperElement, componentTypeMirror, fieldNamingConverter, depth + 1);
+                    if (initRes) {
+                        fullType = fullType + "[]";
+                    }
+                    return initRes;
                 case DECLARED:
                     if (isIterable(typeMirror)) {
                         isIterable = true;
                         DeclaredType declaredType = (DeclaredType) typeMirror;
                         List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
                         if (!typeArguments.isEmpty()) {
-                            return init(mapperElement, typeArguments.get(0), fieldNamingConverter, depth + 1);
+                            initRes = init(mapperElement, typeArguments.get(0), fieldNamingConverter, depth + 1);
+                            if (initRes) {
+                                TypeElement typeElement = ((TypeElement) types.asElement(typeMirror));
+                                fullType = typeElement.getQualifiedName().toString() + "<" + fullType + ">";
+                            }
+                            return initRes;
                         }
                         return false;
                     } else if (isJavaDeclared(typeMirror)) {
                         TypeElement typeElement = ((TypeElement) types.asElement(typeMirror));
                         type = typeElement.getQualifiedName().toString();
+                        fullType = type;
                         return true;
                     } else {
                         TypeElement typeElement = ((TypeElement) types.asElement(typeMirror));
                         type = typeElement.getQualifiedName().toString();
+                        fullType = type;
                         isJavaBean = true;
                         parseJavaBean(typeElement, fieldNamingConverter);
                         return true;

@@ -9,4 +9,6 @@ public interface BaseMapper<T> {
 
     List<T> pageAll(int limit);
 
+    int add(int a, int b);
+
 }
