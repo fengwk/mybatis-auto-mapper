@@ -1,5 +1,7 @@
 package fun.fengwk.automapper.processor.demo;
 
+import fun.fengwk.automapper.annotation.FieldName;
+
 /**
  * @author fengwk
  */

@@ -24,8 +24,10 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import java.beans.Introspector;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -34,7 +36,7 @@ import java.util.stream.Collectors;
  */
 public class MapperMethodParser {
 
-    private static final Pattern PATTERN_GETTER = Pattern.compile("^get(.+)$");
+    private static final Pattern PATTERN_GETTER = Pattern.compile("^(get|is)(.+)$");
     private static final Pattern PATTERN_SETTER = Pattern.compile("^set(.+)$");
 
     private static final List<Predicate<ExecutableElement>> METHOD_FILTERS = Arrays.asList(
@@ -441,26 +443,49 @@ public class MapperMethodParser {
             Collections.reverse(allTypeElements);
             allTypeElements.add(typeElement0);
 
-            Map<String, BeanField> beanFieldMap = new LinkedHashMap<>();
+            Map<String, BeanFieldSource> methodSource = new HashMap<>();
+            Map<String, BeanFieldSource> fieldSource = new HashMap<>();
             for (TypeElement typeElement : allTypeElements) {
                 List<? extends Element> allMembers = elements.getAllMembers(typeElement);
                 for (Element element : allMembers) {
-                    if (element.getKind() == ElementKind.FIELD) {
+                    if (element.getKind() == ElementKind.METHOD) {
+                        ExecutableElement methodElement = (ExecutableElement) element;
+                        String methodName = methodElement.getSimpleName().toString();
+                        Matcher getterMatcher = PATTERN_GETTER.matcher(methodName);
+                        if (methodElement.getParameters().isEmpty()
+                            && getterMatcher.find()) {
+                            String name = Introspector.decapitalize(getterMatcher.group(2));
+                            methodSource.put(name, buildBeanFieldSource(methodElement));
+                        }
+                    } else if (element.getKind() == ElementKind.FIELD) {
                         VariableElement fieldElement = (VariableElement) element;
                         if (!fieldElement.getModifiers().contains(Modifier.STATIC)) {
                             String name = fieldElement.getSimpleName().toString();
-                            if (!beanFieldMap.containsKey(name)) {
-                                FieldName fieldNameAnnotation = fieldElement.getAnnotation(FieldName.class);
-                                String fieldName = fieldNameAnnotation != null ? fieldNameAnnotation.value()
-                                        : fieldNamingConverter.convert(StringUtils.upperCamelToLowerCamel(name));
-                                UseGeneratedKeys useGeneratedKeysAnnotation = fieldElement.getAnnotation(UseGeneratedKeys.class);
-                                boolean useGeneratedKeys = useGeneratedKeysAnnotation != null;
-                                beanFieldMap.put(name, new BeanField(name, fieldName, useGeneratedKeys,
-                                        fieldElement.getAnnotation(Selective.class) != null));
-                            }
+                            fieldSource.put(name, buildBeanFieldSource(fieldElement));
                         }
                     }
                 }
+            }
+
+            // 合并methodSource和fieldSource构建beanFieldMap，如有冲突methodSource优先级高于fieldSource
+            Map<String, BeanField> beanFieldMap = new LinkedHashMap<>();
+            for (Map.Entry<String, BeanFieldSource> entry : methodSource.entrySet()) {
+                String name = entry.getKey();
+                BeanFieldSource methodBfs = entry.getValue();
+                BeanFieldSource fieldBfs = fieldSource.remove(name);
+                // 目前先采取保守的功能支持，如果不存在对应的field字段则忽略
+                // 也就是说仅支持方法级别注解覆盖字段级别注解
+                if (fieldBfs == null) {
+                    continue;
+                }
+                methodBfs.merge(fieldBfs);
+                putBeanFieldMap(beanFieldMap, name, methodBfs, fieldNamingConverter);
+            }
+            // 使用剩余的fieldSource构建beanFieldMap
+            for (Map.Entry<String, BeanFieldSource> entry : fieldSource.entrySet()) {
+                String name = entry.getKey();
+                BeanFieldSource fieldBfs = entry.getValue();
+                putBeanFieldMap(beanFieldMap, name, fieldBfs, fieldNamingConverter);
             }
 
             this.beanFields = new ArrayList<>(beanFieldMap.values());
@@ -497,6 +522,62 @@ public class MapperMethodParser {
 //            this.beanFields = beanFields;
         }
 
+        private BeanFieldSource buildBeanFieldSource(Element element) {
+            FieldName fieldNameAnnotation = element.getAnnotation(FieldName.class);
+            UseGeneratedKeys useGeneratedKeysAnnotation = element.getAnnotation(UseGeneratedKeys.class);
+            Selective selective = element.getAnnotation(Selective.class);
+            return new BeanFieldSource(fieldNameAnnotation, useGeneratedKeysAnnotation, selective);
+        }
+
+        private void putBeanFieldMap(
+            Map<String, BeanField> beanFieldMap, String name, BeanFieldSource bfs, NamingConverter fieldNamingConverter) {
+            if (!beanFieldMap.containsKey(name)) {
+                FieldName fieldNameAnnotation = bfs.getFieldNameAnnotation();
+                String fieldName = fieldNameAnnotation != null ? fieldNameAnnotation.value()
+                        : fieldNamingConverter.convert(StringUtils.upperCamelToLowerCamel(name));
+                UseGeneratedKeys useGeneratedKeysAnnotation = bfs.getUseGeneratedKeysAnnotation();
+                boolean useGeneratedKeys = useGeneratedKeysAnnotation != null;
+                beanFieldMap.put(name, new BeanField(name, fieldName, useGeneratedKeys,
+                        bfs.getSelective() != null));
+            }
+        }
+
+    }
+
+    static class BeanFieldSource {
+        private FieldName fieldNameAnnotation;
+        private UseGeneratedKeys useGeneratedKeysAnnotation;
+        private Selective selective;
+
+        BeanFieldSource(FieldName fieldNameAnnotation, UseGeneratedKeys useGeneratedKeysAnnotation, Selective selective) {
+            this.fieldNameAnnotation = fieldNameAnnotation;
+            this.useGeneratedKeysAnnotation = useGeneratedKeysAnnotation;
+            this.selective = selective;
+        }
+
+        public FieldName getFieldNameAnnotation() {
+            return fieldNameAnnotation;
+        }
+
+        public UseGeneratedKeys getUseGeneratedKeysAnnotation() {
+            return useGeneratedKeysAnnotation;
+        }
+
+        public Selective getSelective() {
+            return selective;
+        }
+
+        public void merge(BeanFieldSource other) {
+            if (fieldNameAnnotation == null) {
+                fieldNameAnnotation = other.fieldNameAnnotation;
+            }
+            if (useGeneratedKeysAnnotation == null) {
+                useGeneratedKeysAnnotation = other.useGeneratedKeysAnnotation;
+            }
+            if (selective == null) {
+                selective = other.selective;
+            }
+        }
     }
 
 }
