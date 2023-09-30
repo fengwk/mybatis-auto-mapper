@@ -1,5 +1,7 @@
 package fun.fengwk.automapper.example.model;
 
+import fun.fengwk.automapper.annotation.UpdateIncrement;
+
 /**
  * create table example (
  *   id bigint not null auto_increment,
@@ -12,8 +14,6 @@ package fun.fengwk.automapper.example.model;
  */
 public class ExampleDO extends BaseDO {
 
-//    @UseGeneratedKeys
-//    private Long id;
     private String name;
     private Integer sort;
 
@@ -22,13 +22,8 @@ public class ExampleDO extends BaseDO {
 
     private Integer isDeleted;
 
-//    public Long getId() {
-//        return id;
-//    }
-//
-//    public void setId(Long id) {
-//        this.id = id;
-//    }
+    @UpdateIncrement
+    private Long version;
 
     public String getName() {
         return name;
@@ -46,8 +41,35 @@ public class ExampleDO extends BaseDO {
         this.sort = sort;
     }
 
-    @Override
-    public String toString() {
-        return String.format("<%d, %s, %d>", getId(), name, sort);
+    public String getF1() {
+        return f1;
+    }
+
+    public void setF1(String f1) {
+        this.f1 = f1;
+    }
+
+    public String getF2() {
+        return f2;
+    }
+
+    public void setF2(String f2) {
+        this.f2 = f2;
+    }
+
+    public Integer getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Integer isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

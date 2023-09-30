@@ -1,11 +1,6 @@
 package fun.fengwk.automapper.processor.mapper;
 
-import fun.fengwk.automapper.annotation.DynamicOrderBy;
-import fun.fengwk.automapper.annotation.ExcludeField;
-import fun.fengwk.automapper.annotation.FieldName;
-import fun.fengwk.automapper.annotation.IncludeField;
-import fun.fengwk.automapper.annotation.Selective;
-import fun.fengwk.automapper.annotation.UseGeneratedKeys;
+import fun.fengwk.automapper.annotation.*;
 import fun.fengwk.automapper.processor.naming.NamingConverter;
 import fun.fengwk.automapper.processor.translator.BeanField;
 import fun.fengwk.automapper.processor.translator.MethodInfo;
@@ -526,7 +521,8 @@ public class MapperMethodParser {
             FieldName fieldNameAnnotation = element.getAnnotation(FieldName.class);
             UseGeneratedKeys useGeneratedKeysAnnotation = element.getAnnotation(UseGeneratedKeys.class);
             Selective selective = element.getAnnotation(Selective.class);
-            return new BeanFieldSource(fieldNameAnnotation, useGeneratedKeysAnnotation, selective);
+            UpdateIncrement updateIncrement = element.getAnnotation(UpdateIncrement.class);
+            return new BeanFieldSource(fieldNameAnnotation, useGeneratedKeysAnnotation, selective, updateIncrement);
         }
 
         private void putBeanFieldMap(
@@ -537,8 +533,10 @@ public class MapperMethodParser {
                         : fieldNamingConverter.convert(StringUtils.upperCamelToLowerCamel(name));
                 UseGeneratedKeys useGeneratedKeysAnnotation = bfs.getUseGeneratedKeysAnnotation();
                 boolean useGeneratedKeys = useGeneratedKeysAnnotation != null;
+                String updateIncrement = bfs.getUpdateIncrement() != null ?
+                    bfs.getUpdateIncrement().value() : null;
                 beanFieldMap.put(name, new BeanField(name, fieldName, useGeneratedKeys,
-                        bfs.getSelective() != null));
+                        bfs.getSelective() != null, updateIncrement));
             }
         }
 
@@ -548,11 +546,13 @@ public class MapperMethodParser {
         private FieldName fieldNameAnnotation;
         private UseGeneratedKeys useGeneratedKeysAnnotation;
         private Selective selective;
+        private UpdateIncrement updateIncrement;
 
-        BeanFieldSource(FieldName fieldNameAnnotation, UseGeneratedKeys useGeneratedKeysAnnotation, Selective selective) {
+        BeanFieldSource(FieldName fieldNameAnnotation, UseGeneratedKeys useGeneratedKeysAnnotation, Selective selective, UpdateIncrement updateIncrement) {
             this.fieldNameAnnotation = fieldNameAnnotation;
             this.useGeneratedKeysAnnotation = useGeneratedKeysAnnotation;
             this.selective = selective;
+            this.updateIncrement = updateIncrement;
         }
 
         public FieldName getFieldNameAnnotation() {
@@ -567,15 +567,22 @@ public class MapperMethodParser {
             return selective;
         }
 
+        public UpdateIncrement getUpdateIncrement() {
+            return updateIncrement;
+        }
+
         public void merge(BeanFieldSource other) {
             if (fieldNameAnnotation == null) {
-                fieldNameAnnotation = other.fieldNameAnnotation;
+                fieldNameAnnotation = other.getFieldNameAnnotation();
             }
             if (useGeneratedKeysAnnotation == null) {
-                useGeneratedKeysAnnotation = other.useGeneratedKeysAnnotation;
+                useGeneratedKeysAnnotation = other.getUseGeneratedKeysAnnotation();
             }
             if (selective == null) {
-                selective = other.selective;
+                selective = other.getSelective();
+            }
+            if (updateIncrement == null) {
+                updateIncrement = other.getUpdateIncrement();
             }
         }
     }

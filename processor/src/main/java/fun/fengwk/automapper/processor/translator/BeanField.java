@@ -25,11 +25,17 @@ public class BeanField implements SelectiveNameEntry {
      */
     private final boolean isSelective;
 
-    public BeanField(String name, String fieldName, boolean useGeneratedKeys, boolean isSelective) {
+    /**
+     * 当前字段是否是自增字段。
+     */
+    private final String updateIncrement;
+
+    public BeanField(String name, String fieldName, boolean useGeneratedKeys, boolean isSelective, String updateIncrement) {
         this.name = name;
         this.fieldName = fieldName;
         this.useGeneratedKeys = useGeneratedKeys;
         this.isSelective = isSelective;
+        this.updateIncrement = updateIncrement;
     }
 
     public String getName() {
@@ -57,4 +63,9 @@ public class BeanField implements SelectiveNameEntry {
     public boolean isSelective() {
         return isSelective;
     }
+
+    public String getUpdateIncrement() {
+        return updateIncrement;
+    }
+
 }

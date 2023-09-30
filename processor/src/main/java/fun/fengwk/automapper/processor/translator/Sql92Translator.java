@@ -403,7 +403,13 @@ public class Sql92Translator extends Translator {
 
         addTextNode(updateElement, LF, INDENT, "update ", tableName, " set ",
                 param.getBeanFields().stream()
-                        .map(f -> String.format("%s=#{%s}", f.getFieldName(), f.getName()))
+                        .map(f -> {
+                            if (f.getUpdateIncrement() == null || f.getUpdateIncrement().isEmpty()) {
+                                return String.format("%s=#{%s}", f.getFieldName(), f.getName());
+                            } else {
+                                return String.format("%s+=%s", f.getFieldName(), f.getUpdateIncrement());
+                            }
+                        })
                         .collect(Collectors.joining(", ")),
                 LF, INDENT
                 );
@@ -440,9 +446,13 @@ public class Sql92Translator extends Translator {
         for (int i = 0; i < bfs.size(); i++) {
             BeanField bf = bfs.get(i);
             addTextNode(trimElement, LF, INDENT, INDENT);
-            Element ifElement = addElement(trimElement, "if");
-            ifElement.setAttribute("test", String.format("%s != null", bf.getName()));
-            addTextNode(ifElement, String.format("%s=#{%s},", bf.getFieldName(), bf.getName()));
+            if (bf.getUpdateIncrement() == null || bf.getUpdateIncrement().isEmpty()) {
+                Element ifElement = addElement(trimElement, "if");
+                ifElement.setAttribute("test", String.format("%s != null", bf.getName()));
+                addTextNode(ifElement, String.format("%s=#{%s},", bf.getFieldName(), bf.getName()));
+            } else {
+                addTextNode(trimElement, String.format("%s+=%s,", bf.getFieldName(), bf.getUpdateIncrement()));
+            }
         }
         addTextNode(trimElement, LF, INDENT);
         addTextNode(updateElement, LF, INDENT);

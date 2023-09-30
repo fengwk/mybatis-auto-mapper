@@ -16,9 +16,9 @@ public class Sql92TranslatorTest {
     public void testInsert() {
         String methodName = "insert";
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Param param = new Param("demoDO", "demoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -43,9 +43,9 @@ public class Sql92TranslatorTest {
     public void testInsertSelective() {
         String methodName = "insertSelective";
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Param param = new Param("demoDO", "demoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -78,9 +78,9 @@ public class Sql92TranslatorTest {
     public void testInsertAll() {
         String methodName = "insertAll";
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Param param = new Param("demoDO", "demoDO", null, null, false, false, true, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -107,9 +107,9 @@ public class Sql92TranslatorTest {
     public void testInsertAllSelective() {
         String methodName = "insertAllSelective";
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Param param = new Param("demoDO", "demoDO", null, null, false, false, true, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -222,9 +222,9 @@ public class Sql92TranslatorTest {
     public void testUpdateBy() {
         String methodName = "updateByUsernameAndUserAddress";
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Param p = new Param("DemoDO", "DemoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -252,9 +252,9 @@ public class Sql92TranslatorTest {
     public void testUpdateBySelective() {
         String methodName = "updateByUsernameAndUserAddressSelective";
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Param p = new Param("DemoDO", "DemoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -284,12 +284,75 @@ public class Sql92TranslatorTest {
     }
 
     @Test
+    public void testUpdateByWithIncrement() {
+        String methodName = "updateByUsernameAndUserAddress";
+
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, "1");
+
+        Param p = new Param("DemoDO", "DemoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
+
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p), null, false));
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+            "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+            "<mapper namespace=\"demo\">\n" +
+            "\n" +
+            "<!--auto mapper generate-->\n" +
+            "<update id=\"updateByUsernameAndUserAddress\" parameterType=\"DemoDO\">\n" +
+            "    update demo set id=#{id}, username=#{username}, user_address+=1\n" +
+            "    <where>\n" +
+            "        username=#{username}\n" +
+            "        and user_address=#{userAddress}\n" +
+            "    </where>\n" +
+            "</update>\n" +
+            "</mapper>"
+        );
+    }
+
+    @Test
+    public void testUpdateBySelectiveWithIncrement() {
+        String methodName = "updateByUsernameAndUserAddressSelective";
+
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, "1");
+
+        Param p = new Param("DemoDO", "DemoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
+
+        Sql92Translator translator = new Sql92Translator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p), null, false));
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<update id=\"updateByUsernameAndUserAddressSelective\" parameterType=\"DemoDO\">\n" +
+                "    update demo set \n" +
+                "    <trim suffixOverrides=\",\">\n" +
+                "        <if test=\"id != null\">id=#{id},</if>\n" +
+                "        <if test=\"username != null\">username=#{username},</if>\n" +
+                "        user_address+=1,\n" +
+                "    </trim>\n" +
+                "    <where>\n" +
+                "        username=#{username}\n" +
+                "        and user_address=#{userAddress}\n" +
+                "    </where>\n" +
+                "</update>\n" +
+                "</mapper>"
+        );
+    }
+
+    @Test
     public void testFindAll() {
         String methodName = "findAll";
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -314,9 +377,9 @@ public class Sql92TranslatorTest {
     public void testFindAllOrderBy() {
         String methodName = "findAllOrderById";
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -344,9 +407,9 @@ public class Sql92TranslatorTest {
 
         Param p1 = new Param("java.lang.Long", "java.lang.Long", "arg0", "arg0", true, true, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -380,9 +443,9 @@ public class Sql92TranslatorTest {
         Param p1 = new Param("java.lang.String", "java.lang.String", "username", "username", false, false, false, false, null, false, false);
         Param p2 = new Param("java.lang.String", "java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -414,9 +477,9 @@ public class Sql92TranslatorTest {
         Param p1 = new Param("java.lang.String", "java.lang.String", "username", "username", false, false, false, false, null, false, false);
         Param p2 = new Param("java.lang.String", "java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -852,9 +915,9 @@ public class Sql92TranslatorTest {
         Param p1 = new Param("int", "int", "offset", "offset", false, false, false, false, null, false, false);
         Param p2 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -882,9 +945,9 @@ public class Sql92TranslatorTest {
 
         Param p1 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -913,9 +976,9 @@ public class Sql92TranslatorTest {
         Param p1 = new Param("int", "int", "offset", "offset", false, false, false, false, null, false, false);
         Param p2 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -947,9 +1010,9 @@ public class Sql92TranslatorTest {
         Param p3 = new Param("int", "int", "offset", "offset", false, false, false, false, null, false, false);
         Param p4 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -984,9 +1047,9 @@ public class Sql92TranslatorTest {
         Param p3 = new Param("int", "int", "offset", "offset", false, false, false, false, null, false, false);
         Param p4 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1020,9 +1083,9 @@ public class Sql92TranslatorTest {
         Param p1 = new Param("int", "int", "offset", "offset", false, false, false, false, null, false, false);
         Param p2 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1050,9 +1113,9 @@ public class Sql92TranslatorTest {
 
         Param p1 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1081,9 +1144,9 @@ public class Sql92TranslatorTest {
         Param p1 = new Param("int", "int", "offset", "offset", false, false, false, false, null, false, false);
         Param p2 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1115,9 +1178,9 @@ public class Sql92TranslatorTest {
         Param p3 = new Param("int", "int", "offset", "offset", false, false, false, false, null, false, false);
         Param p4 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1152,9 +1215,9 @@ public class Sql92TranslatorTest {
         Param p3 = new Param("int", "int", "offset", "offset", false, false, false, false, null, false, false);
         Param p4 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1187,9 +1250,9 @@ public class Sql92TranslatorTest {
 
         Param dynamicOrderBy = new Param("java.lang.String", "java.lang.String", "orderBy", "orderBy", false, false, false, false, null, false, true);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1219,9 +1282,9 @@ public class Sql92TranslatorTest {
         Param p2 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
         Param dynamicOrderBy = new Param("java.lang.String", "java.lang.String", "orderBy", "orderBy", false, false, false, false, null, false, true);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1251,9 +1314,9 @@ public class Sql92TranslatorTest {
         Param p1 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
         Param dynamicOrderBy = new Param("java.lang.String", "java.lang.String", "orderBy", "orderBy", false, false, false, false, null, false, true);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1282,9 +1345,9 @@ public class Sql92TranslatorTest {
 
         Param dynamicOrderBy = new Param("java.lang.String", "java.lang.String", "orderBy", "orderBy", false, false, false, false, null, true, true);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1316,9 +1379,9 @@ public class Sql92TranslatorTest {
         Param p2 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
         Param dynamicOrderBy = new Param("java.lang.String", "java.lang.String", "orderBy", "orderBy", false, false, false, false, null, true, true);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1350,9 +1413,9 @@ public class Sql92TranslatorTest {
         Param p1 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
         Param dynamicOrderBy = new Param("java.lang.String", "java.lang.String", "orderBy", "orderBy", false, false, false, false, null, true, true);
 
-        BeanField bf1 = new BeanField("id", "id", true, false);
-        BeanField bf2 = new BeanField("username", "username", false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null);
+        BeanField bf2 = new BeanField("username", "username", false, false, null);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 

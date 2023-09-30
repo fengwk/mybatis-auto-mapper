@@ -19,7 +19,7 @@ AutoMapper是一款适用于Mybatis的SQL生成插件，提供了JPA风格的SQL
     <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>auto-mapper-processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.30</version>
+    <version>0.0.31</version>
 </dependency>
 ```
 
