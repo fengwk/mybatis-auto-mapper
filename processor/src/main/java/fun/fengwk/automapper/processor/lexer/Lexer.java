@@ -2,12 +2,7 @@ package fun.fengwk.automapper.processor.lexer;
 
 import fun.fengwk.automapper.processor.util.StringCharSequenceView;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,6 +18,7 @@ public class Lexer {
     private static final char EOF = 0;
     private static final String SELECTIVE_EOF = SELECTIVE + EOF;
 
+    private static final Map<Keyword, Pattern> PATTERN_TERM_KEYWORD_MAP = new HashMap<>();
     private static final Pattern PATTERN_TERM_AND = Pattern.compile("^([_0-9a-zA-Z]+?)" + Keyword.AND.getValue());
     private static final Pattern PATTERN_TERM_AND_OR = Pattern.compile("^([_0-9a-zA-Z]+?)(" + Keyword.AND.getValue() + "|" + Keyword.OR.getValue() + ")");
     private static final Pattern PATTERN_TERM_ORDER_BY_AND_OR = Pattern.compile("^([_0-9a-zA-Z]+?)(" + Keyword.ORDER_BY.getValue() + "|" + Keyword.AND.getValue() + "|" + Keyword.OR.getValue() + ")");
@@ -160,7 +156,7 @@ public class Lexer {
                         break;
                     }
 
-                    if (tryEatKeyword(Keyword.BY)) {
+                    if (tryEatUtilKeyword(Keyword.BY)) {
                         state = 9;
                         break;
                     }
@@ -323,6 +319,25 @@ public class Lexer {
             return true;
         }
 
+        return false;
+    }
+
+    /**
+     * 尝试吃掉[_0-9a-zA-Z]+?Keyword，成功返回true，失败返回false
+     *
+     * @param kw
+     * @return
+     */
+    private boolean tryEatUtilKeyword(Keyword kw) {
+        Pattern pattern = PATTERN_TERM_KEYWORD_MAP.computeIfAbsent(
+            kw, k -> Pattern.compile("^([_0-9a-zA-Z]*?)" + k.getValue()));
+        CharSequence expression = new StringCharSequenceView(this.expression, offset);
+        Matcher m = pattern.matcher(expression);
+        if (m.find()) {
+            offset += m.group().length();
+            tokens.add(new Token(TokenType.KEYWORD, kw.getValue()));
+            return true;
+        }
         return false;
     }
 

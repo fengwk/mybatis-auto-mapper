@@ -113,6 +113,20 @@ public class LexerTest {
     @Test
     public void test13() {
         Lexer lexer = new Lexer.Builder().build();
+        List<Token> tokens = lexer.analyse("findIdByUsernameAndPasswordOrderByCreatedTimeDesc");
+        assert tokens.get(0).equals(new DerivedToken(TokenType.KEYWORD, "find", "find"));
+        assert tokens.get(1).equals(new Token(TokenType.KEYWORD, "By"));
+        assert tokens.get(2).equals(new Token(TokenType.VARIABLE, "Username"));
+        assert tokens.get(3).equals(new Token(TokenType.KEYWORD, "And"));
+        assert tokens.get(4).equals(new Token(TokenType.VARIABLE, "Password"));
+        assert tokens.get(5).equals(new Token(TokenType.KEYWORD, "OrderBy"));
+        assert tokens.get(6).equals(new Token(TokenType.VARIABLE, "CreatedTime"));
+        assert tokens.get(7).equals(new Token(TokenType.KEYWORD, "Desc"));
+    }
+
+    @Test
+    public void test14() {
+        Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse("findByAfter");
         assert tokens.get(0).equals(new DerivedToken(TokenType.KEYWORD, "find", "find"));
         assert tokens.get(1).equals(new Token(TokenType.KEYWORD, "By"));
@@ -120,7 +134,7 @@ public class LexerTest {
     }
 
     @Test
-    public void test14() {
+    public void test15() {
         Lexer lexer = new Lexer.Builder().build();
         List<Token> tokens = lexer.analyse("findByUsernameAndPasswordOrderByCreatedTime");
         assert tokens.get(0).equals(new DerivedToken(TokenType.KEYWORD, "find", "find"));
@@ -133,21 +147,21 @@ public class LexerTest {
     }
 
     @Test
-    public void test15() {
+    public void test16() {
         Lexer lexer = new Lexer.Builder().deriveInsert("insertIgnore").build();
         List<Token> tokens = lexer.analyse("insertIgnore");
         assert tokens.get(0).equals(new DerivedToken(TokenType.KEYWORD, "insert", "insertIgnore"));
     }
 
     @Test
-    public void test16() {
+    public void test17() {
         Lexer lexer = new Lexer.Builder().deriveInsert("replace").build();
         List<Token> tokens = lexer.analyse("replace");
         assert tokens.get(0).equals(new DerivedToken(TokenType.KEYWORD, "insert", "replace"));
     }
 
     @Test
-    public void test17() {
+    public void test18() {
         Lexer lexer = new Lexer.Builder().deriveInsert("insertIgnore").build();
         List<Token> tokens = lexer.analyse("insertIgnoreAll");
         assert tokens.get(0).equals(new DerivedToken(TokenType.KEYWORD, "insert", "insertIgnore"));
