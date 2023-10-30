@@ -12,7 +12,7 @@
 
     <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>auto-mapper-parent</artifactId>
-    <version>0.0.33</version>
+    <version>0.0.34</version>
     <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -59,6 +59,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <auto-mapper.version>0.0.34</auto-mapper.version>
         <mybatis.version>3.5.7</mybatis.version>
         <junit.version>4.13.2</junit.version>
         <compile-testing.version>0.19</compile-testing.version>
@@ -69,17 +70,17 @@
             <dependency>
                 <groupId>fun.fengwk.auto-mapper</groupId>
                 <artifactId>auto-mapper-annotation</artifactId>
-                <version>${project.version}</version>
+                <version>${auto-mapper.version}</version>
             </dependency>
             <dependency>
                 <groupId>fun.fengwk.auto-mapper</groupId>
                 <artifactId>auto-mapper-mybatis</artifactId>
-                <version>${project.version}</version>
+                <version>${auto-mapper.version}</version>
             </dependency>
             <dependency>
                 <groupId>fun.fengwk.auto-mapper</groupId>
                 <artifactId>auto-mapper-processor</artifactId>
-                <version>${project.version}</version>
+                <version>${auto-mapper.version}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
