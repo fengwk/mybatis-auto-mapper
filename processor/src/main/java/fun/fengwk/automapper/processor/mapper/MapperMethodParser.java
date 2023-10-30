@@ -144,6 +144,12 @@ public class MapperMethodParser {
         }
 
         String methodName = methodElement.getSimpleName().toString();
+        String methodExpr = methodName;
+        MethodExpr methodExprAnno = methodElement.getAnnotation(MethodExpr.class);
+        if (methodExprAnno != null && methodExprAnno.value() != null && !methodExprAnno.value().isEmpty()) {
+            methodExpr = methodExprAnno.value();
+        }
+
         Set<String> includeFieldNames = getIncludeFieldNames(methodElement);
         Set<String> excludeFieldNames = getExcludeFieldNames(methodElement);
 //        List<Anno> annos = parseAnnotations(methodElement);
@@ -186,7 +192,7 @@ public class MapperMethodParser {
             return null;
         }
 
-        return new MethodInfo(methodName, params, ret, methodElement.isDefault());
+        return new MethodInfo(methodName, methodExpr, params, ret, methodElement.isDefault());
     }
 
     private Set<String> getIncludeFieldNames(ExecutableElement methodElement) {

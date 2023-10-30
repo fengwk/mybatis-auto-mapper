@@ -19,7 +19,7 @@ AutoMapper是一款适用于Mybatis的SQL生成插件，提供了JPA风格的SQL
     <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>auto-mapper-processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.32</version>
+    <version>0.0.33</version>
 </dependency>
 ```
 
@@ -137,6 +137,7 @@ AutoMapper在编译期会打印这以下几种常见信息：
 - 使用`findLockInShareMode`代替`find`可使用`select ... lock in share mode`语法。
 - 使用`findForUpdate`代替`find`可使用`select ... for update`语法。
 - 对于like语句，将使用concat拼接防止SQL注入。
+- 使用`@MethodExpr`替代方法名表达式可以有效地避免冗长的方法名称。
 
 # 应用示例
 

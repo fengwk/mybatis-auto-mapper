@@ -92,7 +92,7 @@ public abstract class Translator {
             return false;
         }
 
-        ASTNode node = parse(methodInfo.getMethodName());
+        ASTNode node = parse(methodInfo.getMethodExpr());
         doTranslate(node, methodInfo);
         return true;
     }

@@ -12,13 +12,10 @@ import fun.fengwk.automapper.processor.translator.TranslateContext;
 import fun.fengwk.automapper.processor.translator.Translator;
 import fun.fengwk.automapper.processor.translator.TranslatorFactory;
 import fun.fengwk.automapper.processor.util.DOMUtils;
+import fun.fengwk.automapper.processor.util.ExceptionUtils;
 import fun.fengwk.automapper.processor.util.StringUtils;
 
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -88,9 +85,12 @@ public class AutoMapperProcessor extends AbstractProcessor {
             TypeElement mapperElement = (TypeElement) annotatedElement;
             try {
                 doProcess(mapperElement);
-            } catch (Throwable e) {
+            } catch (AutoMapperException e) {
                 error(mapperElement, "[AutoMapper] Error occurred when process '%s', cause: '%s'.",
-                        annotatedElement.getSimpleName().toString(), e.toString());
+                    annotatedElement.getSimpleName().toString(), e.toString());
+            } catch (Throwable e) {
+                error(mapperElement, "[AutoMapper] Error occurred when process '%s', cause: '%s'%s.",
+                        annotatedElement.getSimpleName().toString(), e.toString(), ExceptionUtils.getStackTrace(e));
             }
         }
 

@@ -7,7 +7,7 @@
     <parent>
         <groupId>fun.fengwk.auto-mapper</groupId>
         <artifactId>auto-mapper-parent</artifactId>
-        <version>0.0.32</version>
+        <version>0.0.33</version>
     </parent>
 
     <artifactId>auto-mapper-example</artifactId>

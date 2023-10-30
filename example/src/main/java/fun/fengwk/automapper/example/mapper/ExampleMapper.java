@@ -1,11 +1,8 @@
 package fun.fengwk.automapper.example.mapper;
 
-import fun.fengwk.automapper.annotation.AutoMapper;
-import fun.fengwk.automapper.annotation.DynamicOrderBy;
-import fun.fengwk.automapper.annotation.ExcludeField;
-import fun.fengwk.automapper.annotation.IncludeField;
-import fun.fengwk.automapper.annotation.Selective;
+import fun.fengwk.automapper.annotation.*;
 import fun.fengwk.automapper.example.model.ExampleDO;
+import fun.fengwk.automapper.example.model.LogicDeleteParams;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
@@ -59,5 +56,8 @@ public interface ExampleMapper extends BaseMapper<ExampleDO> {
     List<ExampleDO> findByIdInAndIsDeleted(@Param("id") Collection<Long> ids, int isDeleted);
 
     int countByIdIn(List<Long> ids);
+
+    @MethodExpr("updateByIdAndVersion")
+    int logicDelete(LogicDeleteParams params);
 
 }
