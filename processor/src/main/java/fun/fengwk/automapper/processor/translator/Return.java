@@ -39,4 +39,16 @@ public class Return {
     public List<BeanField> getBeanFields() {
         return beanFields;
     }
+
+    public boolean hasTypeHandler() {
+        if (beanFields != null) {
+            for (BeanField bf : beanFields) {
+                if (bf.getTypeHandler() != null) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }

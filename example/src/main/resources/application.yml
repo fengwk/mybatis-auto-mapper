@@ -1,8 +1,8 @@
 spring:
   datasource:
-    username: fengwk
+    username: root
     password: a123
-    url: jdbc:mysql://mysql.fengwk.fun:3306/test?allowMultiQueries=true
+    url: jdbc:mysql://127.0.0.1:3306/test?allowMultiQueries=true
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis:

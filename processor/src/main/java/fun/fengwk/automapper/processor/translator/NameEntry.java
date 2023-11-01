@@ -19,6 +19,13 @@ public interface NameEntry {
      */
     String getFieldName();
 
+    /**
+     * #{${name}}，如果有typeHandler则为#{${name},typeHandler=${typeHandler}}
+     *
+     * @return
+     */
+    String getVariableName();
+
     boolean isInferredName();
 
     boolean isInferredFieldName();

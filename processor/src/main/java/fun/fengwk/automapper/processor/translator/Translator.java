@@ -217,6 +217,40 @@ public abstract class Translator {
         return updateStmtElement;
     }
 
+    protected StmtElement addSelectElement(String id, String parameterType, Return ret) {
+        if (ret.hasTypeHandler()) {
+            String type = ret.getType();
+            String resultMapId = type.replace(".", "@");
+            StmtElement resultMapStmtElement = addStmtElement("resultMap", resultMapId);
+            Element resultMapElement = resultMapStmtElement.getElement();
+            resultMapElement.setAttribute("type", type);
+            for (BeanField bf : ret.getBeanFields()) {
+                Element itemElement;
+                if (bf.isUseGeneratedKeys()) {
+                    addTextNode(resultMapElement, LF, INDENT);
+                    itemElement = addElement(resultMapElement, "id");
+                } else {
+                    addTextNode(resultMapElement, LF, INDENT);
+                    itemElement = addElement(resultMapElement, "result");
+                }
+                itemElement.setAttribute("property", bf.getName());
+                itemElement.setAttribute("column", bf.getFieldName());
+                if (bf.getTypeHandler() != null) {
+                    itemElement.setAttribute("typeHandler", bf.getTypeHandler());
+                }
+            }
+            resultMapStmtElement.append();
+            StmtElement selectStmtElement = addStmtElement(TAG_SELECT, id);
+            if (parameterType != null) {
+                selectStmtElement.getElement().setAttribute("parameterType", parameterType);
+            }
+            selectStmtElement.getElement().setAttribute("resultMap", resultMapId);
+            return selectStmtElement;
+        } else {
+            return addSelectElement(id, parameterType, ret.getType());
+        }
+    }
+
     protected StmtElement addSelectElement(String id, String parameterType, String resultType) {
         StmtElement selectStmtElement = addStmtElement(TAG_SELECT, id);
         if (parameterType != null) {

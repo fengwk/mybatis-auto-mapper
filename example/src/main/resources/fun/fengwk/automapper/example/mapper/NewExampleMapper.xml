@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fun.fengwk.automapper.example.mapper.NewExampleMapper">
+
+<!--    <resultMap id="fun@fengwk@automapper@example@model@NewExampleDO" type="fun.fengwk.automapper.example.model.NewExampleDO">-->
+<!--        <id property="id" column="id" />-->
+<!--        <result property="info" column="info" typeHandler="fun.fengwk.automapper.example.handler.ToStringHandler" />-->
+<!--    </resultMap>-->
+
+<!--    <insert id="insert" parameterType="fun.fengwk.automapper.example.model.NewExampleDO">-->
+<!--        insert into new_example (id, info) values-->
+<!--            (#{id}, #{info,typeHandler=fun.fengwk.automapper.example.handler.ToStringHandler})-->
+<!--    </insert>-->
+
+<!--    <select id="listAll" resultMap="fun@fengwk@automapper@example@model@NewExampleDO">-->
+<!--        select id, info from new_example-->
+<!--    </select>-->
+
+</mapper>

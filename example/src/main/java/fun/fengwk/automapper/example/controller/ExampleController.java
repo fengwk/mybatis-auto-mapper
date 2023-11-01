@@ -1,8 +1,10 @@
 package fun.fengwk.automapper.example.controller;
 
 import fun.fengwk.automapper.example.mapper.ExampleMapper;
+import fun.fengwk.automapper.example.mapper.NewExampleMapper;
 import fun.fengwk.automapper.example.mapper.SimpleExampleMapper;
 import fun.fengwk.automapper.example.model.ExampleDO;
+import fun.fengwk.automapper.example.model.NewExampleDO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +25,39 @@ public class ExampleController {
 
     @Autowired
     private SimpleExampleMapper simpleExampleMapper;
+
+    @Autowired
+    private NewExampleMapper newExampleMapper;
+
+    // curl http://localhost:8080/insert/new?name=NewExample&sort=10
+    @GetMapping("/insert/new")
+    public int insertNew(@RequestParam("name") String name,
+                            @RequestParam("sort") Integer sort) {
+        NewExampleDO exampleDO = new NewExampleDO();
+        NewExampleDO.Info info = new NewExampleDO.Info();
+        exampleDO.setInfo(info);
+        info.setName(name);
+        info.setSort(sort);
+        return newExampleMapper.insert(exampleDO);
+    }
+
+    @GetMapping("/list-all/new")
+    public List<NewExampleDO> listAllNew() {
+        return newExampleMapper.findAll();
+    }
+
+    @GetMapping("/update/new")
+    public int listAllNew(@RequestParam("id") Long id,
+                                         @RequestParam("name") String name,
+                                         @RequestParam("sort") Integer sort) {
+        NewExampleDO exampleDO = new NewExampleDO();
+        exampleDO.setId(id);
+        NewExampleDO.Info info = new NewExampleDO.Info();
+        exampleDO.setInfo(info);
+        info.setName(name);
+        info.setSort(sort);
+        return newExampleMapper.updateById(exampleDO);
+    }
 
     // curl http://localhost:8080/insert?name=NewExample&sort=10
     @GetMapping("/insert")

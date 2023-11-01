@@ -13,10 +13,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import javax.lang.model.element.*;
-import javax.lang.model.type.ArrayType;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.type.TypeVariable;
+import javax.lang.model.type.*;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.beans.Introspector;
@@ -528,7 +525,8 @@ public class MapperMethodParser {
             UseGeneratedKeys useGeneratedKeysAnnotation = element.getAnnotation(UseGeneratedKeys.class);
             Selective selective = element.getAnnotation(Selective.class);
             UpdateIncrement updateIncrement = element.getAnnotation(UpdateIncrement.class);
-            return new BeanFieldSource(fieldNameAnnotation, useGeneratedKeysAnnotation, selective, updateIncrement);
+            TypeHandler typeHandler = element.getAnnotation(TypeHandler.class);
+            return new BeanFieldSource(fieldNameAnnotation, useGeneratedKeysAnnotation, selective, updateIncrement, typeHandler);
         }
 
         private void putBeanFieldMap(
@@ -542,10 +540,25 @@ public class MapperMethodParser {
                 String updateIncrement = bfs.getUpdateIncrement() != null ?
                     bfs.getUpdateIncrement().value() : null;
                 beanFieldMap.put(name, new BeanField(name, fieldName, useGeneratedKeys,
-                        bfs.getSelective() != null, updateIncrement));
+                        bfs.getSelective() != null, updateIncrement,
+                    getTypeHandlerValue(bfs.getTypeHandler())));
             }
         }
 
+        private String getTypeHandlerValue(TypeHandler typeHandler) {
+            if (typeHandler == null) {
+                return null;
+            }
+            try {
+                // 尝试直接访问注解的属性值
+                Class<?> clazz = typeHandler.value();
+                return clazz.getName();
+            } catch (MirroredTypeException mte) {
+                // 处理异常，获取TypeMirror从中获取名称
+                TypeMirror typeMirror = mte.getTypeMirror();
+                return typeMirror.toString();
+            }
+        }
     }
 
     static class BeanFieldSource {
@@ -553,12 +566,14 @@ public class MapperMethodParser {
         private UseGeneratedKeys useGeneratedKeysAnnotation;
         private Selective selective;
         private UpdateIncrement updateIncrement;
+        private TypeHandler typeHandler;
 
-        BeanFieldSource(FieldName fieldNameAnnotation, UseGeneratedKeys useGeneratedKeysAnnotation, Selective selective, UpdateIncrement updateIncrement) {
+        BeanFieldSource(FieldName fieldNameAnnotation, UseGeneratedKeys useGeneratedKeysAnnotation, Selective selective, UpdateIncrement updateIncrement, TypeHandler typeHandler) {
             this.fieldNameAnnotation = fieldNameAnnotation;
             this.useGeneratedKeysAnnotation = useGeneratedKeysAnnotation;
             this.selective = selective;
             this.updateIncrement = updateIncrement;
+            this.typeHandler = typeHandler;
         }
 
         public FieldName getFieldNameAnnotation() {
@@ -577,6 +592,10 @@ public class MapperMethodParser {
             return updateIncrement;
         }
 
+        public TypeHandler getTypeHandler() {
+            return typeHandler;
+        }
+
         public void merge(BeanFieldSource other) {
             if (fieldNameAnnotation == null) {
                 fieldNameAnnotation = other.getFieldNameAnnotation();
@@ -589,6 +608,9 @@ public class MapperMethodParser {
             }
             if (updateIncrement == null) {
                 updateIncrement = other.getUpdateIncrement();
+            }
+            if (typeHandler == null) {
+                typeHandler = other.getTypeHandler();
             }
         }
     }

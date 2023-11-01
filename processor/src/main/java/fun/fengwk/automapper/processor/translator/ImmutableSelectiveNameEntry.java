@@ -30,6 +30,11 @@ public class ImmutableSelectiveNameEntry implements SelectiveNameEntry {
     }
 
     @Override
+    public String getVariableName() {
+        return name;
+    }
+
+    @Override
     public boolean isInferredName() {
         return inferredName;
     }

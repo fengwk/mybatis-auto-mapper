@@ -190,7 +190,7 @@ public class Sql92Translator extends Translator {
 
         String foreachText = LF + INDENT + INDENT + "(" + param.getBeanFields().stream()
                 .filter(bf -> !bf.isUseGeneratedKeys())
-                .map(bf -> String.format("#{item.%s}", bf.getName()))
+                .map(bf -> String.format("#{item.%s}", bf.getVariableName()))
                 .collect(Collectors.joining(", ")) + ")" + LF + INDENT;
         addTextNode(foreachElement, foreachText);
 
@@ -241,7 +241,7 @@ public class Sql92Translator extends Translator {
                 addTextNode(trimElement, LF, INDENT, INDENT, INDENT);
                 Element ifElement = addElement(trimElement, "if");
                 ifElement.setAttribute("test", String.format("item.%s != null", bf.getName()));
-                addTextNode(ifElement, "#{item.", bf.getName(), "},");
+                addTextNode(ifElement, "#{item.", bf.getVariableName(), "},");
             }
         }
         addTextNode(trimElement, LF, INDENT, INDENT);
@@ -274,7 +274,7 @@ public class Sql92Translator extends Translator {
                 ") values", LF, INDENT, "(",
                 param.getBeanFields().stream()
                         .filter(bf -> !bf.isUseGeneratedKeys())
-                        .map(bf -> String.format("#{%s}", bf.getName()))
+                        .map(bf -> String.format("#{%s}", bf.getVariableName()))
                         .collect(Collectors.joining(", ")),
                 ")", LF);
 
@@ -316,7 +316,7 @@ public class Sql92Translator extends Translator {
                 addTextNode(trimElement, LF, INDENT, INDENT);
                 Element ifElement = addElement(trimElement, "if");
                 ifElement.setAttribute("test", String.format("%s != null", bf.getName()));
-                addTextNode(ifElement, "#{", bf.getName(), "},");
+                addTextNode(ifElement, "#{", bf.getVariableName(), "},");
             }
         }
         addTextNode(trimElement, LF, INDENT);
@@ -405,7 +405,7 @@ public class Sql92Translator extends Translator {
                 param.getBeanFields().stream()
                         .map(f -> {
                             if (f.getUpdateIncrement() == null || f.getUpdateIncrement().isEmpty()) {
-                                return String.format("%s=#{%s}", f.getFieldName(), f.getName());
+                                return String.format("%s=#{%s}", f.getFieldName(), f.getVariableName());
                             } else {
                                 return String.format("%s+=%s", f.getFieldName(), f.getUpdateIncrement());
                             }
@@ -449,7 +449,7 @@ public class Sql92Translator extends Translator {
             if (bf.getUpdateIncrement() == null || bf.getUpdateIncrement().isEmpty()) {
                 Element ifElement = addElement(trimElement, "if");
                 ifElement.setAttribute("test", String.format("%s != null", bf.getName()));
-                addTextNode(ifElement, String.format("%s=#{%s},", bf.getFieldName(), bf.getName()));
+                addTextNode(ifElement, String.format("%s=#{%s},", bf.getFieldName(), bf.getVariableName()));
             } else {
                 addTextNode(trimElement, String.format("%s+=%s,", bf.getFieldName(), bf.getUpdateIncrement()));
             }
@@ -480,7 +480,7 @@ public class Sql92Translator extends Translator {
          * </select>
          */
         String parameterType = params.size() == 1 ? params.get(0).getType() : null;
-        StmtElement selectStmtElement = addSelectElement(methodName, parameterType, ret.getType());
+        StmtElement selectStmtElement = addSelectElement(methodName, parameterType, ret);
         Element selectElement = selectStmtElement.getElement();
 
         addTextNode(selectElement, LF, INDENT, "select ",
@@ -538,7 +538,7 @@ public class Sql92Translator extends Translator {
          * </select>
          */
         String parameterType = params.size() == 1 ? params.get(0).getType() : null;
-        StmtElement selectStmtElement = addSelectElement(methodName, parameterType, ret.getType());
+        StmtElement selectStmtElement = addSelectElement(methodName, parameterType, ret);
         Element selectElement = selectStmtElement.getElement();
 
         addTextNode(selectElement, LF, INDENT, "select count(*)", LF, INDENT, "from ", tableName, LF);
@@ -580,7 +580,7 @@ public class Sql92Translator extends Translator {
          * </select>
          */
         String parameterType = params.size() == 1 ? params.get(0).getType() : null;
-        StmtElement selectStmtElement = addSelectElement(methodName, parameterType, ret.getType());
+        StmtElement selectStmtElement = addSelectElement(methodName, parameterType, ret);
         Element selectElement = selectStmtElement.getElement();
 
         addTextNode(selectElement, LF, INDENT, "select ",
