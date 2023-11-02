@@ -17,6 +17,6 @@ public @interface TypeHandler {
     /**
      * 类型处理器类。
      */
-    Class<? extends org.apache.ibatis.type.TypeHandler<?>> value();
+    Class<? extends org.apache.ibatis.type.TypeHandler> value();
 
 }

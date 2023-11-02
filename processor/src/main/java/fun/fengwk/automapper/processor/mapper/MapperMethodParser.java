@@ -559,7 +559,21 @@ public class MapperMethodParser {
             } catch (MirroredTypeException mte) {
                 // 处理异常，获取TypeMirror从中获取名称
                 TypeMirror typeMirror = mte.getTypeMirror();
-                return typeMirror.toString();
+                // 将所有表示类型的节点取出，用于处理内嵌类的情况
+                Element element = types.asElement(typeMirror);
+                TypeElement typeElement;
+                LinkedList<TypeElement> typeElements = new LinkedList<>();
+                while (element instanceof TypeElement) {
+                    typeElement = (TypeElement) element;
+                    typeElements.addFirst(typeElement);
+                    element = typeElement.getEnclosingElement();
+                }
+                // 组装全路径名称
+                StringBuilder sb = new StringBuilder(typeElements.removeFirst().getQualifiedName().toString());
+                while (!typeElements.isEmpty()) {
+                    sb.append('$').append(typeElements.removeFirst().getSimpleName().toString());
+                }
+                return sb.toString();
             }
         }
     }
