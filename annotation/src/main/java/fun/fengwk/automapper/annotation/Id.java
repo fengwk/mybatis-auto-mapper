@@ -6,12 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 该标识表示其为自增键，对应mybatis的useGeneratedKeys。
+ * 用于标识主键。
  *
  * @author fengwk
  */
-@Id
 @Retention(RetentionPolicy.CLASS)
-@Target({ ElementType.FIELD, ElementType.METHOD })
-public @interface UseGeneratedKeys {
+@Target({ ElementType.FIELD, ElementType.METHOD, ElementType.ANNOTATION_TYPE })
+public @interface Id {
 }

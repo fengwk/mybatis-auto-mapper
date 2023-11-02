@@ -526,7 +526,9 @@ public class MapperMethodParser {
             Selective selective = element.getAnnotation(Selective.class);
             UpdateIncrement updateIncrement = element.getAnnotation(UpdateIncrement.class);
             TypeHandler typeHandler = element.getAnnotation(TypeHandler.class);
-            return new BeanFieldSource(fieldNameAnnotation, useGeneratedKeysAnnotation, selective, updateIncrement, typeHandler);
+            Id id = element.getAnnotation(Id.class);
+            return new BeanFieldSource(fieldNameAnnotation, useGeneratedKeysAnnotation,
+                selective,updateIncrement, typeHandler, id);
         }
 
         private void putBeanFieldMap(
@@ -539,9 +541,10 @@ public class MapperMethodParser {
                 boolean useGeneratedKeys = useGeneratedKeysAnnotation != null;
                 String updateIncrement = bfs.getUpdateIncrement() != null ?
                     bfs.getUpdateIncrement().value() : null;
+                String typeHandler = getTypeHandlerValue(bfs.getTypeHandler());
+                boolean id = bfs.getId() != null || bfs.getUseGeneratedKeysAnnotation() != null;
                 beanFieldMap.put(name, new BeanField(name, fieldName, useGeneratedKeys,
-                        bfs.getSelective() != null, updateIncrement,
-                    getTypeHandlerValue(bfs.getTypeHandler())));
+                        bfs.getSelective() != null, updateIncrement, typeHandler, id));
             }
         }
 
@@ -567,13 +570,16 @@ public class MapperMethodParser {
         private Selective selective;
         private UpdateIncrement updateIncrement;
         private TypeHandler typeHandler;
+        private Id id;
 
-        BeanFieldSource(FieldName fieldNameAnnotation, UseGeneratedKeys useGeneratedKeysAnnotation, Selective selective, UpdateIncrement updateIncrement, TypeHandler typeHandler) {
+        BeanFieldSource(FieldName fieldNameAnnotation, UseGeneratedKeys useGeneratedKeysAnnotation,
+                        Selective selective, UpdateIncrement updateIncrement, TypeHandler typeHandler, Id id) {
             this.fieldNameAnnotation = fieldNameAnnotation;
             this.useGeneratedKeysAnnotation = useGeneratedKeysAnnotation;
             this.selective = selective;
             this.updateIncrement = updateIncrement;
             this.typeHandler = typeHandler;
+            this.id = id;
         }
 
         public FieldName getFieldNameAnnotation() {
@@ -596,6 +602,10 @@ public class MapperMethodParser {
             return typeHandler;
         }
 
+        public Id getId() {
+            return id;
+        }
+
         public void merge(BeanFieldSource other) {
             if (fieldNameAnnotation == null) {
                 fieldNameAnnotation = other.getFieldNameAnnotation();
@@ -611,6 +621,9 @@ public class MapperMethodParser {
             }
             if (typeHandler == null) {
                 typeHandler = other.getTypeHandler();
+            }
+            if (id == null) {
+                id = other.getId();
             }
         }
     }

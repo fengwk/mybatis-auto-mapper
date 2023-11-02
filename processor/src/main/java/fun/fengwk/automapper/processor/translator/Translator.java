@@ -226,7 +226,7 @@ public abstract class Translator {
             resultMapElement.setAttribute("type", type);
             for (BeanField bf : ret.getBeanFields()) {
                 Element itemElement;
-                if (bf.isUseGeneratedKeys()) {
+                if (bf.isId()) {
                     addTextNode(resultMapElement, LF, INDENT);
                     itemElement = addElement(resultMapElement, "id");
                 } else {

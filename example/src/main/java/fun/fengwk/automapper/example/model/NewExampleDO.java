@@ -1,5 +1,6 @@
 package fun.fengwk.automapper.example.model;
 
+import fun.fengwk.automapper.annotation.Id;
 import fun.fengwk.automapper.annotation.TypeHandler;
 import fun.fengwk.automapper.example.handler.ToStringHandler;
 
@@ -8,6 +9,7 @@ import fun.fengwk.automapper.example.handler.ToStringHandler;
  */
 public class NewExampleDO {
 
+    @Id
     private Long id;
     @TypeHandler(ToStringHandler.class)
     private Info info;

@@ -35,13 +35,20 @@ public class BeanField implements SelectiveNameEntry {
      */
     private final String typeHandler;
 
-    public BeanField(String name, String fieldName, boolean useGeneratedKeys, boolean isSelective, String updateIncrement, String typeHandler) {
+    /**
+     * 是否为id
+     */
+    private final boolean id;
+
+    public BeanField(String name, String fieldName, boolean useGeneratedKeys, boolean isSelective,
+                     String updateIncrement, String typeHandler, boolean id) {
         this.name = name;
         this.fieldName = fieldName;
         this.useGeneratedKeys = useGeneratedKeys;
         this.isSelective = isSelective;
         this.updateIncrement = updateIncrement;
         this.typeHandler = typeHandler;
+        this.id = id;
     }
 
     public String getName() {
@@ -85,6 +92,10 @@ public class BeanField implements SelectiveNameEntry {
 
     public String getTypeHandler() {
         return typeHandler;
+    }
+
+    public boolean isId() {
+        return id;
     }
 
 }
