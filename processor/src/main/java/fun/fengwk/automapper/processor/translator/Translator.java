@@ -24,9 +24,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author fengwk
@@ -54,7 +52,7 @@ public abstract class Translator {
     protected final NamingConverter fieldNamingConverter;
 
     protected Set<String> existingIdsCache;
-    protected Set<String> appendedIds = new HashSet<>();
+    protected Map<String, Element> appendedIdMap = new HashMap<>();
 
     protected Lexer lexer = newLexer();
     protected Parser parser = new Parser();
@@ -221,8 +219,15 @@ public abstract class Translator {
         if (ret.hasTypeHandler()) {
             String type = ret.getType();
             String resultMapId = type.replace(".", "@");
-            StmtElement resultMapStmtElement = addStmtElement("resultMap", resultMapId);
-            Element resultMapElement = resultMapStmtElement.getElement();
+            StmtElement resultMapStmtElement;
+            Element resultMapElement;
+            if (appendedIdMap.containsKey(resultMapId)) {
+                resultMapStmtElement = null;
+                resultMapElement = appendedIdMap.get(resultMapId);
+            } else {
+                resultMapStmtElement = addStmtElement("resultMap", resultMapId);
+                resultMapElement = resultMapStmtElement.getElement();
+            }
             resultMapElement.setAttribute("type", type);
             for (BeanField bf : ret.getBeanFields()) {
                 Element itemElement;
@@ -239,7 +244,9 @@ public abstract class Translator {
                     itemElement.setAttribute("typeHandler", bf.getTypeHandler());
                 }
             }
-            resultMapStmtElement.append();
+            if (resultMapStmtElement != null) {
+                resultMapStmtElement.append();
+            }
             StmtElement selectStmtElement = addStmtElement(TAG_SELECT, id);
             if (parameterType != null) {
                 selectStmtElement.getElement().setAttribute("parameterType", parameterType);
@@ -281,14 +288,14 @@ public abstract class Translator {
         Element element = document.createElement(tagName);
         element.setAttribute("id", id);
         return new StmtElement(element, () -> {
-            if (appendedIds.contains(id)) {
+            if (appendedIdMap.containsKey(id)) {
                 throw new TranslateException("'%s' id duplicated", id);
             }
             mapperElement.appendChild(document.createTextNode(LF_LF));
             mapperElement.appendChild(comment);
             mapperElement.appendChild(document.createTextNode(LF));
             mapperElement.appendChild(element);
-            appendedIds.add(id);
+            appendedIdMap.put(id, element);
         });
     }
 
