@@ -25,6 +25,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * @author fengwk
@@ -216,20 +218,16 @@ public abstract class Translator {
     }
 
     protected StmtElement addSelectElement(String id, String parameterType, Return ret) {
-        if (ret.hasTypeHandler()) {
-            String type = ret.getType();
-            String resultMapId = type.replace(".", "@");
-            StmtElement resultMapStmtElement;
-            Element resultMapElement;
-            if (appendedIdMap.containsKey(resultMapId)) {
-                resultMapStmtElement = null;
-                resultMapElement = appendedIdMap.get(resultMapId);
-            } else {
-                resultMapStmtElement = addStmtElement("resultMap", resultMapId);
-                resultMapElement = resultMapStmtElement.getElement();
-            }
-            resultMapElement.setAttribute("type", type);
-            for (BeanField bf : ret.getBeanFields()) {
+        String retType = ret.getType();
+        String resultMapId;
+        if (ret.hasTypeHandler() && !appendedIdMap.containsKey(resultMapId = buildResultMapId(retType))) {
+            StmtElement resultMapStmtElement = addStmtElement("resultMap", resultMapId);
+            Element resultMapElement = resultMapStmtElement.getElement();
+            resultMapElement.setAttribute("type", ret.getType());
+            // fix mybatis schema (constructor?,id*,result*,association*,collection*,discriminator?)
+            List<BeanField> sortedBfs = ret.getBeanFields().stream()
+                .sorted(Comparator.comparing(bf -> bf.isId() ? 0 : 1)).collect(Collectors.toList());
+            for (BeanField bf : sortedBfs) {
                 Element itemElement;
                 if (bf.isId()) {
                     addTextNode(resultMapElement, LF, INDENT);
@@ -244,9 +242,7 @@ public abstract class Translator {
                     itemElement.setAttribute("typeHandler", bf.getTypeHandler());
                 }
             }
-            if (resultMapStmtElement != null) {
-                resultMapStmtElement.append();
-            }
+            resultMapStmtElement.append();
             StmtElement selectStmtElement = addStmtElement(TAG_SELECT, id);
             if (parameterType != null) {
                 selectStmtElement.getElement().setAttribute("parameterType", parameterType);
@@ -281,6 +277,10 @@ public abstract class Translator {
         Element element = document.createElement(tagName);
         parent.appendChild(element);
         return element;
+    }
+
+    private String buildResultMapId(String retType) {
+        return retType.replace(".", "_");
     }
 
     private StmtElement addStmtElement(String tagName, String id) {
