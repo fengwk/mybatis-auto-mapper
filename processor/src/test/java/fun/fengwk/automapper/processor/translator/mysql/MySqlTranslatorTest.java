@@ -20,9 +20,9 @@ public class MySqlTranslatorTest {
     public void testInsert() {
         String methodName = "insert";
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Param param = new Param("demoDO", "demoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -47,9 +47,9 @@ public class MySqlTranslatorTest {
     public void testInsertSelective() {
         String methodName = "insertSelective";
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Param param = new Param("demoDO", "demoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -82,9 +82,9 @@ public class MySqlTranslatorTest {
     public void testInsertIgnoreSelective() {
         String methodName = "insertIgnoreSelective";
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Param param = new Param("demoDO", "demoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -117,9 +117,9 @@ public class MySqlTranslatorTest {
     public void testInsertOnDuplicateKeyUpdate() {
         String methodName = "insertOnDuplicateKeyUpdate";
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Param param = new Param("demoDO", "demoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -144,9 +144,9 @@ public class MySqlTranslatorTest {
     public void testInsertOnDuplicateKeyUpdateSelective() {
         String methodName = "insertOnDuplicateKeyUpdateSelective";
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Param param = new Param("demoDO", "demoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -183,9 +183,9 @@ public class MySqlTranslatorTest {
     public void testReplaceSelective() {
         String methodName = "replaceSelective";
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Param param = new Param("demoDO", "demoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -218,9 +218,9 @@ public class MySqlTranslatorTest {
     public void testInsertAll() {
         String methodName = "insertAll";
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Param param = new Param("demoDO", "demoDO", null, null, false, false, true, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -247,9 +247,9 @@ public class MySqlTranslatorTest {
     public void testInsertAllSelective() {
         String methodName = "insertAllSelective";
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Param param = new Param("demoDO", "demoDO", null, null, false, false, true, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -362,9 +362,9 @@ public class MySqlTranslatorTest {
     public void testUpdateBy() {
         String methodName = "updateByUsernameAndUserAddress";
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Param p = new Param("DemoDO", "DemoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -392,9 +392,9 @@ public class MySqlTranslatorTest {
     public void testUpdateBySelective() {
         String methodName = "updateByUsernameAndUserAddressSelective";
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Param p = new Param("DemoDO", "DemoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -427,9 +427,9 @@ public class MySqlTranslatorTest {
     public void testFindAll() {
         String methodName = "findAll";
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -454,9 +454,9 @@ public class MySqlTranslatorTest {
     public void testFindAllOrderBy() {
         String methodName = "findAllOrderById";
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -485,9 +485,9 @@ public class MySqlTranslatorTest {
         Param p1 = new Param("java.lang.String", "java.lang.String", "username", "username", false, false, false, false, null, false, false);
         Param p2 = new Param("java.lang.String", "java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -519,9 +519,9 @@ public class MySqlTranslatorTest {
         Param p1 = new Param("java.lang.String", "java.lang.String", "username", "username", false, false, false, false, null, false, false);
         Param p2 = new Param("java.lang.String", "java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -554,9 +554,9 @@ public class MySqlTranslatorTest {
         Param p1 = new Param("java.lang.String", "java.lang.String", "username", "username", false, false, false, false, null, false, false);
         Param p2 = new Param("java.lang.String", "java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -589,9 +589,9 @@ public class MySqlTranslatorTest {
         Param p1 = new Param("java.lang.String", "java.lang.String", "username", "username", false, false, false, false, null, false, false);
         Param p2 = new Param("java.lang.String", "java.lang.String", "userAddress", "user_address", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1027,9 +1027,9 @@ public class MySqlTranslatorTest {
         Param p1 = new Param("int", "int", "offset", "offset", false, false, false, false, null, false, false);
         Param p2 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1057,9 +1057,9 @@ public class MySqlTranslatorTest {
 
         Param p1 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1088,9 +1088,9 @@ public class MySqlTranslatorTest {
         Param p1 = new Param("int", "int", "offset", "offset", false, false, false, false, null, false, false);
         Param p2 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1122,9 +1122,9 @@ public class MySqlTranslatorTest {
         Param p3 = new Param("int", "int", "offset", "offset", false, false, false, false, null, false, false);
         Param p4 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 
@@ -1159,9 +1159,9 @@ public class MySqlTranslatorTest {
         Param p3 = new Param("int", "int", "offset", "offset", false, false, false, false, null, false, false);
         Param p4 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
 
-        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true);
-        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false);
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false);
 
         Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
 

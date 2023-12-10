@@ -20,7 +20,6 @@ public interface ExampleMapper extends BaseMapper<ExampleDO> {
 
     @IncludeField("f1")
     @IncludeField("f2")
-    @ExcludeField("f1")
     int insertSelective(ExampleDO exampleDO);
 
     int insertIgnore(ExampleDO exampleDO);

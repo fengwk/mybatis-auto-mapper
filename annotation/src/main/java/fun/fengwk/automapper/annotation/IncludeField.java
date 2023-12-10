@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 
 /**
  * 引入字段，该注解用于insert或update方法，一旦使用该注解，那么只有被指定的字段在insert或update表达式生成xml时被使用。
+ * 同时该注解允许直接在bean字段或方法上使用，此时不必指定value值。
  *
  * @author fengwk
  */
@@ -21,7 +22,7 @@ public @interface IncludeField {
      *
      * @return
      */
-    String value();
+    String value() default "";
 
     /**
      * 批量处理引入字段注解。

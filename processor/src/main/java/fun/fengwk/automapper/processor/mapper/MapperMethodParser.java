@@ -2,10 +2,7 @@ package fun.fengwk.automapper.processor.mapper;
 
 import fun.fengwk.automapper.annotation.*;
 import fun.fengwk.automapper.processor.naming.NamingConverter;
-import fun.fengwk.automapper.processor.translator.BeanField;
-import fun.fengwk.automapper.processor.translator.MethodInfo;
-import fun.fengwk.automapper.processor.translator.Param;
-import fun.fengwk.automapper.processor.translator.Return;
+import fun.fengwk.automapper.processor.translator.*;
 import fun.fengwk.automapper.processor.util.StringUtils;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -18,6 +15,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.beans.Introspector;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -172,7 +170,7 @@ public class MapperMethodParser {
 
                     params.add(new Param(desc.fullType, desc.type, name, fieldName, inferredName, inferredFieldName,
                         desc.isIterable, desc.isJavaBean,
-                            getAndFilterBeanFields(desc, includeFieldNames, excludeFieldNames),
+                            getAndFilterBeanFields(desc, includeFieldNames, excludeFieldNames, methodName),
                             methodParameter.getAnnotation(Selective.class) != null,
                             methodParameter.getAnnotation(DynamicOrderBy.class) != null));
                 }
@@ -200,14 +198,14 @@ public class MapperMethodParser {
         }
 
         Set<String> includeFieldNames = new HashSet<>();
-        if (includeField != null && includeField.value() != null) {
+        if (includeField != null && includeField.value() != null && !includeField.value().isEmpty()) {
             includeFieldNames.add(includeField.value());
         }
         if (includeFieldList != null) {
             IncludeField[] includeFieldInListArray = includeFieldList.value();
             if (includeFieldInListArray != null) {
                 for (IncludeField includeFieldInList : includeFieldInListArray) {
-                    if (includeFieldInList != null && includeFieldInList.value() != null) {
+                    if (includeFieldInList != null && includeFieldInList.value() != null && !includeFieldInList.value().isEmpty()) {
                         includeFieldNames.add(includeFieldInList.value());
                     }
                 }
@@ -224,14 +222,14 @@ public class MapperMethodParser {
         }
 
         Set<String> excludeFieldNames = new HashSet<>();
-        if (excludeField != null && excludeField.value() != null) {
+        if (excludeField != null && excludeField.value() != null && !excludeField.value().isEmpty()) {
             excludeFieldNames.add(excludeField.value());
         }
         if (excludeFieldList != null) {
             ExcludeField[] excludeFieldInListArray = excludeFieldList.value();
             if (excludeFieldInListArray != null) {
                 for (ExcludeField excludeFieldInList : excludeFieldInListArray) {
-                    if (excludeFieldInList != null && excludeFieldInList.value() != null) {
+                    if (excludeFieldInList != null && excludeFieldInList.value() != null && !excludeFieldInList.value().isEmpty()) {
                         excludeFieldNames.add(excludeFieldInList.value());
                     }
                 }
@@ -251,24 +249,30 @@ public class MapperMethodParser {
 //        return annos;
 //    }
 
-    private List<BeanField> getAndFilterBeanFields(TypeDescriptor desc, Set<String> includeFieldNames, Set<String> excludeFieldNames) {
+    private List<BeanField> getAndFilterBeanFields(TypeDescriptor desc, Set<String> includeFieldNames, Set<String> excludeFieldNames, String methodName) {
         if (!desc.isJavaBean) {
             return null;
         }
 
+        boolean excludeMode = excludeFieldNames != null || desc.beanFields.stream().anyMatch(BeanField::isExcludeField);
+        boolean includeMode = includeFieldNames != null || desc.beanFields.stream().anyMatch(BeanField::isIncludeField);
+        if (excludeMode && includeMode) {
+            throw new TranslateException("Unable to parse '%s' containing both @ExcludeField and @IncludeField annotations.", methodName);
+        }
+
         List<BeanField> result = new ArrayList<>();
         for (BeanField bf : desc.beanFields) {
-            if (includeFieldNames != null) {
-                if (!includeFieldNames.contains(bf.getName())) {
-                    continue;
+            if (excludeMode) {
+                if (!bf.isExcludeField() && (excludeFieldNames == null || !excludeFieldNames.contains(bf.getName()))) {
+                    result.add(bf);
                 }
-            }
-            if (excludeFieldNames != null) {
-                if (excludeFieldNames.contains(bf.getName())) {
-                    continue;
+            } else if (includeMode) {
+                if (bf.isIncludeField() && (includeFieldNames == null || includeFieldNames.contains(bf.getName()))) {
+                    result.add(bf);
                 }
+            } else {
+                result.add(bf);
             }
-            result.add(bf);
         }
         return result;
     }
@@ -527,8 +531,12 @@ public class MapperMethodParser {
             UpdateIncrement updateIncrement = element.getAnnotation(UpdateIncrement.class);
             TypeHandler typeHandler = element.getAnnotation(TypeHandler.class);
             Id id = element.getAnnotation(Id.class);
+            ExcludeField excludeField = element.getAnnotation(ExcludeField.class);
+            ExcludeField.List excludeFieldList = element.getAnnotation(ExcludeField.List.class);
+            IncludeField includeField = element.getAnnotation(IncludeField.class);
+            IncludeField.List includeFieldList = element.getAnnotation(IncludeField.List.class);
             return new BeanFieldSource(fieldNameAnnotation, useGeneratedKeysAnnotation,
-                selective,updateIncrement, typeHandler, id);
+                selective,updateIncrement, typeHandler, id, excludeField, excludeFieldList, includeField, includeFieldList);
         }
 
         private void putBeanFieldMap(
@@ -543,8 +551,11 @@ public class MapperMethodParser {
                     bfs.getUpdateIncrement().value() : null;
                 String typeHandler = getTypeHandlerValue(bfs.getTypeHandler());
                 boolean id = bfs.getId() != null || bfs.getUseGeneratedKeysAnnotation() != null;
+                boolean excludeField = bfs.getExcludeField() != null || bfs.getExcludeFieldList() != null;
+                boolean includeField = bfs.getIncludeField() != null || bfs.getIncludeFieldList() != null;
                 beanFieldMap.put(name, new BeanField(name, fieldName, useGeneratedKeys,
-                        bfs.getSelective() != null, updateIncrement, typeHandler, id));
+                    bfs.getSelective() != null, updateIncrement, typeHandler, id,
+                    excludeField, includeField));
             }
         }
 
@@ -585,15 +596,25 @@ public class MapperMethodParser {
         private UpdateIncrement updateIncrement;
         private TypeHandler typeHandler;
         private Id id;
+        private ExcludeField excludeField;
+        private ExcludeField.List excludeFieldList;
+        private IncludeField includeField;
+        private IncludeField.List includeFieldList;
 
         BeanFieldSource(FieldName fieldNameAnnotation, UseGeneratedKeys useGeneratedKeysAnnotation,
-                        Selective selective, UpdateIncrement updateIncrement, TypeHandler typeHandler, Id id) {
+                        Selective selective, UpdateIncrement updateIncrement, TypeHandler typeHandler, Id id,
+                        ExcludeField excludeField, ExcludeField.List excludeFieldList,
+                        IncludeField includeField, IncludeField.List includeFieldList) {
             this.fieldNameAnnotation = fieldNameAnnotation;
             this.useGeneratedKeysAnnotation = useGeneratedKeysAnnotation;
             this.selective = selective;
             this.updateIncrement = updateIncrement;
             this.typeHandler = typeHandler;
             this.id = id;
+            this.excludeField = excludeField;
+            this.excludeFieldList = excludeFieldList;
+            this.includeField = includeField;
+            this.includeFieldList = includeFieldList;
         }
 
         public FieldName getFieldNameAnnotation() {
@@ -620,6 +641,22 @@ public class MapperMethodParser {
             return id;
         }
 
+        public ExcludeField getExcludeField() {
+            return excludeField;
+        }
+
+        public ExcludeField.List getExcludeFieldList() {
+            return excludeFieldList;
+        }
+
+        public IncludeField getIncludeField() {
+            return includeField;
+        }
+
+        public IncludeField.List getIncludeFieldList() {
+            return includeFieldList;
+        }
+
         public void merge(BeanFieldSource other) {
             if (fieldNameAnnotation == null) {
                 fieldNameAnnotation = other.getFieldNameAnnotation();
@@ -638,6 +675,18 @@ public class MapperMethodParser {
             }
             if (id == null) {
                 id = other.getId();
+            }
+            if (excludeField == null) {
+                excludeField = other.getExcludeField();
+            }
+            if (excludeFieldList == null) {
+                excludeFieldList = other.getExcludeFieldList();
+            }
+            if (includeField == null) {
+                includeField = other.getIncludeField();
+            }
+            if (includeFieldList == null) {
+                includeFieldList = other.getIncludeFieldList();
             }
         }
     }
