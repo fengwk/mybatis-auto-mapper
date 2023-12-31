@@ -407,7 +407,7 @@ public class Sql92Translator extends Translator {
                             if (f.getUpdateIncrement() == null || f.getUpdateIncrement().isEmpty()) {
                                 return String.format("%s=#{%s}", f.getFieldName(), f.getVariableName());
                             } else {
-                                return String.format("%s+=%s", f.getFieldName(), f.getUpdateIncrement());
+                                return String.format("%s=%s+%s", f.getFieldName(), f.getFieldName(), f.getUpdateIncrement());
                             }
                         })
                         .collect(Collectors.joining(", ")),
@@ -451,7 +451,7 @@ public class Sql92Translator extends Translator {
                 ifElement.setAttribute("test", String.format("%s != null", bf.getName()));
                 addTextNode(ifElement, String.format("%s=#{%s},", bf.getFieldName(), bf.getVariableName()));
             } else {
-                addTextNode(trimElement, String.format("%s+=%s,", bf.getFieldName(), bf.getUpdateIncrement()));
+                addTextNode(trimElement, String.format("%s=%s+%s,", bf.getFieldName(), bf.getFieldName(), bf.getUpdateIncrement()));
             }
         }
         addTextNode(trimElement, LF, INDENT);

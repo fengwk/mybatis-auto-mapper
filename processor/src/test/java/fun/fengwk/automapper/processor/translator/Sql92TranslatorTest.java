@@ -302,7 +302,7 @@ public class Sql92TranslatorTest {
             "\n" +
             "<!--auto mapper generate-->\n" +
             "<update id=\"updateByUsernameAndUserAddress\" parameterType=\"DemoDO\">\n" +
-            "    update demo set id=#{id}, username=#{username}, user_address+=1\n" +
+            "    update demo set id=#{id}, username=#{username}, user_address=user_address+1\n" +
             "    <where>\n" +
             "        username=#{username}\n" +
             "        and user_address=#{userAddress}\n" +
@@ -335,7 +335,7 @@ public class Sql92TranslatorTest {
                 "    <trim suffixOverrides=\",\">\n" +
                 "        <if test=\"id != null\">id=#{id},</if>\n" +
                 "        <if test=\"username != null\">username=#{username},</if>\n" +
-                "        user_address+=1,\n" +
+                "        user_address=user_address+1,\n" +
                 "    </trim>\n" +
                 "    <where>\n" +
                 "        username=#{username}\n" +
