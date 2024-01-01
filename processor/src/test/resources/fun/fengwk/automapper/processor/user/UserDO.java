@@ -3,23 +3,14 @@ package fun.fengwk.automapper.processor.user;
 /**
  * @author fengwk
  */
-public class UserDO {
+public class UserDO extends ConventionDO<Long> {
 
-    private Long id;
     private String username;
     private String email;
     private String mobile;
     private String password;
     private Integer age;
     private String city;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getUsername() {
         return username;

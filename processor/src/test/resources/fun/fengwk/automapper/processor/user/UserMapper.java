@@ -15,6 +15,8 @@ public interface UserMapper extends GsonLongIdCacheRepository<UserDO> {
 
     int insertAll(Collection<UserDO> records);
 
+    int updateById(UserDO record);
+
     int updateByIdSelective(UserDO record);
 
     int countById(Long id);
