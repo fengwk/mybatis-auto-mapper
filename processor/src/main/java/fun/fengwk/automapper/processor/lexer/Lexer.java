@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * 词法分析器，状态转移见doc/MapperMethodStateMachine.drawio
@@ -107,9 +108,15 @@ public class Lexer {
                         break;
                     }
 
-                    throw new LexicalException("Expressions must begin with %s|%s|%s|%s|%s|%s",
-                            Keyword.INSERT.getValue(), Keyword.DELETE.getValue(), Keyword.UPDATE.getValue(),
-                            Keyword.FIND.getValue(), Keyword.COUNT.getValue(), Keyword.PAGE.getValue());
+                    List<String> derivedList = new ArrayList<>();
+                    derivedList.addAll(Arrays.asList(insertDerivedValues));
+                    derivedList.addAll(Arrays.asList(deleteDerivedValues));
+                    derivedList.addAll(Arrays.asList(updateDerivedValues));
+                    derivedList.addAll(Arrays.asList(findDerivedValues));
+                    derivedList.addAll(Arrays.asList(countDerivedValues));
+                    derivedList.addAll(Arrays.asList(pageDerivedValues));
+                    String beginTokens = String.join("|", derivedList);
+                    throw new LexicalException("Expressions must begin with %s", beginTokens);
 
                 case 1:
                     if (tryEatSelectiveEOF()) {

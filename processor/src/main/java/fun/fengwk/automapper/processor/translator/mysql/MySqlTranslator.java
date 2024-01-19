@@ -34,14 +34,14 @@ public class MySqlTranslator extends Sql92Translator {
     }
 
     @Override
-    protected Lexer newLexer() {
-        return new Lexer.Builder()
-                .deriveInsert(DERIVED_INSERT_IGNORE)
-                .deriveInsert(DERIVED_REPLACE)
-                .deriveInsert(DERIVED_INSERT_ON_DUPLICATE_KEY_UPDATE)
-                .deriveFind(DERIVED_FIND_LOCK_IN_SHARE_MODE)
-                .deriveFind(DERIVED_FIND_FOR_UPDATE)
-                .build();
+    protected void configureLexer(Lexer.Builder lexerBuilder) {
+        super.configureLexer(lexerBuilder);
+        lexerBuilder
+            .deriveInsert(DERIVED_INSERT_IGNORE)
+            .deriveInsert(DERIVED_REPLACE)
+            .deriveInsert(DERIVED_INSERT_ON_DUPLICATE_KEY_UPDATE)
+            .deriveFind(DERIVED_FIND_LOCK_IN_SHARE_MODE)
+            .deriveFind(DERIVED_FIND_FOR_UPDATE);
     }
 
     @Override
