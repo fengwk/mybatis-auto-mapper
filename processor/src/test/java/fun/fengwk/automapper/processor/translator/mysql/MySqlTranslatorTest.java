@@ -443,7 +443,7 @@ public class MySqlTranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"findAll\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "</select>\n" +
                 "</mapper>"
@@ -470,7 +470,7 @@ public class MySqlTranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"findAllOrderById\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    order by id\n" +
                 "</select>\n" +
@@ -501,7 +501,7 @@ public class MySqlTranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"findByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    <where>\n" +
                 "        username=#{username}\n" +
@@ -535,7 +535,7 @@ public class MySqlTranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"findLockInShareModeByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    <where>\n" +
                 "        username=#{username}\n" +
@@ -570,7 +570,7 @@ public class MySqlTranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"findForUpdateByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    <where>\n" +
                 "        username=#{username}\n" +
@@ -605,7 +605,7 @@ public class MySqlTranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"findByUsernameAndUserAddressOrderByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    <where>\n" +
                 "        username=#{username}\n" +
@@ -1043,7 +1043,7 @@ public class MySqlTranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"pageAll\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    limit #{offset},#{limit}\n" +
                 "</select>\n" +
@@ -1073,7 +1073,7 @@ public class MySqlTranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"pageAll\" parameterType=\"int\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    limit #{limit}\n" +
                 "</select>\n" +
@@ -1104,7 +1104,7 @@ public class MySqlTranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"pageAllOrderById\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    order by id\n" +
                 "    limit #{offset},#{limit}\n" +
@@ -1138,7 +1138,7 @@ public class MySqlTranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"pageByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    <where>\n" +
                 "        username=#{username}\n" +
@@ -1175,7 +1175,7 @@ public class MySqlTranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"pageByUsernameAndUserAddressOrderByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    <where>\n" +
                 "        username=#{username}\n" +

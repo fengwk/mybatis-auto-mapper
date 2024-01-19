@@ -7,13 +7,14 @@ import fun.fengwk.automapper.processor.mapper.GlobalConfig;
 import fun.fengwk.automapper.processor.mapper.MapperMethodParser;
 import fun.fengwk.automapper.processor.naming.NamingConverter;
 import fun.fengwk.automapper.processor.naming.NamingConverterFactory;
+import fun.fengwk.automapper.processor.naming.FieldNamingConvert;
+import fun.fengwk.automapper.processor.naming.TableNamingConvert;
 import fun.fengwk.automapper.processor.translator.MethodInfo;
 import fun.fengwk.automapper.processor.translator.TranslateContext;
 import fun.fengwk.automapper.processor.translator.Translator;
 import fun.fengwk.automapper.processor.translator.TranslatorFactory;
 import fun.fengwk.automapper.processor.util.DOMUtils;
 import fun.fengwk.automapper.processor.util.ExceptionUtils;
-import fun.fengwk.automapper.processor.util.StringUtils;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -102,6 +103,7 @@ public class AutoMapperProcessor extends AbstractProcessor {
                 findAnnotationMirror(mapperElement, AutoMapper.class), getGlobalConfig());
 
         DBType dbType = autoMapperInfo.getDbType();
+        String mapperName = mapperElement.getSimpleName().toString();
         String mapperSuffix = autoMapperInfo.getMapperSuffix();
         NamingStyle tableNamingStyle = autoMapperInfo.getTableNamingStyle();
         NamingStyle fieldNamingStyle = autoMapperInfo.getFieldNamingStyle();
@@ -109,26 +111,15 @@ public class AutoMapperProcessor extends AbstractProcessor {
         String tableNamePrefix = autoMapperInfo.getTableNamePrefix();
         String tableNameSuffix = autoMapperInfo.getTableNameSuffix();
 
-        NamingConverter tableNamingConverter = NamingConverterFactory.getInstance(tableNamingStyle);
-        NamingConverter fieldNamingConverter = NamingConverterFactory.getInstance(fieldNamingStyle);
+        NamingConverter tableNamingConverter = new TableNamingConvert(NamingConverterFactory.getInstance(tableNamingStyle),
+            mapperName, mapperSuffix, tableNamePrefix, tableNameSuffix);
+        NamingConverter fieldNamingConverter = new FieldNamingConvert(NamingConverterFactory.getInstance(fieldNamingStyle));
 
         // 命名空间
         String namespace = mapperElement.getQualifiedName().toString();
 
-        // 如果没有指定表名那么通过Mapper名称生成表名
-        if (tableName == null || tableName.isEmpty()) {
-            String mapperName = mapperElement.getSimpleName().toString();
-            tableName = mapperNameToTableName(mapperName, mapperSuffix, tableNamingConverter);
-        }
-
-        // 添加前缀
-        if (tableNamePrefix != null && !tableNamePrefix.isEmpty()) {
-            tableName = tableNamePrefix + tableName;
-        }
-        // 添加后缀
-        if (tableNameSuffix != null && !tableNameSuffix.isEmpty()) {
-            tableName = tableName + tableNameSuffix;
-        }
+        // 转换tableName
+        tableName = tableNamingConverter.convert(tableName);
 
         // 解析Mapper方法列表
         List<MethodInfo> methodInfoList = parseMethodInfoList(mapperElement, fieldNamingConverter);
@@ -182,13 +173,6 @@ public class AutoMapperProcessor extends AbstractProcessor {
             }
         }
         return globalConfig;
-    }
-
-    // Mapper名称转表名
-    private String mapperNameToTableName(String mapperName, String mapperSuffix, NamingConverter tableNamingConverter) {
-        String tableName = StringUtils.trimSuffix(mapperName, mapperSuffix);
-        tableName = StringUtils.upperCamelToLowerCamel(tableName);
-        return tableNamingConverter.convert(tableName);
     }
 
     private List<MethodInfo> parseMethodInfoList(TypeElement mapperElement, NamingConverter fieldNamingConverter) {

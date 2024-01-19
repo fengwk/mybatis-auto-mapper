@@ -366,7 +366,7 @@ public class Sql92TranslatorTest {
                         "\n" +
                         "<!--auto mapper generate-->\n" +
                         "<select id=\"findAll\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
+                        "    select id, username, user_address as `userAddress`\n" +
                         "    from demo\n" +
                         "</select>\n" +
                         "</mapper>"
@@ -393,7 +393,7 @@ public class Sql92TranslatorTest {
                         "\n" +
                         "<!--auto mapper generate-->\n" +
                         "<select id=\"findAllOrderById\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
+                        "    select id, username, user_address as `userAddress`\n" +
                         "    from demo\n" +
                         "    order by id\n" +
                         "</select>\n" +
@@ -423,7 +423,7 @@ public class Sql92TranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"findByIdIn\" parameterType=\"java.lang.Long\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    <where>\n" +
                 "        id in\n" +
@@ -459,7 +459,7 @@ public class Sql92TranslatorTest {
                         "\n" +
                         "<!--auto mapper generate-->\n" +
                         "<select id=\"findByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
+                        "    select id, username, user_address as `userAddress`\n" +
                         "    from demo\n" +
                         "    <where>\n" +
                         "        username=#{username}\n" +
@@ -493,7 +493,7 @@ public class Sql92TranslatorTest {
                         "\n" +
                         "<!--auto mapper generate-->\n" +
                         "<select id=\"findByUsernameAndUserAddressOrderByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
+                        "    select id, username, user_address as `userAddress`\n" +
                         "    from demo\n" +
                         "    <where>\n" +
                         "        username=#{username}\n" +
@@ -931,7 +931,7 @@ public class Sql92TranslatorTest {
                         "\n" +
                         "<!--auto mapper generate-->\n" +
                         "<select id=\"pageAll\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
+                        "    select id, username, user_address as `userAddress`\n" +
                         "    from demo\n" +
                         "    limit #{offset},#{limit}\n" +
                         "</select>\n" +
@@ -961,7 +961,7 @@ public class Sql92TranslatorTest {
                         "\n" +
                         "<!--auto mapper generate-->\n" +
                         "<select id=\"pageAll\" parameterType=\"int\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
+                        "    select id, username, user_address as `userAddress`\n" +
                         "    from demo\n" +
                         "    limit #{limit}\n" +
                         "</select>\n" +
@@ -992,7 +992,7 @@ public class Sql92TranslatorTest {
                         "\n" +
                         "<!--auto mapper generate-->\n" +
                         "<select id=\"pageAllOrderById\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
+                        "    select id, username, user_address as `userAddress`\n" +
                         "    from demo\n" +
                         "    order by id\n" +
                         "    limit #{offset},#{limit}\n" +
@@ -1026,7 +1026,7 @@ public class Sql92TranslatorTest {
                         "\n" +
                         "<!--auto mapper generate-->\n" +
                         "<select id=\"pageByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
+                        "    select id, username, user_address as `userAddress`\n" +
                         "    from demo\n" +
                         "    <where>\n" +
                         "        username=#{username}\n" +
@@ -1063,7 +1063,7 @@ public class Sql92TranslatorTest {
                         "\n" +
                         "<!--auto mapper generate-->\n" +
                         "<select id=\"pageByUsernameAndUserAddressOrderByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                        "    select id, username, user_address as userAddress\n" +
+                        "    select id, username, user_address as `userAddress`\n" +
                         "    from demo\n" +
                         "    <where>\n" +
                         "        username=#{username}\n" +
@@ -1099,7 +1099,7 @@ public class Sql92TranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"limitAll\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    limit #{offset},#{limit}\n" +
                 "</select>\n" +
@@ -1129,7 +1129,7 @@ public class Sql92TranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"limitAll\" parameterType=\"int\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    limit #{limit}\n" +
                 "</select>\n" +
@@ -1160,7 +1160,7 @@ public class Sql92TranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"limitAllOrderById\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    order by id\n" +
                 "    limit #{offset},#{limit}\n" +
@@ -1194,7 +1194,7 @@ public class Sql92TranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"limitByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    <where>\n" +
                 "        username=#{username}\n" +
@@ -1231,7 +1231,7 @@ public class Sql92TranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"limitByUsernameAndUserAddressOrderByUsernameAndUserAddress\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    <where>\n" +
                 "        username=#{username}\n" +
@@ -1266,7 +1266,7 @@ public class Sql92TranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"findAll\" parameterType=\"java.lang.String\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    order by ${orderBy}\n" +
                 "</select>\n" +
@@ -1298,7 +1298,7 @@ public class Sql92TranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"pageAll\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    order by ${orderBy}\n" +
                 "    limit #{offset},#{limit}\n" +
@@ -1330,7 +1330,7 @@ public class Sql92TranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"limitAll\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    order by ${orderBy}\n" +
                 "    limit #{limit}\n" +
@@ -1361,7 +1361,7 @@ public class Sql92TranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"findAll\" parameterType=\"java.lang.String\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    <if test=\"orderBy != null\">\n" +
                 "        order by ${orderBy}\n" +
@@ -1395,7 +1395,7 @@ public class Sql92TranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"pageAll\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    <if test=\"orderBy != null\">\n" +
                 "        order by ${orderBy}\n" +
@@ -1429,7 +1429,7 @@ public class Sql92TranslatorTest {
                 "\n" +
                 "<!--auto mapper generate-->\n" +
                 "<select id=\"limitAll\" resultType=\"DemoDO\">\n" +
-                "    select id, username, user_address as userAddress\n" +
+                "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    <if test=\"orderBy != null\">\n" +
                 "        order by ${orderBy}\n" +

@@ -485,7 +485,7 @@ public class Sql92Translator extends Translator {
 
         addTextNode(selectElement, LF, INDENT, "select ",
                 ret.getBeanFields().stream()
-                        .map(f -> f.getFieldName().equals(f.getName()) ? f.getFieldName() : String.format("%s as %s", f.getFieldName(), f.getName()))
+                        .map(f -> f.getFieldName().equals(f.getName()) ? f.getFieldName() : String.format("%s as `%s`", f.getFieldName(), f.getName()))
                         .collect(Collectors.joining(", ")),
                 LF, INDENT, "from ", tableName, LF
                 );
@@ -585,7 +585,7 @@ public class Sql92Translator extends Translator {
 
         addTextNode(selectElement, LF, INDENT, "select ",
                 ret.getBeanFields().stream()
-                        .map(f -> f.getFieldName().equals(f.getName()) ? f.getFieldName() : String.format("%s as %s", f.getFieldName(), f.getName()))
+                        .map(f -> f.getFieldName().equals(f.getName()) ? f.getFieldName() : String.format("%s as `%s`", f.getFieldName(), f.getName()))
                         .collect(Collectors.joining(", ")),
                 LF, INDENT, "from ", tableName, LF);
 
