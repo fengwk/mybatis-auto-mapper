@@ -229,29 +229,33 @@ public abstract class Translator {
     protected StmtElement addSelectElement(String id, String parameterType, Return ret) {
         String retType = ret.getType();
         String resultMapId;
-        if (ret.hasTypeHandler() && !appendedIdMap.containsKey(resultMapId = buildResultMapId(retType))) {
-            StmtElement resultMapStmtElement = addStmtElement("resultMap", resultMapId);
-            Element resultMapElement = resultMapStmtElement.getElement();
-            resultMapElement.setAttribute("type", ret.getType());
-            // fix mybatis schema (constructor?,id*,result*,association*,collection*,discriminator?)
-            List<BeanField> sortedBfs = ret.getBeanFields().stream()
-                .sorted(Comparator.comparing(bf -> bf.isId() ? 0 : 1)).collect(Collectors.toList());
-            for (BeanField bf : sortedBfs) {
-                Element itemElement;
-                if (bf.isId()) {
-                    addTextNode(resultMapElement, LF, INDENT);
-                    itemElement = addElement(resultMapElement, "id");
-                } else {
-                    addTextNode(resultMapElement, LF, INDENT);
-                    itemElement = addElement(resultMapElement, "result");
+        if (ret.hasTypeHandler()) {
+            // if result map stmt not exists, create it
+            if (!appendedIdMap.containsKey(resultMapId = buildResultMapId(retType))) {
+                StmtElement resultMapStmtElement = addStmtElement("resultMap", resultMapId);
+                Element resultMapElement = resultMapStmtElement.getElement();
+                resultMapElement.setAttribute("type", ret.getType());
+                // fix mybatis schema (constructor?,id*,result*,association*,collection*,discriminator?)
+                List<BeanField> sortedBfs = ret.getBeanFields().stream()
+                    .sorted(Comparator.comparing(bf -> bf.isId() ? 0 : 1)).collect(Collectors.toList());
+                for (BeanField bf : sortedBfs) {
+                    Element itemElement;
+                    if (bf.isId()) {
+                        addTextNode(resultMapElement, LF, INDENT);
+                        itemElement = addElement(resultMapElement, "id");
+                    } else {
+                        addTextNode(resultMapElement, LF, INDENT);
+                        itemElement = addElement(resultMapElement, "result");
+                    }
+                    itemElement.setAttribute("property", bf.getName());
+                    // fix column has been converted using "as", so we must use "getName" instead of "getFieldName".
+                    itemElement.setAttribute("column", bf.getName());
+                    if (bf.getTypeHandler() != null) {
+                        itemElement.setAttribute("typeHandler", bf.getTypeHandler());
+                    }
                 }
-                itemElement.setAttribute("property", bf.getName());
-                itemElement.setAttribute("column", bf.getFieldName());
-                if (bf.getTypeHandler() != null) {
-                    itemElement.setAttribute("typeHandler", bf.getTypeHandler());
-                }
+                resultMapStmtElement.append();
             }
-            resultMapStmtElement.append();
             StmtElement selectStmtElement = addStmtElement(TAG_SELECT, id);
             if (parameterType != null) {
                 selectStmtElement.getElement().setAttribute("parameterType", parameterType);
