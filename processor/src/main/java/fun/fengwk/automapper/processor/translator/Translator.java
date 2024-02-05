@@ -35,8 +35,11 @@ public abstract class Translator {
 
 
     protected static final String LIMIT_PAGE = "limit";
+    protected static final String ADD = "add";
+    protected static final String REMOVE = "remove";
     protected static final String GET = "get";
     protected static final String LIST = "list";
+    protected static final String SELECT = "select";
     protected static final String OFFSET = "offset";
     protected static final String LIMIT = "limit";
 
@@ -79,8 +82,11 @@ public abstract class Translator {
      */
     protected Lexer newLexer() {
         Lexer.Builder builder = new Lexer.Builder()
+            .deriveInsert(ADD)
+            .deriveDelete(REMOVE)
             .deriveFind(GET)
             .deriveFind(LIST)
+            .deriveFind(SELECT)
             .derivePage(LIMIT_PAGE);
         configureLexer(builder);
         return builder.build();
