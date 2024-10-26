@@ -76,7 +76,7 @@ public class MySqlTranslator extends Sql92Translator {
                             addTextNode(trimElement, LF, INDENT, INDENT);
                             Element ifElement = addElement(trimElement, "if");
                             ifElement.setAttribute("test", String.format("%s != null", bf.getName()));
-                            addTextNode(ifElement, String.format("%s=#{%s},", bf.getFieldName(), bf.getName()));
+                            addTextNode(ifElement, String.format("%s=#{%s},", bf.getFieldName(), bf.getVariableName()));
                         }
                     }
                     addTextNode(trimElement, LF, INDENT);
@@ -85,7 +85,7 @@ public class MySqlTranslator extends Sql92Translator {
                     addTextNode(insertElement, INDENT,  "on duplicate key update ",
                         param.getBeanFields().stream()
                             .filter(bf -> !bf.isUseGeneratedKeys())
-                            .map(bf -> String.format("%s=#{%s}", bf.getFieldName(), bf.getName()))
+                            .map(bf -> String.format("%s=#{%s}", bf.getFieldName(), bf.getVariableName()))
                             .collect(Collectors.joining(", ")),
                         LF, INDENT);
                 }

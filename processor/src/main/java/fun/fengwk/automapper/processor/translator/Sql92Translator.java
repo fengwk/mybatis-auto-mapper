@@ -3,26 +3,11 @@ package fun.fengwk.automapper.processor.translator;
 import fun.fengwk.automapper.annotation.DynamicOrderBy;
 import fun.fengwk.automapper.processor.lexer.Keyword;
 import fun.fengwk.automapper.processor.lexer.Token;
-import fun.fengwk.automapper.processor.parser.ast.ASTNode;
-import fun.fengwk.automapper.processor.parser.ast.By;
-import fun.fengwk.automapper.processor.parser.ast.ByOp;
-import fun.fengwk.automapper.processor.parser.ast.ConnectOp;
-import fun.fengwk.automapper.processor.parser.ast.Count;
-import fun.fengwk.automapper.processor.parser.ast.Delete;
-import fun.fengwk.automapper.processor.parser.ast.Find;
-import fun.fengwk.automapper.processor.parser.ast.Insert;
-import fun.fengwk.automapper.processor.parser.ast.OrderBy;
-import fun.fengwk.automapper.processor.parser.ast.OrderByOp;
-import fun.fengwk.automapper.processor.parser.ast.Page;
-import fun.fengwk.automapper.processor.parser.ast.Update;
-import fun.fengwk.automapper.processor.parser.ast.Variable;
+import fun.fengwk.automapper.processor.parser.ast.*;
 import fun.fengwk.automapper.processor.util.StringUtils;
 import org.w3c.dom.Element;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -126,12 +111,9 @@ public class Sql92Translator extends Translator {
     }
 
     private void translateInsert(Insert insert, String methodName, List<Param> params) {
-        // insert语句应当只有一个参数，是JavaBean或Iterable<JavaBean>
-        if (params.size() != 1) {
-            throw new TranslateException("%s should have only one param", methodName);
-        }
+        // insert语句应当只有一个参数或是一个被@EntityParam标记的参数，是JavaBean或Iterable<JavaBean>
+        Param param = getEntityParamRequired(params, methodName);
 
-        Param param = params.get(0);
         ASTNode child;
         if (insert.childrenSize() > 0
                 && (child = insert.getChild(0)) != null
@@ -184,13 +166,15 @@ public class Sql92Translator extends Translator {
                 INDENT);
 
         Element foreachElement = addElement(insertElement, "foreach");
-        foreachElement.setAttribute("collection", "collection");
+        foreachElement.setAttribute("collection", param instanceof DetectEntityParam ? param.getName() : "collection");
         foreachElement.setAttribute("item", "item");
         foreachElement.setAttribute("separator", ",");
 
         String foreachText = LF + INDENT + INDENT + "(" + param.getBeanFields().stream()
                 .filter(bf -> !bf.isUseGeneratedKeys())
-                .map(bf -> String.format("#{item.%s}", bf.getVariableName()))
+                .map(bf -> String.format("#{item.%s}",
+                    bf instanceof DetectEntityBeanField ? ((DetectEntityBeanField) bf).getCollectionItemVariableName()
+                        : bf.getVariableName()))
                 .collect(Collectors.joining(", ")) + ")" + LF + INDENT;
         addTextNode(foreachElement, foreachText);
 
@@ -213,7 +197,8 @@ public class Sql92Translator extends Translator {
 
         addTextNode(insertElement, LF, INDENT);
         Element foreachElement = addElement(insertElement, "foreach");
-        foreachElement.setAttribute("collection", "collection");
+        boolean isDetectEntityParam = param instanceof DetectEntityParam;
+        foreachElement.setAttribute("collection", isDetectEntityParam ? param.getName() : "collection");
         foreachElement.setAttribute("item", "item");
         foreachElement.setAttribute("separator", ";");
         addTextNode(foreachElement, LF, INDENT, INDENT, "insert into ", tableName, LF, INDENT, INDENT);
@@ -225,7 +210,9 @@ public class Sql92Translator extends Translator {
             if (!bf.isUseGeneratedKeys()) {
                 addTextNode(trimElement, LF, INDENT, INDENT, INDENT);
                 Element ifElement = addElement(trimElement, "if");
-                ifElement.setAttribute("test", String.format("item.%s != null", bf.getName()));
+                ifElement.setAttribute("test", String.format("item.%s != null",
+                    bf instanceof DetectEntityBeanField ? ((DetectEntityBeanField) bf).getCollectionItemName()
+                        : bf.getName()));
                 addTextNode(ifElement, bf.getFieldName(), ",");
             }
         }
@@ -240,8 +227,13 @@ public class Sql92Translator extends Translator {
             if (!bf.isUseGeneratedKeys()) {
                 addTextNode(trimElement, LF, INDENT, INDENT, INDENT);
                 Element ifElement = addElement(trimElement, "if");
-                ifElement.setAttribute("test", String.format("item.%s != null", bf.getName()));
-                addTextNode(ifElement, "#{item.", bf.getVariableName(), "},");
+                ifElement.setAttribute("test", String.format("item.%s != null",
+                    bf instanceof DetectEntityBeanField ? ((DetectEntityBeanField) bf).getCollectionItemName()
+                        : bf.getName()));
+                addTextNode(ifElement, "#{item.",
+                    bf instanceof DetectEntityBeanField ? ((DetectEntityBeanField) bf).getCollectionItemVariableName()
+                        : bf.getVariableName(),
+                    "},");
             }
         }
         addTextNode(trimElement, LF, INDENT, INDENT);
@@ -256,6 +248,9 @@ public class Sql92Translator extends Translator {
     private void translateInsertOne(Insert insert, String methodName, Param param) {
         if (!param.isJavaBean()) {
             throw new TranslateException("% should have java bean param", methodName);
+        }
+        if (param.isIterable()) {
+            throw new TranslateException("%s can not be iterable param", methodName);
         }
 
         /*
@@ -287,6 +282,9 @@ public class Sql92Translator extends Translator {
     private void translateInsertOneSelective(Insert insert, String methodName, Param param) {
         if (!param.isJavaBean()) {
             throw new TranslateException("% should have java bean param", methodName);
+        }
+        if (param.isIterable()) {
+            throw new TranslateException("%s can not be iterable param", methodName);
         }
 
         StmtElement insertStmtElement = addInsertElement(methodName, param.getType(), param.findUseGeneratedKeysField());
@@ -380,11 +378,8 @@ public class Sql92Translator extends Translator {
     }
 
     private void translateUpdate(Update update, String methodName, List<Param> params) {
-        if (params.size() != 1) {
-            throw new TranslateException("%s should have only one param", methodName);
-        }
+        Param param = getEntityParamRequired(params, methodName);
 
-        Param param = params.get(0);
         if (!param.isJavaBean()) {
             throw new TranslateException("%s should have java bean param", methodName);
         }
@@ -423,11 +418,8 @@ public class Sql92Translator extends Translator {
     }
 
     private void translateUpdateSelective(Update update, String methodName, List<Param> params) {
-        if (params.size() != 1) {
-            throw new TranslateException("%s should have only one param", methodName);
-        }
+        Param param = getEntityParamRequired(params, methodName);
 
-        Param param = params.get(0);
         if (!param.isJavaBean()) {
             throw new TranslateException("%s should have java bean param", methodName);
         }
@@ -744,6 +736,34 @@ public class Sql92Translator extends Translator {
 
         Variable variable = (Variable) orderByOp.getChild(0);
         translator.accept(fieldNamingConverter.convert(StringUtils.upperCamelToLowerCamel(variable.getLexeme().getValue())), texts -> addTextNode(parent, texts));
+    }
+
+    private Param getEntityParamRequired(List<Param> params, String methodName) {
+        // 获取JavaBean或Iterable<JavaBean>
+        Param param;
+        if (params.size() != 1) {
+            param = detectEntityParam(params);
+            if (param == null) {
+                throw new TranslateException("%s can not infer entity param", methodName);
+            }
+        } else {
+            param = params.get(0);
+        }
+        return param;
+    }
+
+    private Param detectEntityParam(List<Param> params) {
+        // 如果只有一个javaBean则推测该javaBean为param
+        List<Param> javaBeanParams = new ArrayList<>();
+        for (Param param : params) {
+            if (param.isJavaBean() && param.getName() != null && !param.isInferredName()) {
+                javaBeanParams.add(param);
+            }
+        }
+        if (javaBeanParams.size() == 1) {
+            return new DetectEntityParam(javaBeanParams.get(0));
+        }
+        return null;
     }
 
     @FunctionalInterface
