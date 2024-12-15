@@ -1,5 +1,6 @@
 package fun.fengwk.automapper.example.model;
 
+import fun.fengwk.automapper.annotation.OnDuplicateKeyUpdateIgnore;
 import fun.fengwk.automapper.annotation.UpdateIncrement;
 
 /**
@@ -17,6 +18,7 @@ public class ExampleDO extends BaseDO {
     private String name;
     private Integer sort;
 
+    @OnDuplicateKeyUpdateIgnore
     private String f1;
     private String f2;
     private String f3;

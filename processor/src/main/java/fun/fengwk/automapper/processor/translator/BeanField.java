@@ -50,8 +50,14 @@ public class BeanField implements SelectiveNameEntry {
      */
     private final boolean includeField;
 
+    /**
+     * 是否包含OnDuplicateKeyUpdateIgnore
+     */
+    private final boolean onDuplicateKeyUpdateIgnore;
+
     public BeanField(String name, String fieldName, boolean useGeneratedKeys, boolean isSelective,
-                     String updateIncrement, String typeHandler, boolean id, boolean excludeField, boolean includeField) {
+                     String updateIncrement, String typeHandler, boolean id, boolean excludeField, boolean includeField,
+                     boolean onDuplicateKeyUpdateIgnore) {
         this.name = name;
         this.fieldName = fieldName;
         this.useGeneratedKeys = useGeneratedKeys;
@@ -61,6 +67,7 @@ public class BeanField implements SelectiveNameEntry {
         this.id = id;
         this.excludeField = excludeField;
         this.includeField = includeField;
+        this.onDuplicateKeyUpdateIgnore = onDuplicateKeyUpdateIgnore;
     }
 
     public String getName() {
@@ -117,4 +124,9 @@ public class BeanField implements SelectiveNameEntry {
     public boolean isIncludeField() {
         return includeField;
     }
+
+    public boolean isOnDuplicateKeyUpdateIgnore() {
+        return onDuplicateKeyUpdateIgnore;
+    }
+
 }

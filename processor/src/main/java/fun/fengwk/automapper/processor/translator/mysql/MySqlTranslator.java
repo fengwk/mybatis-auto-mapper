@@ -72,7 +72,7 @@ public class MySqlTranslator extends Sql92Translator {
                     trimElement.setAttribute("prefix", "on duplicate key update ");
                     trimElement.setAttribute("suffixOverrides", ",");
                     for (BeanField bf : param.getBeanFields()) {
-                        if (!bf.isUseGeneratedKeys()) {
+                        if (!bf.isUseGeneratedKeys() && !bf.isOnDuplicateKeyUpdateIgnore()) {
                             addTextNode(trimElement, LF, INDENT, INDENT);
                             Element ifElement = addElement(trimElement, "if");
                             ifElement.setAttribute("test", String.format("%s != null", bf.getName()));
@@ -84,7 +84,7 @@ public class MySqlTranslator extends Sql92Translator {
                 } else {
                     addTextNode(insertElement, INDENT,  "on duplicate key update ",
                         param.getBeanFields().stream()
-                            .filter(bf -> !bf.isUseGeneratedKeys())
+                            .filter(bf -> !bf.isUseGeneratedKeys() && !bf.isOnDuplicateKeyUpdateIgnore())
                             .map(bf -> String.format("%s=#{%s}", bf.getFieldName(), bf.getVariableName()))
                             .collect(Collectors.joining(", ")),
                         LF, INDENT);

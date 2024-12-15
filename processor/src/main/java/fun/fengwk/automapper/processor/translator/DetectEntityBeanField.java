@@ -10,7 +10,8 @@ public class DetectEntityBeanField extends BeanField {
     public DetectEntityBeanField(BeanField beanField, String paramName) {
         super(beanField.getName(), beanField.getFieldName(), beanField.isUseGeneratedKeys(),
             beanField.isSelective(), beanField.getUpdateIncrement(), beanField.getTypeHandler(),
-            beanField.isId(), beanField.isExcludeField(), beanField.isIncludeField());
+            beanField.isId(), beanField.isExcludeField(), beanField.isIncludeField(),
+            beanField.isOnDuplicateKeyUpdateIgnore());
         this.paramName = paramName;
     }
 

@@ -534,8 +534,10 @@ public class MapperMethodParser {
             ExcludeField.List excludeFieldList = element.getAnnotation(ExcludeField.List.class);
             IncludeField includeField = element.getAnnotation(IncludeField.class);
             IncludeField.List includeFieldList = element.getAnnotation(IncludeField.List.class);
+            OnDuplicateKeyUpdateIgnore onDuplicateKeyUpdateIgnore = element.getAnnotation(OnDuplicateKeyUpdateIgnore.class);
             return new BeanFieldSource(fieldNameAnnotation, useGeneratedKeysAnnotation,
-                selective,updateIncrement, typeHandler, id, excludeField, excludeFieldList, includeField, includeFieldList);
+                selective,updateIncrement, typeHandler, id, excludeField, excludeFieldList, includeField, includeFieldList,
+                onDuplicateKeyUpdateIgnore);
         }
 
         private void putBeanFieldMap(
@@ -552,9 +554,11 @@ public class MapperMethodParser {
                 boolean id = bfs.getId() != null || bfs.getUseGeneratedKeysAnnotation() != null;
                 boolean excludeField = bfs.getExcludeField() != null || bfs.getExcludeFieldList() != null;
                 boolean includeField = bfs.getIncludeField() != null || bfs.getIncludeFieldList() != null;
+                OnDuplicateKeyUpdateIgnore onDuplicateKeyUpdateIgnoreAnnotation = bfs.getOnDuplicateKeyUpdateIgnore();
+                boolean onDuplicateKeyUpdateIgnore = onDuplicateKeyUpdateIgnoreAnnotation != null;
                 beanFieldMap.put(name, new BeanField(name, fieldName, useGeneratedKeys,
                     bfs.getSelective() != null, updateIncrement, typeHandler, id,
-                    excludeField, includeField));
+                    excludeField, includeField, onDuplicateKeyUpdateIgnore));
             }
         }
 
@@ -599,11 +603,13 @@ public class MapperMethodParser {
         private ExcludeField.List excludeFieldList;
         private IncludeField includeField;
         private IncludeField.List includeFieldList;
+        private OnDuplicateKeyUpdateIgnore onDuplicateKeyUpdateIgnore;
 
         BeanFieldSource(FieldName fieldNameAnnotation, UseGeneratedKeys useGeneratedKeysAnnotation,
                         Selective selective, UpdateIncrement updateIncrement, TypeHandler typeHandler, Id id,
                         ExcludeField excludeField, ExcludeField.List excludeFieldList,
-                        IncludeField includeField, IncludeField.List includeFieldList) {
+                        IncludeField includeField, IncludeField.List includeFieldList,
+                        OnDuplicateKeyUpdateIgnore onDuplicateKeyUpdateIgnore) {
             this.fieldNameAnnotation = fieldNameAnnotation;
             this.useGeneratedKeysAnnotation = useGeneratedKeysAnnotation;
             this.selective = selective;
@@ -614,6 +620,7 @@ public class MapperMethodParser {
             this.excludeFieldList = excludeFieldList;
             this.includeField = includeField;
             this.includeFieldList = includeFieldList;
+            this.onDuplicateKeyUpdateIgnore = onDuplicateKeyUpdateIgnore;
         }
 
         public FieldName getFieldNameAnnotation() {
@@ -656,6 +663,10 @@ public class MapperMethodParser {
             return includeFieldList;
         }
 
+        public OnDuplicateKeyUpdateIgnore getOnDuplicateKeyUpdateIgnore() {
+            return onDuplicateKeyUpdateIgnore;
+        }
+
         public void merge(BeanFieldSource other) {
             if (fieldNameAnnotation == null) {
                 fieldNameAnnotation = other.getFieldNameAnnotation();
@@ -686,6 +697,9 @@ public class MapperMethodParser {
             }
             if (includeFieldList == null) {
                 includeFieldList = other.getIncludeFieldList();
+            }
+            if (onDuplicateKeyUpdateIgnore == null) {
+                onDuplicateKeyUpdateIgnore = other.getOnDuplicateKeyUpdateIgnore();
             }
         }
     }
