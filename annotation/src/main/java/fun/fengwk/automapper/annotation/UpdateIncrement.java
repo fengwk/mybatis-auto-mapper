@@ -17,6 +17,6 @@ public @interface UpdateIncrement {
     /**
      * 递增值。
      */
-    String value() default "1";
+    String value() default "+1";
 
 }

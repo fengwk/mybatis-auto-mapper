@@ -74,9 +74,13 @@ public class MySqlTranslator extends Sql92Translator {
                     for (BeanField bf : param.getBeanFields()) {
                         if (!bf.isUseGeneratedKeys() && !bf.isOnDuplicateKeyUpdateIgnore()) {
                             addTextNode(trimElement, LF, INDENT, INDENT);
-                            Element ifElement = addElement(trimElement, "if");
-                            ifElement.setAttribute("test", String.format("%s != null", bf.getName()));
-                            addTextNode(ifElement, String.format("%s=#{%s},", bf.getFieldName(), bf.getVariableName()));
+                            if (bf.getUpdateIncrement() == null || bf.getUpdateIncrement().isEmpty()) {
+                                Element ifElement = addElement(trimElement, "if");
+                                ifElement.setAttribute("test", String.format("%s != null", bf.getName()));
+                                addTextNode(ifElement, String.format("%s=#{%s},", bf.getFieldName(), bf.getVariableName()));
+                            } else {
+                                addTextNode(trimElement, String.format("%s=%s%s,", bf.getFieldName(), bf.getFieldName(), bf.getUpdateIncrement()));
+                            }
                         }
                     }
                     addTextNode(trimElement, LF, INDENT);
@@ -85,7 +89,13 @@ public class MySqlTranslator extends Sql92Translator {
                     addTextNode(insertElement, INDENT,  "on duplicate key update ",
                         param.getBeanFields().stream()
                             .filter(bf -> !bf.isUseGeneratedKeys() && !bf.isOnDuplicateKeyUpdateIgnore())
-                            .map(bf -> String.format("%s=#{%s}", bf.getFieldName(), bf.getVariableName()))
+                            .map(bf -> {
+                                if (bf.getUpdateIncrement() == null || bf.getUpdateIncrement().isEmpty()) {
+                                    return String.format("%s=#{%s}", bf.getFieldName(), bf.getVariableName());
+                                } else {
+                                    return String.format("%s=%s%s", bf.getFieldName(), bf.getFieldName(), bf.getUpdateIncrement());
+                                }
+                            })
                             .collect(Collectors.joining(", ")),
                         LF, INDENT);
                 }

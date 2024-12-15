@@ -289,7 +289,7 @@ public class Sql92TranslatorTest {
 
         BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false, false);
         BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, "1", null, false, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, "+1", null, false, false, false, false);
 
         Param p = new Param("DemoDO", "DemoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
@@ -318,7 +318,7 @@ public class Sql92TranslatorTest {
 
         BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false, false);
         BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false, false);
-        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, "1", null, false, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, "+1", null, false, false, false, false);
 
         Param p = new Param("DemoDO", "DemoDO", null, null, false, false, false, true, Arrays.asList(bf1, bf2, bf3), false, false);
 
