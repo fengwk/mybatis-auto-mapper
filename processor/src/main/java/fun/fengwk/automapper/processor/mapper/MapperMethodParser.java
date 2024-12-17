@@ -325,7 +325,7 @@ public class MapperMethodParser {
                             return initRes;
                         }
                         return false;
-                    } else if (isJavaDeclared(typeMirror)) {
+                    } else if (isJavaDeclared(typeMirror) || isEnum(typeMirror)) {
                         TypeElement typeElement = ((TypeElement) types.asElement(typeMirror));
                         type = typeElement.getQualifiedName().toString();
                         fullType = type;
@@ -433,6 +433,16 @@ public class MapperMethodParser {
 //                    || name.startsWith("org.xml.sax")
 //                    || name.startsWith("sun.")
                     ;
+        }
+
+        private boolean isEnum(TypeMirror typeMirror) {
+            TypeElement typeElement = (TypeElement) types.asElement(typeMirror);
+            TypeMirror superclass = typeElement.getSuperclass();
+            if (superclass != null) {
+                TypeElement superTypeElement = (TypeElement) types.asElement(superclass);
+                return Objects.equals(superTypeElement.getQualifiedName().toString(), "java.lang.Enum");
+            }
+            return false;
         }
 
         // 解析JavaBean
