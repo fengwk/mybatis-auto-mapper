@@ -12,6 +12,9 @@
 
     <artifactId>auto-mapper-processor</artifactId>
 
+    <name>auto-mapper-processor</name>
+    <description>Compile-time SQL generator for MyBatis mapper interfaces.</description>
+
     <dependencies>
         <dependency>
             <groupId>fun.fengwk.auto-mapper</groupId>

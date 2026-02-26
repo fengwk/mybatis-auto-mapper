@@ -11,4 +11,7 @@
     </parent>
 
     <artifactId>auto-mapper-mybatis</artifactId>
+
+    <name>auto-mapper-mybatis</name>
+    <description>Minimal MyBatis API definitions for auto-mapper processor.</description>
 </project>

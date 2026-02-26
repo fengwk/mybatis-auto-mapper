@@ -12,6 +12,9 @@
 
     <artifactId>auto-mapper-example</artifactId>
 
+    <name>auto-mapper-example</name>
+    <description>Spring Boot integration example for auto-mapper.</description>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

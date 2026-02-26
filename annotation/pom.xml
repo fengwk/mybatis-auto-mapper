@@ -12,6 +12,9 @@
 
     <artifactId>auto-mapper-annotation</artifactId>
 
+    <name>auto-mapper-annotation</name>
+    <description>Annotation definitions for auto-mapper.</description>
+
     <dependencies>
         <dependency>
             <groupId>fun.fengwk.auto-mapper</groupId>
