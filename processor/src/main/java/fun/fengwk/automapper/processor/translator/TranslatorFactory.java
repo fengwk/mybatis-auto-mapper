@@ -3,6 +3,8 @@ package fun.fengwk.automapper.processor.translator;
 import fun.fengwk.automapper.annotation.DBType;
 import fun.fengwk.automapper.processor.AutoMapperException;
 import fun.fengwk.automapper.processor.translator.mysql.MySqlTranslator;
+import fun.fengwk.automapper.processor.translator.postgresql.PostgreSqlTranslator;
+import fun.fengwk.automapper.processor.translator.sqlite.SQLiteTranslator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +21,8 @@ public class TranslatorFactory {
         Map<DBType, Function<TranslateContext, Translator>> registry = new HashMap<>();
         registry.put(DBType.SQL92, Sql92Translator::new);
         registry.put(DBType.MYSQL, MySqlTranslator::new);
+        registry.put(DBType.POSTGRESQL, PostgreSqlTranslator::new);
+        registry.put(DBType.SQLITE, SQLiteTranslator::new);
         REGISTRY = registry;
     }
 

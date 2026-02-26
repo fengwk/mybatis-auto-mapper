@@ -13,6 +13,16 @@ public enum DBType {
     /**
      * 生成的语句部分仅支持MySQL语法。
      */
-    MYSQL;
+    MYSQL,
+
+    /**
+     * 生成的语句部分仅支持PostgreSQL语法。
+     */
+    POSTGRESQL,
+
+    /**
+     * 生成的语句部分仅支持SQLite语法。
+     */
+    SQLITE;
 
 }

@@ -10,6 +10,7 @@ import fun.fengwk.automapper.processor.naming.NamingConverterFactory;
 import fun.fengwk.automapper.processor.naming.FieldNamingConvert;
 import fun.fengwk.automapper.processor.naming.TableNamingConvert;
 import fun.fengwk.automapper.processor.translator.MethodInfo;
+import fun.fengwk.automapper.processor.translator.Sql92Translator;
 import fun.fengwk.automapper.processor.translator.TranslateContext;
 import fun.fengwk.automapper.processor.translator.Translator;
 import fun.fengwk.automapper.processor.translator.TranslatorFactory;
@@ -110,10 +111,11 @@ public class AutoMapperProcessor extends AbstractProcessor {
         String tableName = autoMapperInfo.getTableName();
         String tableNamePrefix = autoMapperInfo.getTableNamePrefix();
         String tableNameSuffix = autoMapperInfo.getTableNameSuffix();
+        String identifierQuote = Sql92Translator.resolveIdentifierQuote(dbType);
 
         NamingConverter tableNamingConverter = new TableNamingConvert(NamingConverterFactory.getInstance(tableNamingStyle),
-            mapperName, mapperSuffix, tableNamePrefix, tableNameSuffix);
-        NamingConverter fieldNamingConverter = new FieldNamingConvert(NamingConverterFactory.getInstance(fieldNamingStyle));
+            mapperName, mapperSuffix, tableNamePrefix, tableNameSuffix, identifierQuote);
+        NamingConverter fieldNamingConverter = new FieldNamingConvert(NamingConverterFactory.getInstance(fieldNamingStyle), identifierQuote);
 
         // 命名空间
         String namespace = mapperElement.getQualifiedName().toString();

@@ -8,14 +8,16 @@ package fun.fengwk.automapper.processor.naming;
 public class FieldNamingConvert implements NamingConverter {
 
     protected final NamingConverter delegate;
+    protected final String quote;
 
-    public FieldNamingConvert(NamingConverter delegate) {
+    public FieldNamingConvert(NamingConverter delegate, String quote) {
         this.delegate = delegate;
+        this.quote = quote;
     }
 
     @Override
     public String convert(String name) {
-        return "`" + delegate.convert(name) + "`";
+        return quote + delegate.convert(name) + quote;
     }
 
 }

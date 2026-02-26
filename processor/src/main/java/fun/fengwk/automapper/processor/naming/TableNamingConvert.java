@@ -12,14 +12,16 @@ public class TableNamingConvert implements NamingConverter {
     private final String mapperSuffix;
     private final String tableNamePrefix;
     private final String tableNameSuffix;
+    private final String quote;
 
     public TableNamingConvert(NamingConverter delegate, String mapperName, String mapperSuffix,
-                              String tableNamePrefix, String tableNameSuffix) {
+                              String tableNamePrefix, String tableNameSuffix, String quote) {
         this.delegate = delegate;
         this.mapperName = mapperName;
         this.mapperSuffix = mapperSuffix;
         this.tableNamePrefix = tableNamePrefix;
         this.tableNameSuffix = tableNameSuffix;
+        this.quote = quote;
     }
 
     @Override
@@ -41,7 +43,7 @@ public class TableNamingConvert implements NamingConverter {
             tableName = tableName + tableNameSuffix;
         }
 
-        return "`" + tableName + "`";
+        return quoteQualifiedIdentifier(tableName);
     }
 
     // Mapper名称转表名
@@ -49,6 +51,42 @@ public class TableNamingConvert implements NamingConverter {
         String tableName = StringUtils.trimSuffix(mapperName, mapperSuffix);
         tableName = StringUtils.upperCamelToLowerCamel(tableName);
         return delegate.convert(tableName);
+    }
+
+    private String quoteQualifiedIdentifier(String identifier) {
+        if (identifier == null || identifier.isEmpty()) {
+            return identifier;
+        }
+        if (isQuoted(identifier)) {
+            return identifier;
+        }
+
+        String[] identifierParts = identifier.split("\\.", -1);
+        if (identifierParts.length == 1) {
+            return quoteIdentifier(identifier);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < identifierParts.length; i++) {
+            if (i > 0) {
+                sb.append('.');
+            }
+
+            String identifierPart = identifierParts[i];
+            if (!identifierPart.isEmpty()) {
+                sb.append(quoteIdentifier(identifierPart));
+            }
+        }
+        return sb.toString();
+    }
+
+    private String quoteIdentifier(String identifier) {
+        return isQuoted(identifier) ? identifier : quote + identifier + quote;
+    }
+
+    private boolean isQuoted(String identifier) {
+        return (identifier.startsWith("`") && identifier.endsWith("`"))
+            || (identifier.startsWith("\"") && identifier.endsWith("\""));
     }
 
 }

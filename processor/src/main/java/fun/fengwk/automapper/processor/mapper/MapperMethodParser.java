@@ -266,7 +266,10 @@ public class MapperMethodParser {
                     result.add(bf);
                 }
             } else if (includeMode) {
-                if (bf.isIncludeField() && (includeFieldNames == null || includeFieldNames.contains(bf.getName()))) {
+                boolean include = includeFieldNames != null
+                    ? includeFieldNames.contains(bf.getName())
+                    : bf.isIncludeField();
+                if (include) {
                     result.add(bf);
                 }
             } else {

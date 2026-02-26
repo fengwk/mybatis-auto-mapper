@@ -1,5 +1,6 @@
 package fun.fengwk.automapper.processor.translator.mysql;
 
+import fun.fengwk.automapper.annotation.DBType;
 import fun.fengwk.automapper.processor.lexer.DerivedToken;
 import fun.fengwk.automapper.processor.lexer.Keyword;
 import fun.fengwk.automapper.processor.lexer.Lexer;
@@ -31,6 +32,12 @@ public class MySqlTranslator extends Sql92Translator {
 
     public MySqlTranslator(TranslateContext translateContext) {
         super(translateContext);
+    }
+
+    @Override
+    protected String quoteIdentifier(String identifier) {
+        String quote = resolveIdentifierQuote(DBType.MYSQL);
+        return quote + identifier + quote;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package fun.fengwk.automapper.processor.translator;
 
+import fun.fengwk.automapper.annotation.DBType;
 import fun.fengwk.automapper.annotation.DynamicOrderBy;
 import fun.fengwk.automapper.processor.lexer.Keyword;
 import fun.fengwk.automapper.processor.lexer.Token;
@@ -79,6 +80,22 @@ public class Sql92Translator extends Translator {
         orderByTranslatorMap.put(Keyword.ASC, (fieldName, addTextNode) -> addTextNode.accept(String.format("%s", fieldName)));
         orderByTranslatorMap.put(Keyword.DESC, (fieldName, addTextNode) -> addTextNode.accept(String.format("%s desc", fieldName)));
         return orderByTranslatorMap;
+    }
+
+    public static String resolveIdentifierQuote(DBType dbType) {
+        return dbType == DBType.MYSQL ? "`" : "\"";
+    }
+
+    protected String quoteIdentifier(String identifier) {
+        String quote = resolveIdentifierQuote(DBType.SQL92);
+        return quote + identifier + quote;
+    }
+
+    protected String formatSelectField(BeanField beanField) {
+        if (beanField.getFieldName().equals(beanField.getName())) {
+            return beanField.getFieldName();
+        }
+        return String.format("%s as %s", beanField.getFieldName(), quoteIdentifier(beanField.getName()));
     }
 
     @Override
@@ -184,7 +201,7 @@ public class Sql92Translator extends Translator {
         insertStmtElement.append();
     }
 
-    private void translateInsertAllSelective(Insert insert, String methodName, Param param) {
+    protected void translateInsertAllSelective(Insert insert, String methodName, Param param) {
         if (!param.isIterable()) {
             throw new TranslateException("%s should have iterable param", methodName);
         }
@@ -477,7 +494,7 @@ public class Sql92Translator extends Translator {
 
         addTextNode(selectElement, LF, INDENT, "select ",
                 ret.getBeanFields().stream()
-                        .map(f -> f.getFieldName().equals(f.getName()) ? f.getFieldName() : String.format("%s as `%s`", f.getFieldName(), f.getName()))
+                        .map(this::formatSelectField)
                         .collect(Collectors.joining(", ")),
                 LF, INDENT, "from ", tableName, LF
                 );
@@ -577,7 +594,7 @@ public class Sql92Translator extends Translator {
 
         addTextNode(selectElement, LF, INDENT, "select ",
                 ret.getBeanFields().stream()
-                        .map(f -> f.getFieldName().equals(f.getName()) ? f.getFieldName() : String.format("%s as `%s`", f.getFieldName(), f.getName()))
+                        .map(this::formatSelectField)
                         .collect(Collectors.joining(", ")),
                 LF, INDENT, "from ", tableName, LF);
 
@@ -612,16 +629,20 @@ public class Sql92Translator extends Translator {
             }
         }
 
-        addTextNode(selectElement, INDENT, "limit ");
-        if (offset != null) {
-            addTextNode(selectElement, "#{offset},");
-        }
-        addTextNode(selectElement, "#{limit}", LF);
+        appendPageClause(selectElement, offset, limit);
 
         // for subclass
         postProcessPage(page, selectElement);
 
         selectStmtElement.append();
+    }
+
+    protected void appendPageClause(Element selectElement, SelectiveNameEntry offset, SelectiveNameEntry limit) {
+        addTextNode(selectElement, INDENT, "limit #{", limit.getVariableName(), "}");
+        if (offset != null) {
+            addTextNode(selectElement, " offset #{", offset.getVariableName(), "}");
+        }
+        addTextNode(selectElement, LF);
     }
 
     private boolean isIntOrLong(String type) {

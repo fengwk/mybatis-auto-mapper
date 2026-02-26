@@ -1041,7 +1041,7 @@ public class MySqlTranslatorTest {
                 "<select id=\"pageAll\" resultType=\"DemoDO\">\n" +
                 "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
-                "    limit #{offset},#{limit}\n" +
+                "    limit #{limit} offset #{offset}\n" +
                 "</select>\n" +
                 "</mapper>"
         );
@@ -1103,7 +1103,7 @@ public class MySqlTranslatorTest {
                 "    select id, username, user_address as `userAddress`\n" +
                 "    from demo\n" +
                 "    order by id\n" +
-                "    limit #{offset},#{limit}\n" +
+                "    limit #{limit} offset #{offset}\n" +
                 "</select>\n" +
                 "</mapper>"
         );
@@ -1140,7 +1140,7 @@ public class MySqlTranslatorTest {
                 "        username=#{username}\n" +
                 "        and user_address=#{userAddress}\n" +
                 "    </where>\n" +
-                "    limit #{offset},#{limit}\n" +
+                "    limit #{limit} offset #{offset}\n" +
                 "</select>\n" +
                 "</mapper>"
         );
@@ -1178,7 +1178,38 @@ public class MySqlTranslatorTest {
                 "        and user_address=#{userAddress}\n" +
                 "    </where>\n" +
                 "    order by username, user_address\n" +
-                "    limit #{offset},#{limit}\n" +
+                "    limit #{limit} offset #{offset}\n" +
+                "</select>\n" +
+                "</mapper>"
+        );
+    }
+
+    @Test
+    public void testLimitAll1() {
+        String methodName = "limitAll";
+
+        Param p1 = new Param("int", "int", "offset", "offset", false, false, false, false, null, false, false);
+        Param p2 = new Param("int", "int", "limit", "limit", false, false, false, false, null, false, false);
+
+        BeanField bf1 = new BeanField("id", "id", true, false, null, null, true, false, false, false);
+        BeanField bf2 = new BeanField("username", "username", false, false, null, null, false, false, false, false);
+        BeanField bf3 = new BeanField("userAddress", "user_address", false, false, null, null, false, false, false, false);
+
+        Return ret = new Return("DemoDO", true, Arrays.asList(bf1, bf2, bf3));
+
+        MySqlTranslator translator = new MySqlTranslator(new TranslateContext("demo", "demo", new LowerUnderScoreCaseConverter()));
+        translator.translate(new MethodInfo(methodName, Arrays.asList(p1, p2), ret, false));
+
+        assert DOMUtils.toString(translator.getDocument()).equals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                "<mapper namespace=\"demo\">\n" +
+                "\n" +
+                "<!--auto mapper generate-->\n" +
+                "<select id=\"limitAll\" resultType=\"DemoDO\">\n" +
+                "    select id, username, user_address as `userAddress`\n" +
+                "    from demo\n" +
+                "    limit #{limit} offset #{offset}\n" +
                 "</select>\n" +
                 "</mapper>"
         );

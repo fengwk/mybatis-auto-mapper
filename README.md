@@ -1,381 +1,328 @@
 # AutoMapper
 
-AutoMapper是一款适用于Mybatis的SQL生成插件，提供了JPA风格的SQL语句生成能力，用户仅需依赖一个编译期jar包，就能在编译期根据Mapper接口中的方法定义生成相应的XML文件和SQL语句。就像流行的Lombok一样，一切发生在编译期间，因此不会对软件性能造成任何影响，并且用户可以直接在编译完成的target目录或jar中看到生成的SQL语句。
+AutoMapper 是一个 **MyBatis 编译期 SQL 生成器**。你只需要在 Mapper 接口上声明方法并加 `@AutoMapper`，框架会在编译期生成或增量更新对应 XML。
 
-# 效果展示
-
-下方动图演示了在idea上插件在编译时动态生成SQL的效果，您可以通过Build -> ReBuild Project达到一样的效果。
+- 纯编译期生效，运行时无额外开销。
+- 与手写 XML 共存：同 `id` 的语句会跳过，不会覆盖。
+- 支持 SQL92、MySQL、PostgreSQL、SQLite 方言（MySQL 支持更多派生语法）。
 
 ![idea.gif](./doc/idea.gif)
 
-无论您使用的是什么开发环境，只要编译器是按照标准实现的，都能生成成功。另外在打包发布时，这个过程是无感的，因为在打包编译的过程中AutoMapper会自动生效。
+## 目录
 
-# 快速开始
+- [1. 模块说明](#1-模块说明)
+- [2. 5 分钟快速开始](#2-5-分钟快速开始)
+- [3. 方法命名语法](#3-方法命名语法)
+- [4. 注解说明](#4-注解说明)
+- [5. 全局配置](#5-全局配置)
+- [6. 方言支持与差异](#6-方言支持与差异)
+- [7. MySQL 扩展](#7-mysql-扩展)
+- [8. 与手写 XML 共存](#8-与手写-xml-共存)
+- [9. Example 模块运行](#9-example-模块运行)
+- [10. 常见问题与排查](#10-常见问题与排查)
 
-首先需要在项目的编译阶段依赖AutoMapper，如果您正在使用maven管理项目，那么添加如下依赖即可：
+## 1. 模块说明
+
+- `auto-mapper-annotation`：对外注解（`@AutoMapper`、`@FieldName` 等）。
+- `auto-mapper-processor`：注解处理器核心，编译期解析方法并生成 SQL。
+- `auto-mapper-mybatis`：最小化的 MyBatis 注解/类型定义，降低编译期耦合。
+- `auto-mapper-example`：Spring Boot + MyBatis 的完整接入示例。
+
+## 2. 5 分钟快速开始
+
+### 2.1 添加依赖
+
+Maven:
 
 ```xml
 <dependency>
     <groupId>fun.fengwk.auto-mapper</groupId>
     <artifactId>auto-mapper-processor</artifactId>
+    <version>1.0.0</version>
     <scope>provided</scope>
-    <version>0.0.49</version>
 </dependency>
 ```
 
-常见的Mybatis使用方式是编写一个`*Mapper.java`文件在其中定义接口方法，然后编写一个`*Mapper.xml`文件实现接口方法的SQL语句。例如example模块中（tips：example模块中展示了如何在spring-boot项目里使用AutoMapper）就有`ExampleMapper.java`文件和`ExampleMapper.xml`文件，但只要在`ExampleMapper`类上标记`@AutoMapper`注解，AutoMapper就可以在编译期间帮助您生成相应符合规范的Mybatis SQL片段语句到相同包路径下的xml文件中（如果已经手动编写了相应方法定义的SQL，那么框架会跳过该方法的自动生成工作）。
+Gradle (Java):
 
-```java
-@AutoMapper
-public interface ExampleMapper {
-    
-    ExampleDO findById(long id);
-    
+```groovy
+dependencies {
+    compileOnly "fun.fengwk.auto-mapper:auto-mapper-processor:1.0.0"
+    annotationProcessor "fun.fengwk.auto-mapper:auto-mapper-processor:1.0.0"
 }
 ```
 
-例如定义了如上的`ExampleMapper`类，那么框架会自动生成如下的Mybatis SQL片段并插入与`ExampleMapper`类相同包路径下的名称为`ExampleMapper.xml`文件中，如果不存在`ExampleMapper.xml`文件那么AutoMapper将会自动生成一个。
+### 2.2 定义 DO
+
+```java
+public class UserDO {
+
+    @UseGeneratedKeys
+    private Long id;
+    private String name;
+    private Integer age;
+
+    // getter/setter
+}
+```
+
+### 2.3 定义 Mapper
+
+```java
+@AutoMapper
+public interface UserMapper {
+
+    int insert(UserDO userDO);
+
+    UserDO findById(long id);
+
+    List<UserDO> findByNameStartingWith(@Param("name") String name);
+
+    int updateByIdSelective(UserDO userDO);
+}
+```
+
+### 2.4 编译触发生成
+
+```bash
+env JAVA_HOME=$JAVA_HOME_8 mvn clean compile
+```
+
+### 2.5 选择方言（可选）
+
+如果不配置，`dbType` 默认是 `MYSQL`。
+
+```java
+@AutoMapper(dbType = DBType.SQLITE)
+public interface UserMapper {
+}
+```
+
+也可以在 `auto-mapper.config` 里全局设置：
+
+```properties
+fun.fengwk.automapper.annotation.AutoMapper.dbType=SQLITE
+```
+
+生成产物位于 `target/classes`（`CLASS_OUTPUT`），例如：
+
+`target/classes/your/package/UserMapper.xml`
+
+示例（节选）：
 
 ```xml
 <!--auto mapper generate-->
-<select id="findById" parameterType="long" resultType="fun.fengwk.automapper.example.model.ExampleDO">
-    select id, name, sort
-    from example
+<select id="findById" parameterType="long" resultType="your.package.UserDO">
+    select id, name, age
+    from user
     where id=#{id}
 </select>
 ```
 
-# 语法约定
+## 3. 方法命名语法
 
-为了实现SQL生成，必须遵循一定规则来定义Mapper接口的方法，如果您曾使用过JPA，那么这些规则会非常容易理解，因为这些规则几乎完全遵循了JPA的约定。
+### 3.1 动作词与别名
 
-下标站时刻展示了当前支持的所有模式（如果您了解状态机可以直接查看`doc/MapperMethodStateMachine.drawio`）：
+| 主动作 | 可用前缀 |
+| --- | --- |
+| 新增 | `insert` / `add` |
+| 删除 | `delete` / `remove` |
+| 更新 | `update` |
+| 查询 | `find` / `get` / `list` / `select` |
+| 计数 | `count` |
+| 分页 | `page` / `limit` |
 
-| 描述 | 模式                    | 约束                                                                                                                                                                                                                      |
-| ---- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 新增 | insert[Selective]       | 单个JavaBean入参                                                                                                                                                                                                          |
-|      | insertAll[Selective]    | 可迭代的JavaBean入参，如果在该场景下使用了Selective，则需要在jdbc参数中追加`allowMultiQueries=true`，并且UseGeneratedKeys会失效（确切的来说只会返回第一个SQL的自增键，这是由jdbc的特性决定的，详见JdbcGeneratedKeysTest）|
-| 删除 | deleteAll               | 无入参                                                                                                                                                                                                                    |
-|      | deleteBy...             | 多入参数时必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                                        |
-| 修改 | updateBy...[Selective] | 多入参数时必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                                        |
-| 查询 | findAll[OrderBy...]     | 无入参                                                                                                                                                                                                                    |
-|      | findBy...[OrderBy...]   | 多入参数时必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                                        |
-| 计数 | countAll                | 无入参                                                                                                                                                                                                                    |
-|      | countBy...              | 多入参数时必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                                        |
-| 分页 | pageAll[OrderBy...]     | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                   |
-|      | pageBy...[OrderBy...]   | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                   |
-|      | limitAll[OrderBy...]    | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                   |
-|      | limitBy...[OrderBy...]  | 入参必须拥有limit，可选offset，必须使用@Param注解绑定By后参数与入参关系                                                                                                                                                   |
+### 3.2 方法模式
 
-下表格展示了当前支持的所有关键字：
+| 分类 | 方法模式 | 说明 |
+| --- | --- | --- |
+| 新增 | `insert[All][Selective]` | 单对象或集合对象入参 |
+| 删除 | `deleteAll` / `deleteBy...` | `deleteAll` 无入参 |
+| 更新 | `updateBy...[Selective]` | 必须有 `By` 条件 |
+| 查询 | `findAll[OrderBy...]` / `findBy...[OrderBy...]` | 返回值需为 JavaBean 或其集合 |
+| 计数 | `countAll` / `countBy...` | 返回值必须为 `int/long/Integer/Long` |
+| 分页 | `pageAll[OrderBy...]` / `pageBy...[OrderBy...]` / `limitAll[OrderBy...]` / `limitBy...[OrderBy...]` | 必须有 `limit`，可选 `offset` |
 
-| 关键字             | 方法名                                 | SQL                                          |
-| ------------------ | -------------------------------------- | -------------------------------------------- |
-| And                | findByLastnameAndFirstname             | ... where x.lastname = ? and x.firstname = ? |
-| Or                 | findByLastnameOrFirstname              | ... where x.lastname = ? or x.firstname = ?  |
-| Is，Equals         | findById，findByIdIs，findByIdEquals   | ... where x.id = ?                           |
-| LessThan           | findByAgeLessThan                      | ... where x.age < ?                          |
-| LessThanEquals     | findByAgeLessThanEquals                | ... where x.age <= ?                         |
-| GreaterThan        | findByAgeGreaterThan                   | ... where x.age > ?                          |
-| GreaterThanEquals  | findByAgeGreaterThanEquals             | ... where x.age >= ?                         |
-| After              | findByIdAfter                          | ... where x.id > ?                           |
-| Before             | findByIdBefore                         | ... where x.id < ?                           |
-| IsNull             | findByNameIsNull                       | ... where x.name is null                     |
-| IsNotNull，NotNull | findByNameIsNotNull，findByNameNotNull | ... where x.name is not null                 |
-| Like               | findByNameLike                         | ... where x.name like ?                      |
-| NotLike            | findByNameNotLike                      | ... where x.name not like ?                  |
-| StartingWith       | findByNameStartingWith                 | ... where x.name not like '?%'               |
-| EndingWith         | findByNameEndingWith                   | ... where x.name not like '%?'               |
-| Containing         | findByNameContaining                   | ... where x.name not like '%?%'              |
-| OrderBy            | findByIdOrderByIdDesc                  | ... where x.id = 1 order by x.id desc        |
-| Not                | findByNameNot                          | ... where x.name != ?                        |
-| In                 | findByIdIn(Collection)                 | ... where x.id in (...)                      |
-| NotIn              | findByIdNotIn(Collection)              | ... where x.id not in (...)                  |
+### 3.3 条件关键字 (`By` 后)
 
-# 注解支持
+| 关键字 | 示例 | SQL 语义 |
+| --- | --- | --- |
+| `And` / `Or` | `findByAAndB` | 逻辑连接 |
+| `Is` / `Equals` | `findById` / `findByIdIs` | `=` |
+| `LessThan` / `LessThanEquals` | `findByAgeLessThan` | `<` / `<=` |
+| `GreaterThan` / `GreaterThanEquals` | `findByAgeGreaterThan` | `>` / `>=` |
+| `After` / `Before` | `findByIdAfter` | `>` / `<` |
+| `IsNull` / `IsNotNull` / `NotNull` | `findByNameIsNull` | `is null` / `is not null` |
+| `Like` / `NotLike` | `findByNameLike` | `like` / `not like` |
+| `StartingWith` / `EndingWith` / `Containing` | `findByNameStartingWith` | 前缀 / 后缀 / 包含匹配 |
+| `Not` | `findByNameNot` | `!=` |
+| `In` / `NotIn` | `findByIdIn` | `in (...)` / `not in (...)` |
 
-支持自定义字段名：可以在入参或字段上添加`@FieldName`注解支持自定义数据库字段名称。
+### 3.4 排序关键字 (`OrderBy` 后)
 
-支持useGeneratedKeys：可以在字段上添加`@UseGeneratedKeys`注解支持Mybatis的useGeneratedKeys功能。
+- `Asc`（默认，可省略）
+- `Desc`
+- 多字段排序使用 `And` 连接，例如：`findAllOrderBySortDescAndIdAsc`
 
-使用`@ExcludeField`可以忽略insert或update方法中的指定字段。
+### 3.5 参数绑定规则（很重要）
 
-使用`@IncludeField`可以只指定insert或update方法中的指定字段。
+- 多参数方法建议显式使用 `@Param`，避免参数名推断导致的映射错误。
+- 分页方法中参数名必须能解析出 `limit`，可选 `offset`。
+- `@DynamicOrderBy` 最多只允许一个参数。
+- `@IncludeField` 与 `@ExcludeField` 不能同时作用于同一个方法。
 
-使用`@Selective`可以指明where查询字段是否为可选的。
+## 4. 注解说明
 
-使用`@DynamicOrderBy`可以指明动态排序字段。
+| 注解 | 作用位置 | 作用 |
+| --- | --- | --- |
+| `@AutoMapper` | 接口 | 开启自动映射，可配置 dbType/命名风格/表名策略 |
+| `@FieldName` | 字段、参数、getter | 指定数据库字段名 |
+| `@UseGeneratedKeys` | 字段、getter | 标记自增主键（同时具备 `@Id` 语义） |
+| `@Id` | 字段、getter | 标记主键 |
+| `@Selective` | 字段、参数、方法 | 作为可选条件（null 时跳过） |
+| `@IncludeField` | 方法 | insert/update 仅包含指定字段 |
+| `@ExcludeField` | 字段、方法 | insert/update 排除指定字段 |
+| `@TypeHandler` | 字段、getter | 指定 MyBatis TypeHandler；查询时自动生成 resultMap |
+| `@DynamicOrderBy` | 参数 | 动态拼接 `order by ${...}` |
+| `@UpdateIncrement` | 字段、getter | 更新时生成 `field=field+N` |
+| `@OnDuplicateKeyUpdateIgnore` | 字段、getter | `insertOnDuplicateKeyUpdate` 时忽略该字段 |
+| `@MethodExpr` | 方法 | 自定义方法表达式，替代方法名参与解析 |
 
-# 全局配置
+## 5. 全局配置
 
-尽管我们可以在`@AutoMapper`注解中修改当前类的配置，但如果需要进行全局配置，可以在resource根目录下定义`auto-mapper.config`文件作为全局配置，优先级为：用户明确指定的注解配置 > 全局配置 > 默认配置。
+在 `src/main/resources/auto-mapper.config` 中配置全局默认值：
 
 ```properties
 fun.fengwk.automapper.annotation.AutoMapper.dbType=MYSQL
 fun.fengwk.automapper.annotation.AutoMapper.mapperSuffix=Mapper
 fun.fengwk.automapper.annotation.AutoMapper.tableNamingStyle=LOWER_UNDER_SCORE_CASE
 fun.fengwk.automapper.annotation.AutoMapper.fieldNamingStyle=LOWER_UNDER_SCORE_CASE
-fun.fengwk.automapper.annotation.AutoMapper.tableNamePrefix=test_
-fun.fengwk.automapper.annotation.AutoMapper.tableNameSuffix=_test
+fun.fengwk.automapper.annotation.AutoMapper.tableNamePrefix=
+fun.fengwk.automapper.annotation.AutoMapper.tableNameSuffix=
 ```
 
-# 编译信息
+优先级：
 
-AutoMapper在编译期会打印这以下几种常见信息：
+`注解显式配置 > auto-mapper.config > 注解默认值`
 
-- 映射完成写入目标xml文件。
-- 用户已经编写过要映射的方法的sql片段，AutoMapper将跳过这一方法的处理。
-- 用户没有编写过要映射的方法并且自动映射失败，此时会报告错误并中断编译，此时用户需要确认是否需要使用AutoMapper映射此方法，如果需要则需修正方法语法，否则可以自行在xml文件中定义相应方法对应的sql片段。
+## 6. 方言支持与差异
 
-# MySQL特性
+### 6.1 支持的方言
 
-当在`@AutoMapper`注解或全局配置中指定了dbType为MYSQL时可以使用一些特有的语法：
+| dbType | 支持状态 | 说明 |
+| --- | --- | --- |
+| `MYSQL` | 已支持 | 默认值，支持 MySQL 派生方法语法 |
+| `POSTGRESQL` | 已支持 | 针对 PG 覆盖了 like 关键字与 `insertAllSelective` |
+| `SQLITE` | 已支持 | 针对 SQLite 覆盖了 like 关键字与 `insertAllSelective` |
+| `SQL92` | 已支持 | 通用实现，适配标准 SQL 场景 |
 
-- 使用`insertIgnore`代替`insert`可使用`insert ignore into`语法。
-- 使用`replace`代替`insert`可使用`replace into`语法。
-- 使用`insertOnDuplicateKeyUpdate`可使用`insert into ... on duplicate key update ...`语法。
-- 使用`findLockInShareMode`代替`find`可使用`select ... lock in share mode`语法。
-- 使用`findForUpdate`代替`find`可使用`select ... for update`语法。
-- 对于like语句，将使用concat拼接防止SQL注入。
-- 使用`@MethodExpr`替代方法名表达式可以有效地避免冗长的方法名称。
+### 6.2 关键差异
 
-# 应用示例
+| 能力点 | MYSQL | POSTGRESQL | SQLITE | SQL92 |
+| --- | --- | --- | --- | --- |
+| 标识符引用符 | `` `name` `` | `"name"` | `"name"` | `"name"` |
+| `StartingWith/EndingWith/Containing` | `concat(...)` + `#{}` | `||` + `#{}` | `||` + `#{}` | `${}` 模板拼接 |
+| 分页语法 | `limit #{limit} offset #{offset}` | `limit #{limit} offset #{offset}` | `limit #{limit} offset #{offset}` | `limit #{limit} offset #{offset}` |
+| `insertAllSelective` | `foreach` 多语句（`;` 分隔） | 单条 `insert ... values (...), (...)`，空值用 `default` | 单条 `insert ... values (...), (...)`，空值用 `default` | `foreach` 多语句（`;` 分隔） |
+| MySQL 派生前缀（`insertIgnore` / `replace` / `insertOnDuplicateKeyUpdate` / `findLockInShareMode` / `findForUpdate`） | 支持 | 不支持 | 不支持 | 不支持 |
 
-下面将会展示一些具体的示例（这些示例均来自于example模块，可以结合具体代码理解）帮助您了解如何使用规则定义接口方法。
+### 6.3 选型建议
 
-## 示例一
+- MySQL 业务优先用 `MYSQL`，可使用方言扩展能力。
+- PostgreSQL 业务优先用 `POSTGRESQL`。
+- SQLite 业务优先用 `SQLITE`。
+- 只有在你明确需要“最通用”的输出时，再考虑 `SQL92`。
 
-方法
+## 7. MySQL 扩展
 
-```java
-int insert(ExampleDO exampleDO);
+当 `dbType=MYSQL` 时可使用以下派生语法：
+
+- `insertIgnore...` -> `insert ignore into`
+- `replace...` -> `replace into`
+- `insertOnDuplicateKeyUpdate...` -> `insert ... on duplicate key update ...`
+- `findLockInShareMode...` -> `select ... lock in share mode`
+- `findForUpdate...` -> `select ... for update`
+
+另外：
+
+- MySQL 下 `StartingWith/EndingWith/Containing` 会使用 `concat(...)` 拼接。
+- SQL92 下这些关键字使用字符串模板拼接（`${...}`），请谨慎处理入参，避免注入风险。
+- 分页语法已统一为 `limit #{limit} offset #{offset}`（有 offset 时）与 `limit #{limit}`（无 offset 时），MySQL、PostgreSQL、SQLite 共用同一套分页生成逻辑。
+
+## 8. 与手写 XML 共存
+
+推荐做法：
+
+1. 在 `resources` 下预先创建 Mapper XML 外壳（包含正确 `namespace`）。
+2. 编译时 AutoMapper 会在该 XML 中追加 `<!--auto mapper generate-->` 片段。
+3. 如果某个 `id` 已存在手写 SQL，自动生成会跳过该方法。
+
+这允许你：
+
+- 关键 SQL 手写优化。
+- 常规 CRUD 自动生成。
+
+## 9. Example 模块运行
+
+### 9.1 初始化数据库
+
+执行 `example/src/main/resources/init.sql`。
+
+### 9.2 修改连接配置
+
+编辑 `example/src/main/resources/application.yml`（默认是本地 MySQL `test` 库）。
+
+### 9.3 启动
+
+```bash
+env JAVA_HOME=$JAVA_HOME_8 mvn -pl example -am clean package -DskipTests
+env JAVA_HOME=$JAVA_HOME_8 mvn -pl example spring-boot:run
 ```
 
-SQL片段
+### 9.4 体验接口
 
-```xml
-<!--auto mapper generate-->
-<insert id="insert" keyProperty="id" parameterType="fun.fengwk.automapper.example.model.ExampleDO" useGeneratedKeys="true">
-    insert into example (name, sort) values
-    (#{name}, #{sort})
-</insert>
+```bash
+curl "http://localhost:8080/insert?name=NewExample&sort=10"
+curl "http://localhost:8080/findById?id=1"
+curl "http://localhost:8080/pageAll?offset=0&limit=3"
 ```
 
-说明
+## 10. 常见问题与排查
 
-其中name和sort是通过读取ExampleDO中字段获取的，并且Java字段名称会通过@AutoMapper中定义中fieldNamingStyle转换为相应的数据库字段格式，如果没有办法通过常规的规则转换，也可以通过@FieldName注解直接指定数据库字段名称，如果使用了自增主键，使用@UseGeneratedKeys注解可以对相应字段开启Mybatis的useGeneratedKeys属性并且在insert语句中忽略该字段的插入。
+### Q1: 为什么没有生成 XML？
 
-## 示例二
+- 检查是否引入 `auto-mapper-processor`。
+- 检查编译是否真的执行（IDE 需要开启 annotation processing）。
+- 检查 Mapper 是否是接口且带 `@AutoMapper`。
 
-方法
+### Q2: 报错 `Can not found name entry ...`？
 
-```java
-int deleteById(long id);
-```
+- 多参数场景请为条件参数加 `@Param("...")`，并确保命名与表达式一致。
 
-SQL片段
+### Q3: 分页方法报 `should have limit params`？
 
-```xml
-<!--auto mapper generate-->
-<delete id="deleteById" parameterType="long">
-    delete from example
-    where id=#{id}
-</delete>
-```
+- 参数中必须有 `limit`（可再加 `offset`），类型需为 `int/long/Integer/Long`。
 
-说明
+### Q4: `insertAllSelective` 为什么自增主键只返回一个？
 
-AutoMapper根据By后条件生成where语句，因为只有一个参数不必添加`@Param`注解来说明参数名称。
+- 在 `MYSQL/SQL92` 的 `insertAllSelective`（多语句）场景中，通常只能拿到第一条自增键，这是 JDBC `getGeneratedKeys` 的常见限制。
 
-## 示例三
+### Q5: SQLite 应该用哪个 dbType？
 
-方法
+- 请显式使用 `dbType=SQLITE`，不要依赖 `SQL92` 兜底。
 
-```java
-int updateById(ExampleDO exampleDO);
-```
+### Q6: PostgreSQL / SQLite 的 `insertAllSelective` 有什么不同？
 
-SQL片段
+- 两者都会生成单条 `insert ... values (...), (...)`，并在字段值为空时使用 `default`，比多语句模式更稳定。
 
-```xml
-<!--auto mapper generate-->
-<update id="updateById" parameterType="fun.fengwk.automapper.example.model.ExampleDO">
-    update example set id=#{id}, name=#{name}, sort=#{sort}
-    where id=#{id}
-</update>
-```
+### Q7: 动态排序有风险吗？
 
-说明
+- `@DynamicOrderBy` 使用 `${}` 直接拼接，请务必在业务层做白名单校验。
 
-AutoMapper通过读取入参ExampleDO类的字段生成set语句，并且根据By后条件生成where语句。
+---
 
-## 示例四
+如果你只想快速落地，建议直接参考 `example` 模块中的这几个文件：
 
-方法
-
-```java
-ExampleDO findById(long id);
-```
-
-SQL片段
-
-```xml
-<!--auto mapper generate-->
-<select id="findById" parameterType="long" resultType="fun.fengwk.automapper.example.model.ExampleDO">
-    select id, name, sort
-    from example
-    where id=#{id}
-</select>
-```
-
-说明
-
-AutoMapper通过读取返回值ExampleDO类中的字段生成select语句，并且根据By后条件生成where语句，因为只有一个参数不必添加`@Param`注解来说明参数名称。
-
-## 示例五
-
-方法
-
-```java
-List<ExampleDO> findByNameStartingWith(String name);
-```
-
-SQL片段
-
-```xml
-<!--auto mapper generate-->
-<select id="findByNameStartingWith" parameterType="java.lang.String" resultType="fun.fengwk.automapper.example.model.ExampleDO">
-    select id, name, sort
-    from example
-    where name like concat(#{name}, '%')
-</select>
-```
-
-说明
-
-AutoMapper通过读取返回值泛型ExampleDO类中的字段生成select语句，根据By后条件生成where语句，因为只有一个参数不必添加`@Param`注解来说明参数名称。
-
-## 示例六
-
-方法
-
-```java
-List<ExampleDO> findByNameStartingWithAndSortGreaterThanEqualsOrderBySortDesc(@Param("name") String name, @Param("sort") int sort);
-```
-
-SQL片段
-
-```xml
-<!--auto mapper generate-->
-<select id="findByNameStartingWithAndSortGreaterThanEqualsOrderBySortDesc" resultType="fun.fengwk.automapper.example.model.ExampleDO">
-    select id, name, sort
-    from example
-    where name like concat(#{name}, '%')
-    and sort&gt;=#{sort}
-    order by sort desc
-</select>
-```
-
-说明
-
-AutoMapper通过读取返回值泛型ExampleDO类中的字段生成select语句，根据By后条件生成where语句，因为只有多个参数必须添加`@Param`注解来说明参数名称。
-
-## 示例七
-
-方法
-
-```java
-List<E> pageAll(@Param("offset") int offset, @Param("limit") int limit);
-```
-
-SQL片段
-
-```xml
-<!--auto mapper generate-->
-<select id="pageAll" resultType="fun.fengwk.automapper.example.model.ExampleDO">
-    select id, name, sort
-    from example
-    limit #{offset},#{limit}
-</select>
-```
-
-说明
-
-AutoMapper解析父类泛型E得到ExampleDO，继而读取ExampleDO字段生成select语句，由于是page方法，必须添加offset和limit参数。
-
-## 示例八
-
-方法
-
-```java
-@ExcludeField("name")
-int insert(ExampleDO exampleDO);
-```
-
-SQL片段
-
-```xml
-<!--auto mapper generate-->
-<insert id="insert" keyProperty="id" parameterType="fun.fengwk.automapper.example.model.ExampleDO" useGeneratedKeys="true">
-    insert into example (sort) values
-    (#{sort})
-</insert>
-```
-
-说明
-
-使用`@ExcludeField`注解可以去除insert和update语句中不需要的字段。
-
-## 示例九
-
-方法
-
-```java
-@IncludeField("name")
-int insert(ExampleDO exampleDO);
-```
-
-SQL片段
-
-```xml
-<!--auto mapper generate-->
-<insert id="insert" keyProperty="id" parameterType="fun.fengwk.automapper.example.model.ExampleDO" useGeneratedKeys="true">
-    insert into example (name) values
-    (#{name})
-</insert>
-```
-
-说明
-
-使用`@IncludeField`注解可以在insert和update语句中仅引入需要的字段。
-
-## 示例十
-
-方法
-
-```java
-List<ExampleDO> findByIdInAndIsDeleted(@Param("id") Collection<Long> ids, @Param("isDeleted") int isDeleted);
-```
-
-SQL片段
-
-```xml
-<!--auto mapper generate-->
-<select id="findByIdInAndIsDeleted" resultType="fun.fengwk.automapper.example.model.ExampleDO">
-    select id, name, sort, f1, f2, is_deleted as isDeleted
-    from example
-    where id in
-    <foreach close=")" collection="id" item="item" open="(" separator=",">
-        #{item}
-    </foreach>
-    and is_deleted=#{isDeleted}
-</select>
-```
-
-说明
-
-注意在当前版本中@Param的value值要与对象字段和接口定义表达式中的值（这里是id）保持一致。
-
-# 原理
-
-AutoMapper基于JSR 269 Annotation Processing API实现，Annotation Processing API是Javac程序的一个SPI扩展点，通过编译期读取原文件信息自动生成相应代码片段，类似原理实现的框架有Lombok、Google auto......
+- `example/src/main/java/fun/fengwk/automapper/example/mapper/ExampleMapper.java`
+- `example/src/main/java/fun/fengwk/automapper/example/model/ExampleDO.java`
+- `example/src/main/resources/fun/fengwk/automapper/example/mapper/ExampleMapper.xml`
